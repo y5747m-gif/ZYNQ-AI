@@ -157,20 +157,19 @@ section('14) زر الترجمة — زر واحد يحوّل زيتونة إل�
   'الاختيار يكون من قائمة اللغات، ثم: تحقق من البنية بمدقّق اللغة الحقيقي، وتشغيل المخرج،',
   'ومقارنة النتيجة بمخرج جافاسكربت. وإن غاب المدقّق عن الجهاز نقولها صريحة ولا نعلن نجاحًا.',
   '',
-  '**`zaytuna ترجم examples/حاسبة.zy --إلى بايثون --out /tmp/حاسبة.py`**',
+  '**`zaytuna ترجم examples/حاسبة.zy --إلى بايثون --out /tmp/zaytuna-tour.py`**',
 ]);
 code(Z(['ترجم', 'examples/حاسبة.zy', '--إلى', 'بايثون', '--out', '/tmp/zaytuna-tour.py']).out);
 push('```text', '$ head -3 /tmp/zaytuna-tour.py', '```');
 code(run('head', ['-3', '/tmp/zaytuna-tour.py']).out);
 push('```text', '$ python3 /tmp/zaytuna-tour.py   # تنفيذ المخرج فعلًا', '```');
 code(run('python3', ['/tmp/zaytuna-tour.py']).out);
-push('', '**وإلى سي++ كذلك** — والتحقق هنا بمترجم g++ الحقيقي:', '', '**`zaytuna ترجم examples/مرحبا.zy --إلى سي++ --out /tmp/حاسبة.cpp`**');
+push('', '**وإلى سي++ كذلك** — والتحقق هنا بمترجم g++ الحقيقي:', '', '**`zaytuna ترجم examples/مرحبا.zy --إلى سي++ --out /tmp/zaytuna-tour.cpp`**');
 code(Z(['ترجم', 'examples/مرحبا.zy', '--إلى', 'سي++', '--out', '/tmp/zaytuna-tour.cpp']).out);
 push('```text', '$ g++ -std=c++17 -fsyntax-only /tmp/zaytuna-tour.cpp', '```');
 code(run('bash', ['-c', 'g++ -std=c++17 -fsyntax-only /tmp/zaytuna-tour.cpp && echo "سليم ✔ (لا أخطاء بنية)"']).out);
-push('', '**قائمة اللغات كما تعرضها الأداة نفسها:**', '```text');
+push('', '**قائمة اللغات كما تعرضها الأداة نفسها:**');
 code(Z(['ترجم', '--لغات']).out);
-push('```');
 
 // ------------------------------------------------------------- 5) الاختبارات
 section('15) الاختبارات الذاتية', ['```text']);
