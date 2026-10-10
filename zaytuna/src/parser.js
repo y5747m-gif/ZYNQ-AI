@@ -89,6 +89,7 @@ class Parser {
         case 'إذا': return this.parseIf();
         case 'طالما': return this.parseWhile();
         case 'كرر': return this.parseFor();
+        case 'اختر': return this.parseSwitch();
         case 'لكل': return this.parseForOf();
         case 'أرجع': {
           this.next();
@@ -123,6 +124,43 @@ class Parser {
     }
     this.endStatement();
     return { type: 'ExprStmt', expr, line: t.line };
+  }
+
+  /**
+   * اختر (تعبير) {
+   *   حالة 1: …
+   *   حالة 2: …
+   *   غير_ذلك: …
+   * }
+   */
+  parseSwitch() {
+    const t = this.next(); // اختر
+    const open = this.expectPunc('(', 'شرط الاختيار');
+    const discriminant = this.parseExpr();
+    this.expectPunc(')', 'إغلاق شرط الاختيار');
+    this.expectPunc('{', 'بداية كتلة الاختيار');
+    const cases = [];
+    while (!this.eof() && !this.isPunc('}')) {
+      let test = null;
+      let caseLine = this.tok().line;
+      if (this.isKw('حالة')) {
+        caseLine = this.next().line;
+        test = this.parseExpr();
+      } else if (this.isKw('غير_ذلك')) {
+        this.next();
+      } else {
+        this.fail('Z024', `متوقّع «حالة» أو «غير_ذلك» داخل «اختر»، لكن وجدنا «${this.tok().raw ?? this.tok().value}».`, this.tok(),
+          { suggestion: 'اكتب «حالة قيمة:» أو «غير_ذلك:»' });
+      }
+      this.expectPunc(':', 'بعد «حالة قيمة» أو «غير_ذلك»');
+      const body = [];
+      while (!this.eof() && !this.isPunc('}') && !this.isKw('حالة') && !this.isKw('غير_ذلك')) {
+        body.push(this.parseStatement());
+      }
+      cases.push({ test, body, line: caseLine });
+    }
+    this.expectPunc('}', 'إغلاق كتلة الاختيار');
+    return { type: 'SwitchStmt', discriminant, cases, line: t.line };
   }
 
   parseBlock() {
@@ -166,7 +204,15 @@ class Parser {
     this.expectPunc('(', 'قائمة معاملات');
     const params = [];
     while (!this.eof() && !this.isPunc(')')) {
-      params.push(this.expectId('اسم معامل'));
+      const rest = this.isKw('انشر');
+      if (rest) this.next();
+      const name = this.expectId('اسم معامل');
+      if (rest) {
+        if (params.length) this.fail('Z025', '«انشر» (المعامل الباقي) يجب أن يكون آخر المعاملات.', this.tok());
+        params.push('...' + name);
+        break;
+      }
+      params.push(name);
       if (this.isPunc(',')) this.next();
       else break;
     }
@@ -438,6 +484,7 @@ class Parser {
   parseUnary() {
     const t = this.tok();
     if (this.isKw('ليس')) { this.next(); return { type: 'Unary', op: '!', arg: this.parseUnary(), prefix: true, line: t.line }; }
+    if (this.isKw('احذف')) { this.next(); return { type: 'Unary', op: 'delete', arg: this.parseUnary(), prefix: true, line: t.line }; }
     if (this.isKw('نوع')) { this.next(); return { type: 'Unary', op: 'typeof', arg: this.parseUnary(), prefix: true, line: t.line }; }
     if (this.isKw('انتظر')) { this.next(); return { type: 'Await', arg: this.parseUnary(), line: t.line }; }
     if (this.isOp('!')) { this.next(); return { type: 'Unary', op: '!', arg: this.parseUnary(), prefix: true, line: t.line }; }
@@ -481,11 +528,20 @@ class Parser {
     return expr;
   }
 
+  /** عنصر قد يكون «انشر تعبير» (بسط/تجميع) */
+  parseElement() {
+    if (this.isKw('انشر')) {
+      const t = this.next();
+      return { type: 'Spread', arg: this.parseExpr(), line: t.line };
+    }
+    return this.parseExpr();
+  }
+
   parseArgs() {
     this.expectPunc('(', 'قائمة الوسائط');
     const args = [];
     while (!this.eof() && !this.isPunc(')')) {
-      args.push(this.parseExpr());
+      args.push(this.parseElement());
       if (this.isPunc(',')) this.next();
       else break;
     }
@@ -523,6 +579,7 @@ class Parser {
         case 'عدم': this.next(); return { type: 'NullLit', line: t.line };
         case 'لاشيء': this.next(); return { type: 'UndefinedLit', line: t.line };
         case 'هذا': this.next(); return { type: 'ThisLit', line: t.line };
+        case 'الأصل': this.next(); return { type: 'Super', line: t.line };
         case 'جديد': {
           this.next();
           const callee = this.parsePostfix();
@@ -582,7 +639,7 @@ class Parser {
       this.next();
       const elements = [];
       while (!this.eof() && !this.isPunc(']')) {
-        elements.push(this.parseExpr());
+        elements.push(this.parseElement());
         if (this.isPunc(',')) this.next();
         else break;
       }
@@ -594,6 +651,12 @@ class Parser {
       this.next();
       const properties = [];
       while (!this.eof() && !this.isPunc('}')) {
+        if (this.isKw('انشر')) {
+          const sp = this.next();
+          properties.push({ spread: true, value: this.parseExpr(), line: sp.line });
+          if (this.isPunc(',')) this.next();
+          continue;
+        }
         const keyTok = this.tok();
         let key, computed = false;
         if (keyTok.type === 'id' || keyTok.type === 'kw') { key = keyTok.value || keyTok.ar; this.next(); }

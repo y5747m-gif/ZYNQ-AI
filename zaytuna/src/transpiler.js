@@ -84,6 +84,7 @@ class Transpiler {
       case 'WhileStmt': return this.emitWhile(node);
       case 'ForStmt': return this.emitFor(node);
       case 'ForOfStmt': return this.emitForOf(node);
+      case 'SwitchStmt': return this.emitSwitch(node);
       case 'ReturnStmt':
         return this.em.push(`return${node.argument ? ' ' + this.expr(node.argument) : ''};`, node.line);
       case 'BreakStmt': return this.em.push('break;', node.line);
@@ -159,6 +160,23 @@ class Transpiler {
       this.em.push('} else {', cur.line);
       this.emitBody(cur.alternate.body);
     }
+    this.em.push('}', node.line);
+  }
+
+  /** اختر/حالة → switch/case (كل حالة داخل كتلة {} لتفادي تسرّب النطاق) */
+  emitSwitch(node) {
+    this.em.push(`switch (${this.expr(node.discriminant)}) {`, node.line);
+    this.em.indent++;
+    for (const c of node.cases) {
+      this.em.flushComments(c.line, this.ast.comments);
+      this.em.push(c.test === null ? 'default:' : `case ${this.expr(c.test)}:`, c.line);
+      this.em.indent++;
+      this.em.push('{', c.line);
+      this.emitBody(c.body);
+      this.em.push('}', c.line);
+      this.em.indent--;
+    }
+    this.em.indent--;
     this.em.push('}', node.line);
   }
 
@@ -243,7 +261,7 @@ class Transpiler {
       case 'New': return `new ${this.expr(node.callee, 99)}(${node.args.map((a) => this.expr(a)).join(', ')})`;
       case 'ArrayLit': return `[${node.elements.map((e) => this.expr(e)).join(', ')}]`;
       case 'ObjectLit':
-        return `{ ${node.properties.map((p) => (p.shorthand ? p.key : `${p.computed ? `[${this.expr(p.key)}]` : /^[A-Za-z_$][\w$]*$/.test(p.key) ? p.key : JSON.stringify(p.key)}: ${this.expr(p.value)}`)).join(', ')} }`;
+        return `{ ${node.properties.map((p) => p.spread ? `...${this.expr(p.value)}` : (p.shorthand ? p.key : `${p.computed ? `[${this.expr(p.key)}]` : /^[A-Za-z_$][\w$]*$/.test(p.key) ? p.key : JSON.stringify(p.key)}: ${this.expr(p.value)}`)).join(', ')} }`;
       case 'Arrow': {
         const body = node.expression ? this.expr(node.body) : `{ ${this.emitArrowBlock(node.body.body)} }`;
         return `(${node.params.join(', ')}) => ${body}`;
@@ -255,8 +273,11 @@ class Transpiler {
       case 'Await': return `await ${this.expr(node.arg, 8)}`;
       case 'Unary': {
         if (node.op === 'typeof') return `typeof ${this.expr(node.arg, 8)}`;
+        if (node.op === 'delete') return `delete ${this.expr(node.arg, 8)}`;
         return `${node.op}${this.expr(node.arg, 8)}`;
       }
+      case 'Spread': return `...${this.expr(node.arg, 8)}`;
+      case 'Super': return 'super';
       case 'Update': return node.prefix ? `${node.op}${this.expr(node.arg, 99)}` : `${this.expr(node.arg, 99)}${node.op}`;
       case 'Assign': return `${this.expr(node.target, 8)} ${node.op} ${this.expr(node.value, 8, true)}`;
       case 'Conditional': {

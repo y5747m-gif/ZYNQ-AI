@@ -8,17 +8,21 @@
 // ==========================================================================
 
 const { digitValue, isIdStart, isIdPart, RANGES, inRanges } = require('./lexer');
+const { familyOf } = require('./languages');
 
+// عائلات «سطح» الكود: التعليقات وعلامات التنصيص لكل مجموعة لغات
 const FAMILY = {
   js: { line: ['//', '#'], block: [['/*', '*/']], quotes: ["'", '"', '`', '«'], triple: false },
-  ts: { line: ['//', '#'], block: [['/*', '*/']], quotes: ["'", '"', '`', '«'], triple: false },
   zy: { line: ['//', '#'], block: [['/*', '*/']], quotes: ["'", '"', '`', '«'], triple: false },
   py: { line: ['#'], block: [], quotes: ["'", '"'], triple: true },
+  clike: { line: ['//'], block: [['/*', '*/']], quotes: ["'", '"', '`', '«'], triple: false },
+  php: { line: ['//', '#'], block: [['/*', '*/']], quotes: ["'", '"', '«'], triple: false },
+  hash: { line: ['#'], block: [], quotes: ["'", '"', '`', '«'], triple: false },
 };
 
 /** يقسّم النص إلى: كود مكشوف (masked) + فترات النصوص والتعليقات */
 function maskCode(text, lang) {
-  const fam = FAMILY[lang] || FAMILY.js;
+  const fam = FAMILY[familyOf(lang)] || FAMILY.js;
   const out = Array.from(text);
   const strings = [];
   const comments = [];
@@ -192,7 +196,7 @@ function scanText(text, opts = {}) {
     } else {
       const ascii = [...dm[0]].map((ch) => digitValue(ch)).join('');
       add('error', 'Z211',
-        `عدد مكتوب بأرقام عربية/هندية «${dm[0]}» — لا تقبله لا جافاسكربت ولا بايثون في الأعداد.`,
+        `عدد مكتوب بأرقام عربية/هندية «${dm[0]}» — لغات البرمجة لا تقبلها في الأعداد (خطأ حقيقي عند المترجم).`,
         s, dm[0].length,
         { suggestion: `استبدله بـ «${ascii}»`, fix: { start: s, end: e, replacement: ascii }, ascii });
       if (after && isIdStart(after)) {

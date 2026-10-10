@@ -83,10 +83,10 @@
       <b>ولا يُكتب أي إصلاح قبل اجتيازه مدقّق اللغة الحقيقي.</b>
     </p>
     <div class="chips">
-      <span class="chip"><b>44</b> اختبارًا ناجحًا فعلًا</span>
-      <span class="chip"><b>34</b> كلمة مفتاحية عربية</span>
+      <span class="chip"><b>55</b> اختبارًا ناجحًا فعلًا</span>
+      <span class="chip"><b>40</b> كلمة مفتاحية عربية</span>
       <span class="chip"><b>15</b> رمز تشخيص أمني وترقيمي</span>
-      <span class="chip"><b>3</b> لغات مُتحقَّق منها اليوم</span>
+      <span class="chip"><b>7</b> لغات مُتحقَّق منها اليوم</span>
       <span class="chip">النموذج يعمل: <span class="mono">bash demo/tour.sh</span></span>
     </div>
   </header>
@@ -123,7 +123,7 @@
       <div class="card" style="border-color:#2f6b4a">
         <h3>② المصحّح التلقائي</h3>
         <p>ثلاثة مستويات: حتمي (حروف مخفية وأرقام وترقيم) ← قواعد لغوية (إعادة تسمية متسقة) ← نموذج لغوي بحلقة تحقق. يعمل على <b>ملفاتك أنت</b> في جافاسكربت وبايثون، لا على لصق في متصفح.</p>
-        <p style="margin-top:8px"><span class="pill ok">إصلاح + تحقق إلزامي</span> <span class="pill ok">نسخة احتياطية</span></p>
+        <p style="margin-top:8px"><span class="pill ok">إصلاح + تحقق إلزامي</span> <span class="pill ok">نسخة احتياطية</span> <span class="pill ok">17 لغة</span></p>
       </div>
       <div class="card" style="border-color:#2f6b4a">
         <h3>③ حارس اليونيكود</h3>
@@ -198,7 +198,8 @@ let قيمه_total = 1;  <span class="cm">// تحذير: خلط لغات — ق�
     <div class="grid g3" style="margin-top:16px">
       <div class="card"><h3>مستوى 0 — حتمي</h3><p>حروف مخفية · أرقام عربية في الأعداد · <span class="mono">، ؛ ٫ ٬</span> · <span class="mono">؟</span> في الشرط الثلاثي · تطويل. يُطبَّق بلا سؤال بعد التحقق.</p></div>
       <div class="card"><h3>مستوى 1 — قواعد لغوية</h3><p>إعادة تسمية <b>متسقة</b>: <span class="mono">متغير١</span> ← <span class="mono">متغير1</span> في كل مواضعها في الملف.</p></div>
-      <div class="card"><h3>مستوى 2 — نموذج لغوي</h3><p>للأخطاء المنطقية. بحلقة تحقق: إن فشل الإصلاح لا يُكتب شيء ويُقال ذلك صراحةً. مفتاحك يبقى عندك.</p></div>
+      <div class="card"><h3>مستوى 2 — نموذج لغوي</h3><p>للأخطاء المنطقية. بحلقة تحقق: إن فشل الإصلاح لا يُكتب شيء ويُقال ذلك صراحةً. مفتاحك يبقى عندك — ولا يُقبل إصلاحه أصلًا إن لم يوجد مدقّق يتحقق منه.</p></div>
+      <div class="card" style="border-color:#2f6b4a"><h3>لغة موسّعة (جديد)</h3><p><span class="mono">اختر/حالة/غير_ذلك</span> (switch) · <span class="mono">انشر</span> (بسط/تجميع) · دوال سهمية <span class="mono">(س) ⟶ س * 2</span> · <span class="mono">الأصل</span> (super) · <span class="mono">احذف</span> (delete) · 4 أدوات نصية عربية جديدة.</p></div>
     </div>
   </section>
 
@@ -251,12 +252,12 @@ if (access_level != "user‮  ‮// Check if admin") { … }
       <div class="card">
         <h3>اليوم (مُتحقَّق منه)</h3>
         <div style="display:grid;gap:9px">
-          <div class="lang"><span>جافاسكربت / نود</span><span><span class="pill ok">فحص node --check</span> <span class="pill ok">إصلاح 0 و1</span></span></div>
-          <div class="lang"><span>بايثون</span><span><span class="pill ok">فحص py_compile</span> <span class="pill ok">إصلاح 0</span></span></div>
-          <div class="lang"><span>زيتونة (عربية)</span><span><span class="pill ok">مترجم داخلي</span></span></div>
-          <div class="lang"><span>تايبسكربت</span><span><span class="pill part">فحوص يونيكود + تصريح صريح بغياب tsc</span></span></div>
+          <div class="lang"><span>جافاسكربت · بايثون · زيتونة</span><span><span class="pill ok">مُتحقَّق: node --check · py_compile · مترجم زيتونة</span></span></div>
+          <div class="lang"><span>سي · سي++ · شل · بيرل</span><span><span class="pill ok">مُتحقَّق: gcc/g++ -fsyntax-only · bash -n · perl -c</span></span></div>
+          <div class="lang"><span>تايبسكربت · جافا · جو · رست · بي إتش بي · روبي · سويفت · كوتلن</span><span><span class="pill part">المدقّق معرّف ومربوط — ينتظر تثبيت الأداة (ونذكر أمر التثبيت)</span></span></div>
+          <div class="lang"><span>سي شارب · SQL</span><span><span class="pill part">لا تحقق كامل (يحتاج مشروعًا / لا نُشغّل SQL) — نقولها صريحة</span></span></div>
         </div>
-        <p class="note">القاعدة: <b>لا ندّعي دعم لغة لا نتحقق منها.</b> لو لم يوجد مدقّق نقول ذلك بدل تمرير «نجاح» كاذب.</p>
+        <p class="note">القاعدة: <b>لا ندّعي دعم لغة لا نتحقق منها ولن نكتب إصلاحًا بلا تحقق.</b> لو لم يوجد مدقّق مثبّت نقول ذلك ونرفض <span class="mono">--write</span> (إلا بـ <span class="mono">--no-verify</span> الصريحة).</p>
       </div>
       <div class="card">
         <h3>خارطة التوسّع (مدقّق واحد كل مرحلة)</h3>
@@ -269,10 +270,10 @@ if (access_level != "user‮  ‮// Check if admin") { … }
   <section>
     <h2><span class="num">08</span>أرقام النموذج الحالي (لا وعود)</h2>
     <div class="grid g4">
-      <div class="stat"><div class="big">44/44</div><div class="lb">اختبارًا ناجحًا (لغة · تشخيص · أمان · إصلاح · مدقّقون · CLI)</div></div>
+      <div class="stat"><div class="big">55/55</div><div class="lb">اختبارًا ناجحًا (لغة · تشخيص · أمان · إصلاح · مدقّقون · CLI)</div></div>
       <div class="stat"><div class="big">0</div><div class="lb">إصلاح يُكتب بدون اجتياز مدقّق اللغة — مفروض برمجيًا</div></div>
-      <div class="stat"><div class="big">2</div><div class="lb">لغتان حقيقيّتان (JS/Python) + زيتونة، مع ترجمة رسائل المترجم</div></div>
-      <div class="stat"><div class="big">34</div><div class="lb">كلمة مفتاحية عربية + 10 دوال مدمجة عربية</div></div>
+      <div class="stat"><div class="big">7</div><div class="lb">لغات مُتحقَّق منها محليًا (JS · Python · زيتونة · C · C++ · Shell · Perl) من 17 لغة مدعومة</div></div>
+      <div class="stat"><div class="big">40</div><div class="lb">كلمة مفتاحية عربية + 14 دالة مدمجة عربية</div></div>
     </div>
   </section>
 
@@ -319,8 +320,9 @@ if (access_level != "user‮  ‮// Check if admin") { … }
 <span class="kw">node</span> bin/zaytuna.js إصلاح examples/كود_به_أخطاء.js --tier 1 --write
 
 <span class="cm"># شغّل 44 اختبارًا / جولة العرض الكاملة</span>
-<span class="kw">node</span> tests/run.js
-<span class="kw">bash</span> demo/tour.sh</pre>
+<span class="kw">node</span> tests/run.js        <span class="cm"># 55 اختبارًا</span>
+<span class="kw">bash</span> demo/tour.sh        <span class="cm"># 10 خطوات: زيتونة + جافاسكربت + سي + شل</span>
+<span class="kw">node</span> demo/make-transcript.js  <span class="cm"># سجلّ المخرجات الحقيقية</span></pre>
       <p class="note">التفاصيل الكاملة: <b>docs/ARABIC_CODE_SPEC.md</b> · المخرجات الحقيقية: <b>docs/DEMO_TRANSCRIPT.md</b></p>
     </div>
   </section>

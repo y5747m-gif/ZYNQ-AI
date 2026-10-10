@@ -367,6 +367,148 @@ test('CLI: تشغيل ملف زيتونة كامل', () => {
   eq(r.stdout.trim(), '42');
 });
 
+
+// ------------------------------------------------- توسيع اللغة (اختر/بسط/سهم/…)
+console.log('\nتوسيع اللغة:');
+
+test('«اختر/حالة/غير_ذلك» تعمل مثل switch', () => {
+  const src = [
+    'متغير ن = ٢',
+    'متغير النتيجة = ""',
+    'اختر (ن) {',
+    '  حالة ١:',
+    '    النتيجة = "واحد"',
+    '    كسر',
+    '  حالة ٢:',
+    '    النتيجة = "اثنان"',
+    '    كسر',
+    '  غير_ذلك:',
+    '    النتيجة = "غير ذلك"',
+    '}',
+    'اطبع(النتيجة)',
+  ].join('\n');
+  eq(runZy(src), 'اثنان');
+});
+
+test('«انشر» للبسط في الوسائط والمعامل الباقي في الدوال', () => {
+  const src = ['دالة جمع(انشر القيم) {', '  متغير م = 0', '  لكل ق في القيم { م += ق }', '  أرجع م', '}', 'اطبع(جمع(انشر [١، ٢، ٣]))'].join('\n');
+  eq(runZy(src), '6');
+});
+
+test('«الأصل» (super) تُترجم صحيحة والصنف يمتد', () => {
+  const res = compile(['صنف أ {', '  منشئ() { هذا.س = 1 }', '}', 'صنف ب موسع أ {', '  منشئ() { الأصل() }', '}'].join('\n'));
+  ok(res.ok, JSON.stringify(res.diagnostics));
+  includes(res.code, 'super()');
+  includes(res.code, 'class ب extends أ');
+});
+
+test('«احذف» تحذف خاصية فعلًا', () => {
+  const src = ['متغير ك = { أ: 1، ب: 2 }', 'احذف ك.أ', 'اطبع(نوع ك.أ)'].join('\n');
+  eq(runZy(src), 'undefined');
+});
+
+test('الأدوات النصية العربية الجديدة تعمل', () => {
+  eq(runZy('اطبع(اقسم("أ-ب-ج"، "-")[1])'), 'ب');
+  eq(runZy('اطبع(انضم([١، ٢، ٣]، "+"))'), '1+2+3');
+  eq(runZy('اطبع(يحتوي("مرحبا"، "حب"))'), 'true');
+  eq(runZy('اطبع(استبدل("مرحبا"، "م"، "س"))'), 'سرحبا');
+});
+
+// ------------------------------------------------- تعدد اللغات (المحرّك الموسّع)
+console.log('\nتعدد اللغات (المحرّك الموسّع):');
+
+const { verifyText } = require('../src/checkers');
+const { LANGS, LANG_LABEL } = require('../src/languages');
+
+test('سجلّ اللغات: تعرّف صحيح على الامتدادات + مدقّق لكل لغة', () => {
+  const cases = { 'a.js': 'js', 'a.cpp': 'cpp', 'a.rb': 'rb', 'a.sh': 'sh', 'a.go': 'go', 'a.rs': 'rs', 'a.php': 'php', 'a.cs': 'cs', 'a.kt': 'kt', 'a.mmm': 'unknown' };
+  for (const [f, want] of Object.entries(cases)) eq(api.detectLang(f), want, f);
+  for (const [id, info] of Object.entries(LANGS)) {
+    if (id === 'unknown') continue;
+    ok(info.label && info.exts.length, `لغة ${id} بلا اسم/امتداد`);
+    ok(info.verifier && (info.verifier.tools || info.verifier.internal || info.verifier.none), `لغة ${id} بلا مدقّق معرّف`);
+  }
+  ok(LANG_LABEL.c && LANG_LABEL.go && LANG_LABEL.rb);
+});
+
+function toolMissing(tools) { return require('../src/checkers').resolveTool(tools) === null; }
+
+test('سي (C): خطأ حقيقي من gcc ← إصلاح ← اجتياز التحقق', () => {
+  const bad = '#include <stdio.h>\nint main(void) {\n  int س = ٥;\n  printf("%d", س);\n  return 0;\n}\n';
+  if (toolMissing(['gcc', 'cc', 'clang'])) {
+    const f = tmp('.c', bad);
+    const r = api.checkFile(f);
+    fs.unlinkSync(f);
+    eq(r.external.verified, false, 'بلا gcc يجب أن نقول صريحًا إننا لم نتحقق');
+    ok(/لم أجد/.test(r.external.note || ''), r.external.note);
+    return;
+  }
+  const f = tmp('.c', bad);
+  const chk = api.checkFile(f);
+  fs.unlinkSync(f);
+  eq(chk.ok, false, 'يجب رصد الخطأ');
+  eq(chk.external.verified, true);
+  eq(chk.external.ok, false);
+  ok(chk.diagnostics.some((d) => d.code === 'Z401'), 'يجب إضافة تشخيص عربي من المدقّق');
+  const fixed = fixText(bad, { lang: 'c', tier: 0 });
+  includes(fixed.text, 'int س = 5;');
+  const v = verifyText(fixed.text, 'c');
+  eq(v.ok, true, 'gcc -fsyntax-only يجب أن ينجح بعد الإصلاح: ' + v.output);
+});
+
+test('شل: حرف مخفي داخل «if» يكسر bash ← الإصلاح يُصلحه فعلًا', () => {
+  if (toolMissing(['bash'])) return;
+  const bad = 'i\u200bf [ 1 -eq 1 ]; then\n  echo نعم\nfi\n';
+  const f = tmp('.sh', bad);
+  const chk = api.checkFile(f);
+  fs.unlinkSync(f);
+  eq(chk.ok, false, 'bash -n يجب أن يفشل بسبب الحرف المخفي');
+  ok(chk.diagnostics.some((d) => d.code === 'Z102'), 'يجب رصد الحرف صفري العرض');
+  const fixed = fixText(bad, { lang: 'sh', tier: 0 });
+  ok(!fixed.text.includes('\u200b'), 'يجب حذف الحرف المخفي');
+  const v = verifyText(fixed.text, 'sh');
+  eq(v.ok, true, 'bash -n يجب أن ينجح بعد الإصلاح: ' + v.output);
+});
+
+test('بيرل: رقم عربي في عدد ← إصلاح ← perl -c', () => {
+  if (toolMissing(['perl'])) return;
+  const bad = 'my $x = ٥;\nprint $x;\n';
+  const fixed = fixText(bad, { lang: 'pl', tier: 0 });
+  includes(fixed.text, 'my $x = 5;');
+  const v = verifyText(fixed.text, 'pl');
+  eq(v.ok, true, 'perl -c يجب أن ينجح: ' + v.output);
+});
+
+test('لغة بلا مدقّق: نقولها صريحة ولا نكتب ملفًا', () => {
+  const missing = Object.entries(LANGS).find(([id, i]) => id !== 'unknown' && !i.verifier.internal && !i.verifier.none && !i.verifier.needsProject && toolMissing(i.verifier.tools || []));
+  if (!missing) return; // كل المدقّقات متوفّرة في هذه البيئة
+  const [id, info] = missing;
+  const ext = info.exts[0];
+  const src = 'x = ٥\n';
+  const v = verifyText(src, id);
+  eq(v.verified, false, `لغة ${id} بلا مدقّق يجب أن تُعلن عدم التحقق`);
+  ok(/لم أجد|تحتاج|gofmt/.test(v.note || ''), v.note);
+  // CLI: الكتابة ترفض
+  const f = tmp(ext, 'x = ٥\n');
+  const before = fs.readFileSync(f, 'utf8');
+  const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'bin', 'zaytuna.js'), 'إصلاح', f, '--tier', '0', '--write'], { encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' } });
+  const after = fs.readFileSync(f, 'utf8');
+  fs.unlinkSync(f);
+  eq(r.status, 1, 'يجب أن يرفض الكتابة بدون تحقق');
+  eq(after, before, 'لا يجوز تغيير الملف');
+  includes(r.stdout, 'لم أكتب الملف');
+});
+
+test('CLI: فحص ملف سي يعرض اسم اللغة العربية ويشرح خطأ المترجم', () => {
+  if (toolMissing(['gcc', 'cc', 'clang'])) return;
+  const f = tmp('.c', 'int main(void) {\n  int س = ٥;\n  return 0;\n}\n');
+  const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'bin', 'zaytuna.js'), 'فحص', f], { encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' } });
+  fs.unlinkSync(f);
+  eq(r.status, 1);
+  includes(r.stdout, 'اللغة: سي');
+  includes(r.stdout, 'Z401');
+});
+
 // ---------------------------------------------------------------- النتيجة
 console.log(`\n═══ النتيجة: ${passed} ناجح · ${failed} فاشل ═══\n`);
 if (failed) {

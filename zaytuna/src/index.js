@@ -10,7 +10,7 @@ const { parse } = require('./parser');
 const { transpile } = require('./transpiler');
 const { scanText } = require('./security');
 const { fixText } = require('./fixer');
-const { detectLang, runChecker, arabizeCheckerOutput, extractPosition } = require('./checkers');
+const { detectLang, runChecker, verifyText, arabizeCheckerOutput, extractPosition, LANG_LABEL } = require('./checkers');
 
 const isFat = (d) => d.severity === 'error' || d.severity === 'security';
 
@@ -96,4 +96,6 @@ module.exports = {
   scanText,
   detectLang,
   runChecker,
+  verifyText,
+  LANG_LABEL,
 };

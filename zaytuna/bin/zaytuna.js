@@ -15,7 +15,8 @@ const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
 const api = require('../src/index');
-const { detectLang, runChecker, arabizeCheckerOutput, extractPosition, LANG_LABEL } = require('../src/checkers');
+const { runChecker, arabizeCheckerOutput, extractPosition } = require('../src/checkers');
+const { detectLang, langInfo, LANG_LABEL, LANGS } = require('../src/languages');
 const { formatAll, summaryLine, summarize, lineDiff, paint } = require('../src/diagnostics');
 const { fixText } = require('../src/fixer');
 
@@ -47,18 +48,6 @@ function tmpPath(ext, content) {
   const p = path.join(os.tmpdir(), `zaytuna-${crypto.randomBytes(4).toString('hex')}${ext}`);
   fs.writeFileSync(p, content, 'utf8');
   return p;
-}
-
-function verifyText(text, lang) {
-  if (lang === 'zy') {
-    const r = api.compile(text, { file: '<إصلاح>' });
-    return { ok: r.ok, output: r.diagnostics.map((d) => `${d.code} ${d.message}`).join('\n') };
-  }
-  const ext = lang === 'py' ? '.py' : '.js';
-  const tmp = tmpPath(ext, text);
-  const r = runChecker(tmp, lang);
-  fs.unlinkSync(tmp);
-  return r;
 }
 
 function readSource(file) {
@@ -107,6 +96,7 @@ function cmdCheck(file, flags) {
       summary: summarize(res.diagnostics),
     }, null, 2));
   } else {
+    console.log(paint(`  اللغة: ${LANG_LABEL[lang] || lang}`, 'dim', useColor));
     printDiagnostics(res.diagnostics, source, file);
     if (res.external.note) console.log(paint('  ⓘ ' + res.external.note, 'dim', useColor));
     if (res.external.ok && !res.external.note && res.external.kind !== 'بلا مدقّق') {
@@ -115,7 +105,9 @@ function cmdCheck(file, flags) {
       const arab = arabizeCheckerOutput(lang, res.external.output);
       const pos = extractPosition(lang, res.external.output);
       console.log(paint(`  ✖ التحقق الخارجي (${res.external.kind}) فشل${pos ? ` عند السطر ${pos.line}:${pos.col}` : ''}: ${arab[0].ar}`, 'error', useColor));
-      console.log(paint('     ' + (res.external.output.trim().split('\n')[0] || ''), 'dim', useColor));
+      const rawLines = res.external.output.trim().split('\n').filter((l) => l.trim());
+      const keyLine = rawLines.find((l) => /error|فشل|Error/.test(l)) || rawLines[0] || '';
+      console.log(paint('     ' + keyLine.trim(), 'dim', useColor));
     }
   }
   return res.ok ? 0 : 1;
@@ -125,6 +117,7 @@ async function cmdFix(file, flags) {
   const source = readSource(file);
   const lang = flags.lang || detectLang(file);
   const tier = flags.tier !== undefined ? Number(flags.tier) : (flags.ai ? 2 : 0);
+  console.log(paint(`  اللغة: ${LANG_LABEL[lang] || lang}${langInfo(lang).en ? ' (' + langInfo(lang).en + ')' : ''}`, 'dim', useColor));
   const before = api.checkSource(source, { lang, file });
   if (flags.verbose) printDiagnostics(before.diagnostics, source, file);
   else console.log(summaryLine(before.diagnostics, file, useColor));
@@ -152,7 +145,11 @@ async function cmdFix(file, flags) {
       console.log(paint(`⏳ محاولة إصلاح بالنموذج (${i}/${attempts})…`, 'info', useColor));
       const r = await aiRepair({ code: current, lang, diagnostics: diags, apiKey: pickKey({}), model: flags.model, attempt: i });
       if (!r.ok) { console.log(paint('  ✖ ' + r.error, 'error', useColor)); break; }
-      const verify = verifyText(r.code, lang);
+      const verify = api.verifyText(r.code, lang);
+      if (!verify.verified) {
+        console.log(paint(`  ✖ لا أستطيع التحقق من هذا الإصلاح (${verify.kind}): ${verify.note || 'لا مدقّق متاح'} — لا نطبّق إصلاحًا غير مُتحقّق منه.`, 'error', useColor));
+        break;
+      }
       if (verify.ok) {
         fixedText = r.code; success = true;
         console.log(paint('  ✔ إصلاح اجتاز التحقق.', 'green', useColor));
@@ -173,15 +170,22 @@ async function cmdFix(file, flags) {
       console.log('\n' + paint('— الفرق —', 'bold', useColor));
       console.log(lineDiff(source, fixedText, useColor));
     }
-    const verify = verifyText(fixedText, lang);
+    const verify = api.verifyText(fixedText, lang, { file });
     console.log('');
-    if (verify.ok) console.log(paint(`✔ التحقق بعد الإصلاح (${lang}): سليم.`, 'green', useColor));
-    else console.log(paint('⚠ التحقق بعد الإصلاح فشل — راجع يدويًا قبل الكتابة.', 'warning', useColor));
+    if (verify.verified && verify.ok) console.log(paint(`✔ التحقق بعد الإصلاح (${verify.kind}): سليم.`, 'green', useColor));
+    else if (verify.verified) console.log(paint('✖ التحقق بعد الإصلاح فشل — لا يُكتب الملف. راجع يدويًا.', 'error', useColor));
+    else console.log(paint(`⚠ لم أستطع التحقق (${verify.kind}) — ${verify.note || 'لا مدقّق متاح'}`, 'warning', useColor));
 
     const after = api.checkSource(fixedText, { lang, file });
     console.log(summaryLine(after.diagnostics, 'بعد الإصلاح', useColor));
 
     if (flags.write) {
+      if (!verify.verified && !flags['no-verify']) {
+        console.log(paint('✖ لم أكتب الملف: القاعدة الذهبية — لا يُكتب إصلاح قبل اجتيازه مدقّق اللغة الحقيقي.', 'error', useColor));
+        console.log(paint('  · ثبّت المدقّق ثم أعد المحاولة، أو استخدم --no-verify للمخاطرة الصريحة على مسؤوليتك.', 'dim', useColor));
+        return 1;
+      }
+      if (!verify.verified) console.log(paint('⚠ كتابة بلا تحقق (--no-verify) — على مسؤوليتك.', 'warning', useColor));
       const bak = file + '.bak';
       fs.writeFileSync(bak, source, 'utf8');
       fs.writeFileSync(file, fixedText, 'utf8');
@@ -214,6 +218,7 @@ function cmdExplain(file) {
       WhileStmt: 'حلقة «طالما»',
       ForStmt: 'حلقة «كرر»',
       ForOfStmt: `حلقة «لكل» على العناصر باسم «${node.name}»`,
+      SwitchStmt: `اختيار متعدد «اختر» بـ ${node.cases.length} حالة`,
       ReturnStmt: 'إرجاع قيمة',
       TryStmt: 'كتلة «جرب/التقط»',
       ExprStmt: 'تعبير',
@@ -253,6 +258,18 @@ function cmdTest() {
   return r.status ?? 1;
 }
 
+/** جدول اللغات لعرضه في «مساعدة» */
+function langTable() {
+  const rows = [];
+  for (const [id, info] of Object.entries(LANGS)) {
+    if (id === 'unknown') continue;
+    const v = info.verifier || {};
+    const how = v.internal ? 'مترجم زيتونة' : (v.none ? 'بلا تحقق' : (v.tools ? v.tools.join('/') : '—'));
+    rows.push(`  ${info.label.padEnd(12)} ${(info.exts.join(' ')).padEnd(24)} ${how}`);
+  }
+  return rows.join('\n');
+}
+
 function help() {
   console.log(`
 ${paint('زيتونة', 'bold', useColor)} — لغة برمجة عربية + مصحّح أكواد تلقائي  (v${VERSION})
@@ -273,6 +290,13 @@ ${paint('مستويات الإصلاح:', 'cyan', useColor)}
   0 = حتمي وآمن (حروف مخفية، ترقيم وأرقام عربية، فاصلة عشرية)
   1 = + إعادة تسمية متسقة للأسماء المتشابهة
   2 = + نموذج لغوي (يحتاج ZAYTUNA_API_KEY) — ولا يُطبَّق أي إصلاح قبل اجتيازه التحقق
+
+${paint('اللغات المدعومة (الفحص + الإصلاح):', 'cyan', useColor)}
+${langTable()}
+
+${paint('قاعدة ثابتة:', 'cyan', useColor)}
+  لا يُكتب أي إصلاح قبل اجتيازه مدقّق اللغة الحقيقي — وإن لم يوجد المدقّق نقول ذلك ولا نكتب.
+  (للكتابة بلا تحقق صريحًا: --no-verify)
 
 ${paint('أمثلة:', 'cyan', useColor)}
   zaytuna فحص examples/كود_به_أخطاء.js
