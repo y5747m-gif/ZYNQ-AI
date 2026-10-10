@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
-#  زيتونة — جولة عرض سريعة (١٠ أوامر)
+#  زيتونة — جولة عرض سريعة (١١ خطوة)
 #  التشغيل:  bash demo/tour.sh
 # ============================================================
 set -u
@@ -53,5 +53,10 @@ printf 'i\342\200\213f [ 1 -eq 1 ]; then\n  echo نعم\nfi\n' > /tmp/zaytuna-to
 bash -n /tmp/zaytuna-tour.sh 2>&1 | head -2 || true
 $Z إصلاح /tmp/zaytuna-tour.sh --tier 0 --write | tail -2 || true
 bash -n /tmp/zaytuna-tour.sh && echo "bash -n (/tmp/zaytuna-tour.sh): سليم ✔"
+
+line "11) الأنماط والأنواع: «طابق/مع» + أدوية عامة (تُشطب في JS وتبقى في TS)"
+$Z تشغيل examples/أنماط_وأنواع.zy | tail -5
+$Z بناء examples/أنماط_وأنواع.zy --ts --out /tmp/zaytuna-tour.ts | tail -1
+grep -nE "هوية<س>|class صندوق|الأول\(\)|const س: " /tmp/zaytuna-tour.ts | head -4
 
 printf '\n\033[32mانتهت الجولة.\033[0m\n'

@@ -46,7 +46,7 @@ const isIdPart = (ch) => /[\p{L}\p{M}\p{Nd}_$]/u.test(ch);
 
 const PUNCT3 = ['===', '!=='];
 const PUNCT2 = ['=>', '==', '!=', '<=', '>=', '&&', '||', '**', '+=', '-=', '*=', '/=', '%=', '++', '--'];
-const PUNCT1 = [...'{}()[];,:.?=<>+-*/%!'];
+const PUNCT1 = [...'{}()[];,:.?=<>+-*/%!|&'];
 
 class Lexer {
   constructor(source, opts = {}) {
@@ -138,8 +138,20 @@ class Lexer {
         continue;
       }
       if (cp === RANGES.AR_QUESTION) {
-        this.fail('Z202', 'علامة استفهام عربية «؟» لا معنى لها في الكود — المقصود غالبًا «?» أو أنه خطأ مطبعي.',
-          { line: startLine, col: startCol, suggestion: 'استبدل «؟» بـ «?» أو احذفها' });
+        // «؟» = الشرط الثلاثي إذا وُجد «:» في نفس العبارة (نفس قاعدة المصحّح) — وإلا فخطأ
+        const rest = this.src.slice(this.i + 1);
+        const stop = rest.search(/[\n;]/);
+        const statement = stop === -1 ? rest : rest.slice(0, stop);
+        if (statement.includes(':')) {
+          this.advance();
+          diag(this.diagnostics, 'info', 'Z213',
+            'قُرِئت «؟» كـ «?» (شرط ثلاثي: ؟ … : …) — ويمكن إصلاحها تلقائيًا في الملفات الأخرى.',
+            startLine, startCol, { suggestion: 'استبدل «؟» بـ «?»' });
+          tokens.push({ type: 'punc', value: '?', ar: '؟', raw: '؟', line: startLine, col: startCol, start, end: this.i });
+          continue;
+        }
+        this.fail('Z202', 'علامة استفهام عربية «؟» بلا شرط ثلاثي (`؟ … : …`) — نحتاج قرارًا بشريًا.',
+          { line: startLine, col: startCol, suggestion: 'استبدل «؟» بـ «?» مع «:» أو احذفها' });
       }
       if (cp === RANGES.TATWEEL) {
         diag(this.diagnostics, 'warning', 'Z203', 'التطويل «ـ» (تطويل الكلمة) غير مرئي المعنى لكنه يجعل الاسم يشبه اسمًا آخر.',

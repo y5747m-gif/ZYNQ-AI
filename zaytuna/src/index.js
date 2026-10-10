@@ -19,7 +19,7 @@ function compile(source, opts = {}) {
   const diagnostics = [];
   try {
     const { ast } = parse(source, { file: opts.file, diagnostics });
-    const { code, map } = transpile(ast);
+    const { code, map } = transpile(ast, { types: !!opts.types });
     return { ok: true, code, map, diagnostics: dedupe(diagnostics) };
   } catch (err) {
     if (err && err.isZaytunaError) {

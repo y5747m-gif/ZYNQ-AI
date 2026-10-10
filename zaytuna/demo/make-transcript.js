@@ -127,8 +127,20 @@ const pyChk = run('python3', ['-m', 'py_compile', tmp('zaytuna-doc.py')]);
 push('', `**\`python3 -m py_compile\` → ${pyChk.code === 0 ? 'سليم ✔' : 'فشل ✘'}**`, '', '```python',
   fs.readFileSync(tmp('zaytuna-doc.py'), 'utf8').trimEnd(), '```');
 
+// --------------------------------------------- 4ب) الأنماط والأنواع
+section('11) الأنماط (طابق/مع) والأدوية العامة والأنواع', [
+  '**`zaytuna تشغيل examples/أنماط_وأنواع.zy`**',
+]);
+code(Z(['تشغيل', 'examples/أنماط_وأنواع.zy']).out);
+push('```text', '$ zaytuna بناء examples/أنماط_وأنواع.zy --ts --out /tmp/zaytuna-doc.ts', '```');
+const tsOut = Z(['بناء', 'examples/أنماط_وأنواع.zy', '--ts', '--out', tmp('zaytuna-doc.ts')]);
+code(tsOut.out.split('\n').filter((l) => !/^\s*[\d]+ │|^ℹ|^\s+↳|^\s+\^/.test(l)).join('\n'));
+push('', '**مقتطف من مخرج تايبسكربت (الأنواع محفوظة):**', '', '```ts');
+const tsLines = fs.readFileSync(tmp('zaytuna-doc.ts'), 'utf8').split('\n');
+push(tsLines.filter((l) => /هوية<س>|class صندوق|constructor\(|الأول\(\)|الحجم\(\)|const س:/.test(l)).join('\n'), '```');
+
 // ------------------------------------------------------------- 5) الاختبارات
-section('11) الاختبارات الذاتية', ['```text']);
+section('12) الاختبارات الذاتية', ['```text']);
 const tests = run(process.execPath, ['tests/run.js']);
 push(tests.out.split('\n').slice(-16).join('\n'), '```');
 

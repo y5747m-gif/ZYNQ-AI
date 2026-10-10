@@ -7,7 +7,7 @@
 
 const { Lexer } = require('./lexer');
 const { ZError, diag } = require('./errors');
-const { suggestKeyword } = require('./dictionary');
+const { suggestKeyword, KEYWORDS } = require('./dictionary');
 
 class Parser {
   constructor(tokens, opts = {}) {
@@ -90,6 +90,7 @@ class Parser {
         case 'طالما': return this.parseWhile();
         case 'كرر': return this.parseFor();
         case 'اختر': return this.parseSwitch();
+        case 'طابق': return this.parseMatch();
         case 'لكل': return this.parseForOf();
         case 'أرجع': {
           this.next();
@@ -163,6 +164,118 @@ class Parser {
     return { type: 'SwitchStmt', discriminant, cases, line: t.line };
   }
 
+  /** هل التوكن الحالي كلمة عادية بهذا النص؟ (تسمح بكلمات مثل «مع» و«إلى» بلا حجزها) */
+  isWord(word, off = 0) {
+    const t = this.tok(off);
+    return (t.type === 'id' && t.value === word) || (t.type === 'kw' && t.ar === word);
+  }
+
+  /**
+   * الأنماط:
+   *   طابق (تعبير) {
+   *     مع 1: …                       قيمة حرفية
+   *     مع 1، 2: …                    بدائل
+   *     مع من 10 إلى 20: …            مدى
+   *     مع نوع "string": …            نوع (وأيضًا "قائمة" و"كائن")
+   *     مع [أ، ب]: …                  نمط قائمة مع ربط الأسماء
+   *     مع {اسم، عمر}: …             نمط كائن مع ربط الأسماء
+   *     مع 5 إذا (س > 0): …           مع شرط إضافي
+   *     غير_ذلك: …                    الحالة الباقية
+   *   }
+   */
+  parseMatch() {
+    const t = this.next(); // طابق
+    this.expectPunc('(', 'شرط المطابقة');
+    const discriminant = this.parseExpr();
+    this.expectPunc(')', 'إغلاق شرط المطابقة');
+    this.expectPunc('{', 'بداية كتلة المطابقة');
+    const arms = [];
+    while (!this.eof() && !this.isPunc('}')) {
+      const armTok = this.tok();
+      let pattern = null;
+      if (this.isKw('غير_ذلك')) {
+        this.next();
+        pattern = { kind: 'default', line: armTok.line };
+      } else if (this.isWord('مع')) {
+        this.next();
+        pattern = this.parsePattern();
+      } else {
+        this.fail('Z026', `متوقّع «مع» أو «غير_ذلك» داخل «طابق»، لكن وجدنا «${armTok.raw ?? armTok.value}».`, armTok,
+          { suggestion: 'اكتب «مع قيمة:» أو «غير_ذلك:»' });
+      }
+      let guard = null;
+      if (this.isKw('إذا')) {
+        this.next();
+        this.expectPunc('(', 'شرط إضافي');
+        guard = this.parseExpr();
+        this.expectPunc(')', 'إغلاق الشرط الإضافي');
+      }
+      this.expectPunc(':', 'بعد النمط');
+      const body = [];
+      while (!this.eof() && !this.isPunc('}') && !this.isKw('غير_ذلك') && !this.isWord('مع')) body.push(this.parseStatement());
+      arms.push({ pattern, guard, body, line: pattern.line });
+    }
+    this.expectPunc('}', 'إغلاق كتلة المطابقة');
+    return { type: 'MatchStmt', discriminant, arms, line: t.line };
+  }
+
+  /** نمط واحد (قد يكون بدائل مفصولة بـ «،») */
+  parsePattern() {
+    const first = this.parsePatternAtom();
+    if (this.isPunc(',')) {
+      const alts = [first];
+      while (this.isPunc(',')) { this.next(); alts.push(this.parsePatternAtom()); }
+      return { kind: 'alt', alts, line: first.line };
+    }
+    return first;
+  }
+
+  parsePatternAtom() {
+    const t = this.tok();
+    // مدى: من 10 إلى 20
+    if (this.isWord('من')) {
+      this.next();
+      const from = this.parseUnary();
+      if (!this.isWord('إلى')) this.fail('Z027', 'متوقّع «إلى» في نمط المدى: «مع من ١٠ إلى ٢٠».', this.tok());
+      this.next();
+      const to = this.parseUnary();
+      return { kind: 'range', from, to, line: t.line };
+    }
+    // نوع: نوع "string"
+    if (this.isKw('نوع')) {
+      this.next();
+      const arg = this.parseUnary();
+      return { kind: 'type', arg, line: t.line };
+    }
+    // نمط قائمة مع ربط أسماء
+    if (this.isPunc('[')) {
+      this.next();
+      const names = [];
+      while (!this.eof() && !this.isPunc(']')) {
+        names.push(this.expectId('اسمًا في النمط'));
+        if (this.isPunc(',')) this.next(); else break;
+      }
+      this.expectPunc(']', 'إغلاق نمط القائمة');
+      return { kind: 'array', names, line: t.line };
+    }
+    // نمط كائن مع ربط أسماء
+    if (this.isPunc('{')) {
+      this.next();
+      const keys = [];
+      while (!this.eof() && !this.isPunc('}')) {
+        const k = this.tok();
+        if (k.type === 'id' || k.type === 'kw') { keys.push(k.value || k.ar); this.next(); }
+        else this.fail('Z028', 'متوقّع اسم خاصية في نمط الكائن.', k);
+        if (this.isPunc(',')) this.next(); else break;
+      }
+      this.expectPunc('}', 'إغلاق نمط الكائن');
+      return { kind: 'object', keys, line: t.line };
+    }
+    // قيمة حرفية
+    const value = this.parseUnary();
+    return { kind: 'lit', value, line: t.line };
+  }
+
   parseBlock() {
     const t = this.expectPunc('{', 'بداية كتلة');
     const body = [];
@@ -178,13 +291,15 @@ class Parser {
     for (;;) {
       const nameToken = this.tok();
       const name = this.expectId('اسمًا للمتغيّر');
+      let typeAnn = null;
+      if (this.isPunc(':')) { this.next(); typeAnn = this.parseType(); }
       let init = null;
       if (this.isOp('=')) { this.next(); init = this.parseExpr(); }
       else if (kind === 'const') {
         this.fail('Z014', `الثابت «${name}» بلا قيمة — «ثابت» يجب أن يُسند عند التعريف.`,
           nameToken, { suggestion: `اكتب: ثابت ${name} = …` });
       }
-      decls.push({ name, init, line: nameToken.line });
+      decls.push({ name, init, typeAnn, line: nameToken.line });
       if (this.isPunc(',')) { this.next(); continue; }
       break;
     }
@@ -195,41 +310,106 @@ class Parser {
   parseFuncDecl(exported = false, async = false) {
     const t = this.next(); // دالة
     const name = this.expectId('اسمًا للدالة');
+    const typeParams = this.isKw('عام') ? (this.next(), this.parseTypeParams()) : null;
     const params = this.parseParams();
+    const paramTypes = this.paramTypes;
+    const returnType = this.isPunc(':') ? (this.next(), this.parseType()) : null;
     const body = this.parseBlock();
-    return { type: 'FuncDecl', name, params, body, async, exported, line: t.line };
+    return { type: 'FuncDecl', name, params, paramTypes, typeParams, returnType, body, async, exported, line: t.line };
   }
 
   parseParams() {
     this.expectPunc('(', 'قائمة معاملات');
     const params = [];
+    const types = [];
     while (!this.eof() && !this.isPunc(')')) {
       const rest = this.isKw('انشر');
       if (rest) this.next();
       const name = this.expectId('اسم معامل');
+      let typeAnn = null;
+      if (this.isPunc(':')) { this.next(); typeAnn = this.parseType(); }
       if (rest) {
         if (params.length) this.fail('Z025', '«انشر» (المعامل الباقي) يجب أن يكون آخر المعاملات.', this.tok());
         params.push('...' + name);
+        types.push(typeAnn);
         break;
       }
       params.push(name);
+      types.push(typeAnn);
       if (this.isPunc(',')) this.next();
       else break;
     }
     this.expectPunc(')', 'إغلاق قائمة المعاملات');
+    this.paramTypes = types;
     return params;
+  }
+
+  /** معاملات الأنواع العامة: عام <س، ص> */
+  parseTypeParams() {
+    if (this.isOp('<')) this.next(); else this.expectPunc('<', 'بداية معاملات النوع');
+    const names = [];
+    while (!this.eof() && !this.isOp('>')) {
+      names.push(this.expectId('اسم نوع'));
+      if (this.isPunc(',')) this.next(); else break;
+    }
+    if (!this.isOp('>')) this.fail('Z029', 'متوقّع «>» لإغلاق معاملات النوع العام.', this.tok(), { suggestion: 'أغلق بـ «>»' });
+    this.next();
+    return names;
+  }
+
+  /** نوع: اسم · اسم[] · اسم<نوع> · نوع | نوع */
+  parseType() {
+    let t = this.parseTypePrimary();
+    for (;;) {
+      if (this.isPunc('[') && this.isPunc(']', 1)) { this.next(); this.next(); t = { kind: 'array', of: t }; continue; }
+      if (this.isOp('<')) {
+        this.next();
+        const args = [];
+        while (!this.eof() && !this.isOp('>')) {
+          args.push(this.parseType());
+          if (this.isPunc(',')) this.next(); else break;
+        }
+        if (!this.isOp('>')) this.fail('Z029', 'متوقّع «>» لإغلاق نوع عام.', this.tok());
+        this.next();
+        t = { kind: 'generic', name: t, args };
+        continue;
+      }
+      if (this.isOp('|')) {
+        this.next();
+        const right = this.parseTypePrimary();
+        t = { kind: 'union', parts: [...(t.kind === 'union' ? t.parts : [t]), right] };
+        continue;
+      }
+      break;
+    }
+    return t;
+  }
+
+  parseTypePrimary() {
+    const tk = this.tok();
+    if (tk.type === 'id') { this.next(); return { kind: 'name', name: tk.value }; }
+    // كلمات مفتاحية في موضع نوع: «عدم» ← null · «لاشيء» ← undefined
+    if (tk.type === 'kw' && ['عدم', 'لاشيء'].includes(tk.ar)) {
+      this.next();
+      return { kind: 'name', name: tk.ar, js: KEYWORDS.get(tk.ar) };
+    }
+    if (tk.type === 'str') { this.next(); return { kind: 'lit', value: tk.value }; }
+    if (tk.type === 'num') { this.next(); return { kind: 'lit', value: tk.value }; }
+    this.fail('Z029', `متوقّع نوع بعد «:» لكن وجدنا «${tk.raw ?? tk.value}».`, tk,
+      { suggestion: 'اكتب نوعًا مثل: عدد · نص · قائمة<عدد>' });
   }
 
   parseClassDecl(exported = false) {
     const t = this.next(); // صنف
     const name = this.expectId('اسمًا للصنف');
+    const typeParams = this.isKw('عام') ? (this.next(), this.parseTypeParams()) : null;
     let superClass = null;
     if (this.isKw('موسع')) { this.next(); superClass = this.expectId('اسم الصنف الأب'); }
     this.expectPunc('{', 'بداية جسم الصنف');
     const members = [];
     while (!this.eof() && !this.isPunc('}')) members.push(this.parseClassMember());
     this.expectPunc('}', 'نهاية جسم الصنف');
-    return { type: 'ClassDecl', name, superClass, members, exported, line: t.line };
+    return { type: 'ClassDecl', name, typeParams, superClass, members, exported, line: t.line };
   }
 
   parseClassMember() {
@@ -239,15 +419,18 @@ class Parser {
     if (this.isKw('منشئ')) {
       this.next();
       const params = this.parseParams();
+      const paramTypes = this.paramTypes;
       const body = this.parseBlock();
-      return { type: 'ClassMember', kind: 'constructor', name: 'constructor', params, body, isStatic, line: t.line };
+      return { type: 'ClassMember', kind: 'constructor', name: 'constructor', params, paramTypes, body, isStatic, line: t.line };
     }
     if (this.isKw('دالة')) {
       this.next();
       const name = this.expectId('اسمًا للدالة');
       const params = this.parseParams();
+      const paramTypes = this.paramTypes;
+      const returnType = this.isPunc(':') ? (this.next(), this.parseType()) : null;
       const body = this.parseBlock();
-      return { type: 'ClassMember', kind: 'method', name, params, body, isStatic, line: t.line };
+      return { type: 'ClassMember', kind: 'method', name, params, paramTypes, returnType, body, isStatic, line: t.line };
     }
     const name = this.expectId('اسمًا لعضو الصنف');
     this.expectPunc('=', 'إسناد قيمة للعضو');
@@ -558,7 +741,25 @@ class Parser {
         depth--;
         if (depth === 0) {
           const n = this.tokens[k + 1];
-          return !!(n && n.type === 'op' && n.value === '=>');
+          if (n && n.type === 'op' && n.value === '=>') return true;
+          // دالة سهمية بنوع إرجاع: (س: عدد): عدد => …
+          if (n && n.type === 'punc' && n.value === ':') {
+            let j = k + 2;
+            const first = this.tokens[j];
+            if (!first || first.type !== 'id') return false;
+            j++;
+            while (j < this.tokens.length) {
+              const x = this.tokens[j];
+              const isTypeTok = x.type === 'id' || x.type === 'str' ||
+                (x.type === 'punc' && ['[', ']', ',', '.', ':'].includes(x.value)) ||
+                (x.type === 'op' && ['<', '>', '|'].includes(x.value));
+              if (!isTypeTok) break;
+              j++;
+            }
+            const after = this.tokens[j];
+            return !!(after && after.type === 'op' && after.value === '=>');
+          }
+          return false;
         }
       }
       if (t.type === 'eof') return false;
@@ -591,6 +792,7 @@ class Parser {
           this.next();
           const name = (this.tok().type === 'id') ? this.next().value : null;
           const params = this.parseParams();
+          const paramTypes = this.paramTypes;
           const body = this.parseBlock();
           return { type: 'FuncExpr', name, params, body, async: false, line: t.line };
         }
@@ -599,6 +801,7 @@ class Parser {
           this.expectKw('دالة', 'بعد «غير_متزامن»');
           const name = (this.tok().type === 'id') ? this.next().value : null;
           const params = this.parseParams();
+          const paramTypes = this.paramTypes;
           const body = this.parseBlock();
           return { type: 'FuncExpr', name, params, body, async: true, line: t.line };
         }
@@ -624,10 +827,12 @@ class Parser {
     if (this.isPunc('(')) {
       if (this.looksLikeArrow()) {
         const params = this.parseParams();
+        const paramTypes = this.paramTypes;
+        const returnType = this.isPunc(':') ? (this.next(), this.parseType()) : null;
         const arrow = this.tokens[this.pos];
         if (!(arrow && arrow.type === 'op' && arrow.value === '=>')) this.fail('Z021', 'متوقّع «=>» بعد معاملات الدالة السهمية.', this.tok());
         this.next();
-        return this.parseArrowBody(params, t.line);
+        return this.parseArrowBody(params, t.line, paramTypes, returnType);
       }
       this.next();
       const inner = this.parseExpr();
@@ -681,13 +886,13 @@ class Parser {
     this.fail('Z023', `تعبير غير متوقّع: «${t.raw ?? t.value}».`, t, { suggestion: 'راجع السطر — قد يكون قوس ناقص أو كلمة في غير موضعها' });
   }
 
-  parseArrowBody(params, line) {
+  parseArrowBody(params, line, paramTypes = null, returnType = null) {
     if (this.isPunc('{')) {
       const body = this.parseBlock();
-      return { type: 'Arrow', params, body, expression: false, line };
+      return { type: 'Arrow', params, paramTypes, returnType, body, expression: false, line };
     }
     const body = this.parseAssign();
-    return { type: 'Arrow', params, body, expression: true, line };
+    return { type: 'Arrow', params, paramTypes, returnType, body, expression: true, line };
   }
 }
 

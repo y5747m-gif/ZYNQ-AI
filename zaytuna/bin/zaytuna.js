@@ -63,12 +63,14 @@ function printDiagnostics(diags, source, file) {
 // ------------------------------------------------------------------ الأوامر
 function cmdBuild(file, flags) {
   const source = readSource(file);
-  const res = api.compile(source, { file });
+  const wantTs = !!flags.ts;
+  const res = api.compile(source, { file, types: wantTs });
   printDiagnostics(res.diagnostics, source, file);
   if (!res.ok) return 1;
-  const out = flags.out || file.replace(/\.zy$/, '') + '.js';
+  const out = flags.out || file.replace(/\.zy$/, '') + (wantTs ? '.ts' : '.js');
   fs.writeFileSync(out, res.code, 'utf8');
   if (flags.map) fs.writeFileSync(out + '.map.json', JSON.stringify(res.map, null, 2), 'utf8');
+  if (wantTs) console.log(paint('  ⓘ مخرج تايبسكربت: الأنواع العامة والتعليقات النوعية محفوظة (وفحصها يحتاج tsc).', 'dim', useColor));
   console.log(paint(`✔ تمت الترجمة: ${out}`, 'green', useColor) + (flags.map ? ' (+ خريطة الأسطر)' : ''));
   if (flags.print) console.log('\n' + res.code);
   return 0;
@@ -277,7 +279,7 @@ ${paint('زيتونة', 'bold', useColor)} — لغة برمجة عربية + م
 ${paint('الاستخدام:', 'cyan', useColor)}  zaytuna <أمر> <ملف> [خيارات]
 
 ${paint('الأوامر:', 'cyan', useColor)}
-  بناء | build <ملف.zy>      ترجمة زيتونة إلى جافاسكربت            [--out ملف] [--map] [--print]
+  بناء | build <ملف.zy>      ترجمة زيتونة (إلى جافاسكربت افتراضيًا)  [--out ملف] [--map] [--print] [--ts]
   تشغيل | run <ملف.zy>       بناء ثم تشغيل البرنامج
   فحص | check <ملف>          تشخيص عربي مفصّل + تحقق من مدقّق اللغة      [--json] [--lang]
   إصلاح | fix <ملف>          إصلاح تلقائي        [--write] [--tier 0|1] [--ai] [--model م] [--json]

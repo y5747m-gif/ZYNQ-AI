@@ -58,9 +58,38 @@ function precOf(node) {
 }
 
 class Transpiler {
-  constructor(ast) {
+  constructor(ast, opts = {}) {
     this.ast = ast;
     this.em = new Emitter();
+    this.seq = 0;
+    this.keepTypes = !!opts.types; // تُشطب الأنواع في جافاسكربت، وتبقى في مخرج تايبسكربت
+  }
+
+  /** نصّ نوع واحد: اسم · اسم[] · اسم<نوع> · أ | ب */
+  typeText(t) {
+    if (!t) return '';
+    switch (t.kind) {
+      case 'name': return t.js || t.name;
+      case 'lit': return JSON.stringify(t.value);
+      case 'array': return `${this.typeText(t.of)}[]`;
+      case 'generic': return `${this.typeText(t.name)}<${t.args.map((a) => this.typeText(a)).join(', ')}>`;
+      case 'union': return t.parts.map((x) => this.typeText(x)).join(' | ');
+      default: return '';
+    }
+  }
+
+  /** قائمة المعاملات مع الأنواع (إن كان الإبقاء عليها مفعّلًا) */
+  paramsText(params, types) {
+    return params.map((p, i) => {
+      const t = types && types[i];
+      if (!this.keepTypes || !t) return p;
+      const txt = this.typeText(t);
+      return p.startsWith('...') ? `...${p.slice(3)}: ${txt}` : `${p}: ${txt}`;
+    }).join(', ');
+  }
+
+  typeParamsText(list) {
+    return this.keepTypes && list && list.length ? `<${list.join(', ')}>` : '';
   }
 
   run() {
@@ -85,6 +114,7 @@ class Transpiler {
       case 'ForStmt': return this.emitFor(node);
       case 'ForOfStmt': return this.emitForOf(node);
       case 'SwitchStmt': return this.emitSwitch(node);
+      case 'MatchStmt': return this.emitMatch(node);
       case 'ReturnStmt':
         return this.em.push(`return${node.argument ? ' ' + this.expr(node.argument) : ''};`, node.line);
       case 'BreakStmt': return this.em.push('break;', node.line);
@@ -114,29 +144,36 @@ class Transpiler {
   }
 
   varDeclInline(node) {
-    const parts = node.decls.map((d) => `${d.name}${d.init ? ' = ' + this.expr(d.init) : ''}`);
+    const parts = node.decls.map((d) => {
+      const ann = this.keepTypes && d.typeAnn ? `: ${this.typeText(d.typeAnn)}` : '';
+      return `${d.name}${ann}${d.init ? ' = ' + this.expr(d.init) : ''}`;
+    });
     return `${node.kind} ${parts.join(', ')}`;
   }
 
   emitFuncDecl(node) {
-    const prefix = `${node.exported ? 'export ' : ''}${node.async ? 'async ' : ''}function ${node.name}(${node.params.join(', ')}) {`;
+    const gen = this.typeParamsText(node.typeParams);
+    const ret = this.keepTypes && node.returnType ? `: ${this.typeText(node.returnType)}` : '';
+    const prefix = `${node.exported ? 'export ' : ''}${node.async ? 'async ' : ''}function ${node.name}${gen}(${this.paramsText(node.params, node.paramTypes)})${ret} {`;
     this.em.push(prefix, node.line);
     this.emitBody(node.body.body);
     this.em.push('}', node.line);
   }
 
   emitClass(node) {
-    const head = `${node.exported ? 'export ' : ''}class ${node.name}${node.superClass ? ' extends ' + node.superClass : ''} {`;
+    const gen = this.typeParamsText(node.typeParams);
+    const head = `${node.exported ? 'export ' : ''}class ${node.name}${gen}${node.superClass ? ' extends ' + node.superClass : ''} {`;
     this.em.push(head, node.line);
     this.em.indent++;
     for (const m of node.members) {
       this.em.flushComments(m.line, this.ast.comments);
       if (m.kind === 'constructor') {
-        this.em.push(`constructor(${m.params.join(', ')}) {`, m.line);
+        this.em.push(`constructor(${this.paramsText(m.params, m.paramTypes)}) {`, m.line);
         this.emitBody(m.body.body);
         this.em.push('}', m.line);
       } else if (m.kind === 'method') {
-        this.em.push(`${m.isStatic ? 'static ' : ''}${m.name}(${m.params.join(', ')}) {`, m.line);
+        const ret = this.keepTypes && m.returnType ? `: ${this.typeText(m.returnType)}` : '';
+        this.em.push(`${m.isStatic ? 'static ' : ''}${m.name}(${this.paramsText(m.params, m.paramTypes)})${ret} {`, m.line);
         this.emitBody(m.body.body);
         this.em.push('}', m.line);
       } else {
@@ -178,6 +215,73 @@ class Transpiler {
     }
     this.em.indent--;
     this.em.push('}', node.line);
+  }
+
+  /**
+   * طابق/مع → سلسلة if/else مع متغيّر مؤقت (بلا مكتبات، وتُترجم إلى JS عادي).
+   * الأنماط التي تربط أسماء تُنتج ثوابت داخل الكتلة نفسها.
+   */
+  emitMatch(node) {
+    const tmp = `__ز_م${++this.seq}`;
+    this.em.push(`const ${tmp} = ${this.expr(node.discriminant)};`, node.line);
+    let opened = false;
+    for (const arm of node.arms) {
+      this.em.flushComments(arm.line, this.ast.comments);
+      const m = this.matchCond(tmp, arm.pattern, arm.guard);
+      if (m.isDefault) {
+        this.em.push(opened ? '} else {' : '{', arm.line);
+        if (m.bindings) this.em.push(m.bindings, arm.line);
+        this.emitBody(arm.body);
+        this.em.push('}', arm.line);
+        opened = false;
+        continue;
+      }
+      this.em.push(opened ? `} else if (${m.cond}) {` : `if (${m.cond}) {`, arm.line);
+      if (m.bindings) this.em.push(m.bindings, arm.line);
+      this.emitBody(arm.body);
+      opened = true;
+    }
+    if (opened) this.em.push('}', node.line);
+  }
+
+  /** شرط نمط واحد + ثوابت الربط إن وُجدت */
+  matchCond(tmp, pattern, guard) {
+    const g = guard ? `(${this.expr(guard)})` : null;
+    if (pattern.kind === 'default') {
+      // «غير_ذلك» + شرط إضافي = حالة بشرط، وإلا فهي الحالة الباقية
+      return g ? { cond: g, bindings: null, isDefault: false } : { isDefault: true };
+    }
+    let cond = null;
+    let bindings = null;
+
+    if (pattern.kind === 'lit') {
+      cond = `${tmp} === ${this.expr(pattern.value)}`;
+    } else if (pattern.kind === 'alt') {
+      cond = pattern.alts.map((a) => this.matchCond(tmp, a, null).cond).map((c) => `(${c})`).join(' || ');
+    } else if (pattern.kind === 'range') {
+      cond = `(${tmp} >= ${this.expr(pattern.from)} && ${tmp} <= ${this.expr(pattern.to)})`;
+    } else if (pattern.kind === 'type') {
+      const v = pattern.arg;
+      if (v.type === 'StrLit') {
+        const raw = v.js.slice(1, -1); // القيمة كما كُتبت داخل النص
+        if (raw === 'قائمة') cond = `Array.isArray(${tmp})`;
+        else if (raw === 'كائن') cond = `(${tmp} !== null && typeof ${tmp} === 'object')`;
+        else cond = `typeof ${tmp} === ${v.js}`;
+      } else {
+        cond = `typeof ${tmp} === ${this.expr(v)}`;
+      }
+    } else if (pattern.kind === 'array') {
+      cond = `(Array.isArray(${tmp}) && ${tmp}.length === ${pattern.names.length})`;
+      bindings = `const ${pattern.names.map((n, i) => `${n} = ${tmp}[${i}]`).join(', ')};`;
+    } else if (pattern.kind === 'object') {
+      const checks = pattern.keys.map((k) => `${JSON.stringify(k)} in ${tmp}`).join(' && ');
+      cond = `(${tmp} !== null && typeof ${tmp} === 'object' && ${checks})`;
+      bindings = `const { ${pattern.keys.join(', ')} } = ${tmp};`;
+    } else {
+      cond = 'true';
+    }
+
+    return { cond: g ? `(${cond}) && ${g}` : cond, bindings, isDefault: false };
   }
 
   emitWhile(node) {
@@ -264,11 +368,12 @@ class Transpiler {
         return `{ ${node.properties.map((p) => p.spread ? `...${this.expr(p.value)}` : (p.shorthand ? p.key : `${p.computed ? `[${this.expr(p.key)}]` : /^[A-Za-z_$][\w$]*$/.test(p.key) ? p.key : JSON.stringify(p.key)}: ${this.expr(p.value)}`)).join(', ')} }`;
       case 'Arrow': {
         const body = node.expression ? this.expr(node.body) : `{ ${this.emitArrowBlock(node.body.body)} }`;
-        return `(${node.params.join(', ')}) => ${body}`;
+        const ret = this.keepTypes && node.returnType ? `: ${this.typeText(node.returnType)}` : '';
+        return `(${this.paramsText(node.params, node.paramTypes)})${ret} => ${body}`;
       }
       case 'FuncExpr': {
         const name = node.name ? ` ${node.name}` : '';
-        return `${node.async ? 'async ' : ''}function${name}(${node.params.join(', ')}) { ${this.emitArrowBlock(node.body.body)} }`;
+        return `${node.async ? 'async ' : ''}function${name}(${this.paramsText(node.params, node.paramTypes)}) { ${this.emitArrowBlock(node.body.body)} }`;
       }
       case 'Await': return `await ${this.expr(node.arg, 8)}`;
       case 'Unary': {
@@ -315,8 +420,8 @@ class Transpiler {
   }
 }
 
-function transpile(ast) {
-  return new Transpiler(ast).run();
+function transpile(ast, opts = {}) {
+  return new Transpiler(ast, opts).run();
 }
 
 module.exports = { transpile, Emitter };

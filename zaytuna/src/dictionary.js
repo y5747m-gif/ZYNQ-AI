@@ -31,6 +31,8 @@ const KEYWORD_TABLE = {
   'كرر': 'for',
   'لكل': 'for',
   'في': 'of',
+  'طابق': 'match',
+  'عام': 'generic',
   'اختر': 'switch',
   'حالة': 'case',
   'غير_ذلك': 'default',
