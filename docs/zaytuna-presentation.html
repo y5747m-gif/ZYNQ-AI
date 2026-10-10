@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>زيتونة — لغة برمجة عربية + مصحّح أكواد تلقائي</title>
+<style>
+  :root{
+    --bg:#06080e; --card:#0f1624; --card2:#131c2e; --line:#1e2a40;
+    --txt:#e9eefb; --mut:#93a3c0; --acc:#4ade80; --acc2:#22d3ee; --vio:#a78bfa;
+    --warn:#fbbf24; --dang:#f87171; --ok:#34d399; --r:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1000px 520px at 88% -8%, rgba(34,211,238,.13), transparent 62%),
+      radial-gradient(900px 500px at 2% 2%, rgba(74,222,128,.12), transparent 62%),
+      var(--bg);
+    color:var(--txt);
+    font-family:"Noto Naskh Arabic","Segoe UI",Tahoma,system-ui,-apple-system,sans-serif;
+    line-height:1.85; padding:36px 20px 72px;
+  }
+  .wrap{max-width:1140px;margin:0 auto}
+  h1{font-size:clamp(30px,5.2vw,56px);line-height:1.25;font-weight:800;
+     background:linear-gradient(90deg,#fff,#9ff5c8 52%,#7ee3f5);
+     -webkit-background-clip:text;background-clip:text;color:transparent}
+  h2{font-size:clamp(20px,2.7vw,28px);margin:0 0 14px;font-weight:800}
+  h2 .num{color:var(--acc);font-family:ui-monospace,monospace;font-size:.78em;margin-inline-end:9px}
+  h3{font-size:17.5px;font-weight:700;margin-bottom:8px}
+  p,li{color:#cfdaf0}
+  section{margin-top:56px}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:var(--r);padding:20px}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(255px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .chip{border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--mut);padding:5px 12px;border-radius:999px;font-size:12.5px}
+  .chip b{color:var(--acc)}
+  code,pre,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  pre{direction:ltr;text-align:left;background:#080d16;border:1px solid #1b2740;border-radius:14px;
+      padding:14px 16px;overflow-x:auto;font-size:13.6px;line-height:1.75;color:#d9e6ff}
+  .ar-pre{direction:rtl;text-align:right}
+  .kw{color:#8fd3ff} .st{color:#9ce9bd} .cm{color:#63789c} .nm{color:#fbbf24} .fn{color:#c4b5fd}
+  .diff-add{background:rgba(52,211,153,.10);border-inline-start:3px solid var(--ok);padding-inline-start:8px;border-radius:6px}
+  .diff-del{background:rgba(248,113,113,.10);border-inline-start:3px solid var(--dang);padding-inline-start:8px;border-radius:6px;text-decoration:line-through;opacity:.85}
+  .stat{background:linear-gradient(180deg,#121a29,#0e1520);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center}
+  .stat .big{font-size:clamp(26px,3.6vw,38px);font-weight:800;
+             background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat .lb{font-size:13.5px;color:var(--mut);margin-top:4px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px}
+  th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+  th{background:#101827;color:#cfe0ff;font-size:13.5px}
+  tr:last-child td{border-bottom:none}
+  .tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#0d131f}
+  .pill{display:inline-block;font-size:11.5px;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--mut)}
+  .pill.ok{border-color:#2f6b4a;color:#9ce9bd;background:rgba(52,211,153,.08)}
+  .pill.part{border-color:#5c5430;color:#f3dfa0;background:rgba(251,191,36,.07)}
+  .pill.dang{border-color:#5c3a3a;color:#f5b3b3;background:rgba(248,113,113,.07)}
+  ul.tick{list-style:none;display:grid;gap:9px}
+  ul.tick li{padding-inline-start:26px;position:relative}
+  ul.tick li::before{content:"◆";position:absolute;inset-inline-start:0;color:var(--acc);font-size:12px;top:7px}
+  ul.no{list-style:none;display:grid;gap:10px}
+  ul.no li{background:#140f14;border:1px solid #3a2530;border-radius:13px;padding:12px 14px;padding-inline-start:40px;position:relative;font-size:14.5px}
+  ul.no li::before{content:"⚠";position:absolute;inset-inline-start:14px;top:11px;color:var(--warn)}
+  .hero{background:linear-gradient(135deg,#0c2318,#0a1a2b 62%);border:1px solid #2c6a4a}
+  .note{font-size:13px;color:var(--mut);margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}
+  .tl{display:grid;grid-template-columns:132px 1fr;gap:14px;background:#0e1523;border:1px solid var(--line);border-radius:14px;padding:14px}
+  .tl .w{color:var(--acc);font-size:13.5px;font-weight:700}
+  @media(max-width:600px){.tl{grid-template-columns:1fr;gap:6px}}
+  .lang{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#0e1523;font-size:14.5px}
+  footer{margin-top:60px;color:var(--mut);font-size:13px;text-align:center;border-top:1px solid var(--line);padding-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>زيتونة — لغة برمجة عربية<br>+ مصحّح أكواد تلقائي + حارس أمني لليونيكود</h1>
+    <p style="color:#cfdaf0;max-width:830px;margin-top:12px;font-size:16px">
+      لغة عربية تُترجم 1:1 إلى جافاسكربت (لا جزيرة، بل <b>جسر</b>)، ومصحّح يفهم الأخطاء التي لا يراها أحد غير العربي:
+      <span class="mono">٥</span> في موضع عدد، و<span class="mono">،</span> بدل <span class="mono">,</span>، وحرف اتجاه مخفي يقلب معنى الكود.
+      <b>ولا يُكتب أي إصلاح قبل اجتيازه مدقّق اللغة الحقيقي.</b>
+    </p>
+    <div class="chips">
+      <span class="chip"><b>44</b> اختبارًا ناجحًا فعلًا</span>
+      <span class="chip"><b>34</b> كلمة مفتاحية عربية</span>
+      <span class="chip"><b>15</b> رمز تشخيص أمني وترقيمي</span>
+      <span class="chip"><b>3</b> لغات مُتحقَّق منها اليوم</span>
+      <span class="chip">النموذج يعمل: <span class="mono">bash demo/tour.sh</span></span>
+    </div>
+  </header>
+
+  <section>
+    <h2><span class="num">01</span>لماذا الآن؟ ثلاثة آلام حقيقية</h2>
+    <div class="grid g3">
+      <div class="card">
+        <h3>الألم العربي</h3>
+        <p>الأرقام الهندية في الأعداد = <b>خطأ حقيقي</b> في جافاسكربت وبايثون (تحقّقنا عمليًا)، والترقيم العربي <span class="mono">، ؛ ٫ ٬ ؟</span> ينتج رسائل مترجم إنجليزية غامضة. وأخطرها: <b>أحرف مخفية</b> لا يراها المراجع أبدًا.</p>
+        <span class="pill dang">CVE-2021-42574 · Trojan Source</span>
+      </div>
+      <div class="card">
+        <h3>انفجار كود الذكاء الاصطناعي</h3>
+        <p><b>42%</b> من الكود الملتزَم فيه مساعدة AI · <b>96%</b> لا يثقون ثقة كاملة · <b>48%</b> فقط يراجعون دائمًا · <b>45%</b> من كود AI فيه ثغرات أمنية.</p>
+        <span class="pill">Sonar · Addy Osmani 2026</span>
+      </div>
+      <div class="card">
+        <h3>المراجعة صارت عنق الزجاجة</h3>
+        <p><b>+441.5%</b> في وسيط زمن مراجعة الـ PR عند أعلى الفرق استخدامًا للـ AI · <b>85%</b> من المطوّرين يرون أن عنق الزجاجة انتقل من الكتابة إلى <b>التحقق</b>.</p>
+        <span class="pill">Faros (22 ألف مطوّر) · GitLab 2026</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span>المنتج في ثلاثة أجزاء — كلها تعمل اليوم</h2>
+    <div class="grid g3">
+      <div class="card" style="border-color:#2f6b4a">
+        <h3>① لغة «زيتونة»</h3>
+        <p>نحو عربي طبيعي (متغير · دالة · أرجع · طالما)، فاصلة منقوطة اختيارية، ترقيم عربي مقبول، أرقام هندية تُحوَّل تلقائيًا، ونصوص بعلامات <span class="mono">«…»</span>.</p>
+        <p style="margin-top:8px"><span class="pill ok">تُترجم إلى جافاسكربت</span> <span class="pill ok">خريطة أسطر</span> <span class="pill ok">تعليقات محفوظة</span></p>
+      </div>
+      <div class="card" style="border-color:#2f6b4a">
+        <h3>② المصحّح التلقائي</h3>
+        <p>ثلاثة مستويات: حتمي (حروف مخفية وأرقام وترقيم) ← قواعد لغوية (إعادة تسمية متسقة) ← نموذج لغوي بحلقة تحقق. يعمل على <b>ملفاتك أنت</b> في جافاسكربت وبايثون، لا على لصق في متصفح.</p>
+        <p style="margin-top:8px"><span class="pill ok">إصلاح + تحقق إلزامي</span> <span class="pill ok">نسخة احتياطية</span></p>
+      </div>
+      <div class="card" style="border-color:#2f6b4a">
+        <h3>③ حارس اليونيكود</h3>
+        <p>يكشف أحرف الاتجاه المخفية (هجوم يعرض الكود معكوسًا عمّا ينفّذه المترجم)، وحروف الحقن صفرية العرض، والأسماء المتشابهة <span class="mono">متغير١</span> / <span class="mono">متغير1</span>.</p>
+        <p style="margin-top:8px"><span class="pill ok">نحن أول من تقرأ هذه الأحرف فعلًا</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span>اللغة: كود عربي حقيقي ← جافاسكربت</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>تكتب (زيتونة)</h3>
+<pre class="ar-pre"><span class="cm"># حاسبة صغيرة</span>
+<span class="kw">دالة</span> صنّف(العدد) {
+  <span class="kw">إذا</span> (العدد &gt; 10) { <span class="kw">أرجع</span> <span class="st">"كبير"</span> }
+  <span class="kw">وإلا</span> { <span class="kw">أرجع</span> <span class="st">"صغير"</span> }
+}
+
+<span class="kw">ثابت</span> الأعداد = [<span class="nm">١، ٢، ٣، ٤، ٥</span>]   <span class="cm"># أرقام هندية ← تُحوَّل</span>
+<span class="kw">متغير</span> المجموع = 0
+<span class="kw">لكل</span> عدد <span class="kw">في</span> الأعداد { المجموع += عدد }
+اطبع(<span class="st">"المجموع = "</span> + المجموع + <span class="st">" — "</span> + صنّف(المجموع))</pre>
+      </div>
+      <div class="card">
+        <h3>يُنفَّذ (جافاسكربت مولَّد)</h3>
+<pre><span class="cm">// حاسبة صغيرة</span>
+<span class="kw">function</span> <span class="fn">صنّف</span>(العدد) {
+  <span class="kw">if</span> (العدد &gt; 10) { <span class="kw">return</span> <span class="st">"كبير"</span>; }
+  <span class="kw">else</span> { <span class="kw">return</span> <span class="st">"صغير"</span>; }
+}
+
+<span class="kw">const</span> الأعداد = [1, 2, 3, 4, 5];
+<span class="kw">let</span> المجموع = 0;
+<span class="kw">for</span> (<span class="kw">const</span> عدد <span class="kw">of</span> الأعداد) { المجموع += عدد; }
+console.log(<span class="st">"المجموع = "</span> + المجموع + <span class="st">" — "</span> + صنّف(المجموع));</pre>
+        <p class="note">مخرجات التشغيل الحقيقية: <span class="mono">المجموع = 15 — كبير</span> — والخريطة تحفظ السطر العربي ↔ السطر المولَّد (لتشخيص دقيق في المحرر لاحقًا).</p>
+      </div>
+    </div>
+    <div class="note">
+      <b>لماذا هذا مهم؟</b> لأن كل مكتبات العالم (npm) تعمل معها فورًا: اللغة عربية الوجه، ونظامية القلب. لا «جزيرة برمجية» جديدة بلا مكتبات كما حدث للغات العربية السابقة.
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span>المصحّح: من 9 مشاكل إلى ملف سليم — بإثبات</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>قبل</h3>
+<pre><span class="diff-del">let س = ٥، ع = ٣؛</span>
+<span class="diff-del">let وصف = نتيجه &gt; 7 ؟ "كبير" : "صغير";</span>
+console.log("٥،")   <span class="cm">// نص: لا يُمَس</span>
+<span class="diff-del">let متغير١ = 10;</span>
+<span class="diff-del">let مبلغ = ٥٬٠٠٠;</span>
+<span class="diff-del">let ا‮لسر = 2;     <span class="cm">// حرف اتجاه مخفي</span></span>
+let قيمه_total = 1;</pre>
+        <p class="note">رسالة التحقق: <span class="mono">node --check → فشل</span></p>
+      </div>
+      <div class="card">
+        <h3>بعد <span class="pill ok">تحقق: سليم ✔</span></h3>
+<pre><span class="diff-add">let س = 5, ع = 3;</span>
+<span class="diff-add">let وصف = نتيجه &gt; 7 ? "كبير" : "صغير";</span>
+console.log("٥،")   <span class="cm">// بقي كما هو ✅</span>
+<span class="diff-add">let متغير1 = 10;</span>
+<span class="diff-add">let مبلغ = 5000;</span>
+<span class="diff-add">let السر = 2;</span>
+let قيمه_total = 1;  <span class="cm">// تحذير: خلط لغات — قرار بشري</span></pre>
+        <p class="note">9 إصلاحات مُبلَّغ عنها واحدًا واحدًا برمزها وموضعها، ونسخة احتياطية <span class="mono">.bak</span> قبل الكتابة.</p>
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:16px">
+      <div class="card"><h3>مستوى 0 — حتمي</h3><p>حروف مخفية · أرقام عربية في الأعداد · <span class="mono">، ؛ ٫ ٬</span> · <span class="mono">؟</span> في الشرط الثلاثي · تطويل. يُطبَّق بلا سؤال بعد التحقق.</p></div>
+      <div class="card"><h3>مستوى 1 — قواعد لغوية</h3><p>إعادة تسمية <b>متسقة</b>: <span class="mono">متغير١</span> ← <span class="mono">متغير1</span> في كل مواضعها في الملف.</p></div>
+      <div class="card"><h3>مستوى 2 — نموذج لغوي</h3><p>للأخطاء المنطقية. بحلقة تحقق: إن فشل الإصلاح لا يُكتب شيء ويُقال ذلك صراحةً. مفتاحك يبقى عندك.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">05</span>الحارس الأمني: الميزة التي لا يملكها أحد غيرنا</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>هجوم Trojan Source — كيف يبدو</h3>
+        <p>سطران يبدوان متطابقين، والمترجم ينفّذ شيئًا آخر — لأن حرف اتجاه مخفي (U+202E) يقلب العرض. رست 1.56 صارت ترفضها، فكّرت المنصّات أن الحل هو <b>إظهارها للمراجعين</b>.</p>
+<pre><span class="cm">// كما يراه المراجع:</span>
+if (access_level != "user‮  ‮// Check if admin") { … }
+
+<span class="cm">// زيتونة تقول:</span>
+<span style="color:#f87171">⛔ خطر أمني Z101 — السطر 13، العمود 6: حرف اتجاه مخفي (Bidi): U+202E</span>
+<span style="color:#93a3c0">   ↳ الإصلاح المقترح: احذفه</span>
+<span style="color:#93a3c0">   ⓘ يقلب اتجاه عرض السطر فيظهر الكود معكوسًا عمّا ينفّذه المترجم</span></pre>
+      </div>
+      <div class="card">
+        <h3>ما يكشفه في ملف واحد</h3>
+        <ul class="tick" style="font-size:14.5px">
+          <li><b>Z101</b> — أحرف الاتجاه (خطر أمني في الكود، تحذير داخل النصوص)</li>
+          <li><b>Z102/Z104/Z105</b> — صفرية العرض · وسوم الحقن · حروف التحكّم</li>
+          <li><b>Z208</b> — رقم عربي داخل اسم: <span class="mono">متغير١</span> يشبه <span class="mono">متغير1</span></li>
+          <li><b>Z211/Z212</b> — أرقام هندية وفواصل عربية في الأعداد (أخطاء فعلية)</li>
+          <li><b>Z213</b> — <span class="mono">؟</span>: تُصلح فقط لو كانت شرطًا ثلاثيًا، وإلا تُترك بقرار بشري</li>
+          <li><b>Z214</b> — خلط <span class="mono">ي/ى</span> أو <span class="mono">ك/ک</span> أو <span class="mono">ه/ة</span> في اسم واحد</li>
+          <li><b>Z401</b> — فشل مدقّق اللغة، مشروحًا بالعربية</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">06</span>الدرس: لماذا ماتت «قلب» — ولن نموت نحن</h2>
+    <div class="tblwrap">
+      <table>
+        <tr><th>المعيار</th><th>قلب (2012) — آخر تحديث يناير 2013</th><th>زيتونة (2026)</th></tr>
+        <tr><td>الفكرة</td><td>لغة عربية كاملة، مفسّر خاص، عالم مغلق</td><td>لغة عربية <b>تُترجم إلى جافاسكربت</b> — جسر لا جزيرة</td></tr>
+        <tr><td>قيمة فورية لغير مبرمج زيتونة</td><td>لا شيء</td><td><b>مصحّح الأخطاء العربية + حارس اليونيكود</b> يعملان على كود المستخدم الحالي</td></tr>
+        <tr><td>المكتبات والنظام</td><td>معزولة (لا npm ولا محرر ولا مترجم إنتاجي)</td><td>كل npm ونظام جافاسكربت يعمل فورًا</td></tr>
+        <tr><td>الاعتماد</td><td>جهد فرد فني بلا أدوات حوله</td><td>أدوات (مصحّح/حارس) تجلب المستخدمين، واللغة هي البانر</td></tr>
+        <tr><td>الحكم النهائي</td><td>«تجربة برمجة عربية كاملة مستحيلة» — رمزي ناصر</td><td>لم نحاول أن نكون كل شيء: أخذنا ما يمكن تحقيقه ونفّذناه بضمانات</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">07</span>تعدد اللغات — بوعد لا نكذبه</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>اليوم (مُتحقَّق منه)</h3>
+        <div style="display:grid;gap:9px">
+          <div class="lang"><span>جافاسكربت / نود</span><span><span class="pill ok">فحص node --check</span> <span class="pill ok">إصلاح 0 و1</span></span></div>
+          <div class="lang"><span>بايثون</span><span><span class="pill ok">فحص py_compile</span> <span class="pill ok">إصلاح 0</span></span></div>
+          <div class="lang"><span>زيتونة (عربية)</span><span><span class="pill ok">مترجم داخلي</span></span></div>
+          <div class="lang"><span>تايبسكربت</span><span><span class="pill part">فحوص يونيكود + تصريح صريح بغياب tsc</span></span></div>
+        </div>
+        <p class="note">القاعدة: <b>لا ندّعي دعم لغة لا نتحقق منها.</b> لو لم يوجد مدقّق نقول ذلك بدل تمرير «نجاح» كاذب.</p>
+      </div>
+      <div class="card">
+        <h3>خارطة التوسّع (مدقّق واحد كل مرحلة)</h3>
+        <p>جافا · C# · Go · C++ · PHP · Ruby · Rust · SQL — كل لغة = ملف مدقّق + جدول ترجمة رسائل المترجم إلى العربية، ثم قواعد إصلاح مشتركة (الحروف المخفية والأرقام العشرية ظاهرة عامة في كل اللغات).</p>
+        <p style="margin-top:10px"><span class="pill">لماذا سريع؟</span> لأن 90% من الأخطاء «العربية» ليست خاصة بلغة — بل باليونيكود. المدقّق الواحد يخدم كل اللغات.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">08</span>أرقام النموذج الحالي (لا وعود)</h2>
+    <div class="grid g4">
+      <div class="stat"><div class="big">44/44</div><div class="lb">اختبارًا ناجحًا (لغة · تشخيص · أمان · إصلاح · مدقّقون · CLI)</div></div>
+      <div class="stat"><div class="big">0</div><div class="lb">إصلاح يُكتب بدون اجتياز مدقّق اللغة — مفروض برمجيًا</div></div>
+      <div class="stat"><div class="big">2</div><div class="lb">لغتان حقيقيّتان (JS/Python) + زيتونة، مع ترجمة رسائل المترجم</div></div>
+      <div class="stat"><div class="big">34</div><div class="lb">كلمة مفتاحية عربية + 10 دوال مدمجة عربية</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">09</span>النموذج الربحي وخارطة 12 شهرًا</h2>
+    <div class="grid g3">
+      <div class="card"><h3>مجاني</h3><p>زيتونة + إصلاح المستوى 0/1 + حارس اليونيكود للمشاريع الشخصية.</p></div>
+      <div class="card" style="border-color:#2f6b4a"><h3>محترفون — <span class="mono">$6–10</span>/شهر</h3><p>إصلاح بنموذج لغوي بحلقة تحقق · مشاريع غير محدودة · تصدير.</p></div>
+      <div class="card"><h3>فرق — <span class="mono">$8–15</span>/مقعد</h3><p>حارس Unicode في CI لكل PR · تقارير · سياسة أسماء · إصلاح جماعي.</p></div>
+    </div>
+    <div class="grid" style="margin-top:16px">
+      <div class="tl"><div class="w">الآن (تم)</div><div>مترجم زيتونة + مصحّح JS/Python + حارس 15 رمزًا + 44 اختبارًا.</div></div>
+      <div class="tl"><div class="w">1–2 شهر</div><div>إكمال المستوى 2 + جافا و C# و Go + واجهة عربية كاملة + دعم tsc.</div></div>
+      <div class="tl"><div class="w">3–5 شهور</div><div>تطبيق الموبايل (محرر + زر إصلاح + تقرير) أوفلاين أولًا · 500 مستخدم تجريبي.</div></div>
+      <div class="tl"><div class="w">6–8 شهور</div><div>إضافة VS Code + Language Server + GitHub Action للحارس.</div></div>
+      <div class="tl"><div class="w">9–12 شهرًا</div><div>توسيع المعجم + كتب تعليمية + «زيتونة تكتب زيتونة» (تضخيم ذاتي).</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">10</span>المخاطر — بصراحة كاملة</h2>
+    <ul class="no">
+      <li><b>«لعاطفة عربية تُنسى بعد أسبوعين»:</b> العلاج — المنتج يبيع ألمًا يوميًا (أخطاء حقيقية + حارس أمني)، لا هوية فقط.</li>
+      <li><b>منافس غربي يضيف دعمًا عربيًا:</b> العلاج — خندقنا المعجم والنحو العربي؛ قائمة أحرف تُنسخ، وتصميم لغة لا يُنسخ في أسبوع.</li>
+      <li><b>إصلاح خاطئ يهدم الثقة:</b> العلاج — تحقق إلزامي + نسخة احتياطية + شفافية كل تغيير + «لا نكتب شيئًا» عند الفشل.</li>
+      <li><b>تشتّت الجهد بين لغات كثيرة:</b> العلاج — لغة كاملة واحدة (JS) + بايثون، ثم مدقّق واحد كل مرحلة بشروط تحقق.</li>
+      <li><b>«مجرد لعبة أكاديمية»:</b> العلاج — أرقام: 44 اختبارًا + تكامل مع اللغات الحقيقية + ضمان التحقق + حالة استخدام تجارية (CI).</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="num">11</span>جرّبه الآن</h2>
+    <div class="card hero">
+<pre><span class="cm"># كل الأوامر بالعربية</span>
+<span class="kw">node</span> bin/zaytuna.js مساعدة
+
+<span class="cm"># شغّل برنامجًا عربيًا</span>
+<span class="kw">node</span> bin/zaytuna.js تشغيل examples/حاسبة.zy
+
+<span class="cm"># افحص ملفك — أي ملف جافاسكربت أو بايثون</span>
+<span class="kw">node</span> bin/zaytuna.js فحص examples/كود_به_أخطاء.js
+
+<span class="cm"># أصلح (مع تحقق إلزامي ونسخة احتياطية)</span>
+<span class="kw">node</span> bin/zaytuna.js إصلاح examples/كود_به_أخطاء.js --tier 1 --write
+
+<span class="cm"># شغّل 44 اختبارًا / جولة العرض الكاملة</span>
+<span class="kw">node</span> tests/run.js
+<span class="kw">bash</span> demo/tour.sh</pre>
+      <p class="note">التفاصيل الكاملة: <b>docs/ARABIC_CODE_SPEC.md</b> · المخرجات الحقيقية: <b>docs/DEMO_TRANSCRIPT.md</b></p>
+    </div>
+  </section>
+
+  <footer>
+    زيتونة — نموذج عامل في مستودع ZYNQ-AI · أكتوبر 2026<br>
+    كل الأرقام في هذه الصفحة إما من تشغيل حقيقي في هذا المستودع، أو موثّقة بمصادرها في المواصفة.
+  </footer>
+
+</div>
+</body>
+</html>
