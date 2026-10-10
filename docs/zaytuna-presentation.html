@@ -83,10 +83,11 @@
       <b>ولا يُكتب أي إصلاح قبل اجتيازه مدقّق اللغة الحقيقي.</b>
     </p>
     <div class="chips">
-      <span class="chip"><b>67</b> اختبارًا ناجحًا فعلًا</span>
+      <span class="chip"><b>74</b> اختبارًا ناجحًا فعلًا</span>
       <span class="chip"><b>40</b> كلمة مفتاحية عربية</span>
       <span class="chip"><b>15</b> رمز تشخيص أمني وترقيمي</span>
       <span class="chip"><b>7</b> لغات مُتحقَّق منها اليوم</span>
+      <span class="chip">زر ترجمة: <b>بايثون</b> · <b>سي++</b> بمترجمَين حقيقيين</span>
       <span class="chip">النموذج يعمل: <span class="mono">bash demo/tour.sh</span></span>
     </div>
   </header>
@@ -246,6 +247,37 @@ if (access_level != "user‮  ‮// Check if admin") { … }
     </div>
   </section>
 
+    <h2><span class="num">06.5</span>زر الترجمة — نكتب بالعربية، ونُخرج إلى أي لغة</h2>
+    <p class="lead">الهدف: <b>تسهيل البرمجة على الناس</b> — من تعلّم بالعربية يكتب بزيتونة، ثم يحوّل برنامجه إلى اللغة التي يريدها بضغطة واحدة.</p>
+    <div class="grid g2">
+      <div class="card">
+        <h3>خطّ الترجمة لا يكتفي بتوليد نص</h3>
+        <ul>
+          <li>يترجم الشجرة العربية إلى الهدف، و<b>يسجّل كل موضع لم يستطع ترجمته</b> (لا يخفي شيئًا).</li>
+          <li><b>يشغّل مدقّق اللغة الحقيقي</b> على المخرج؛ وإن لم يكن مثبتًا يقول «لم أتحقق» + أمر التثبيت.</li>
+          <li><b>يشغّل المخرج فعلًا</b> ويقارن نتيجته بمخرج جافاسكربت — التطابق هو الدليل.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>الحالة اليوم (بصراحة)</h3>
+        <div style="display:grid;gap:9px">
+          <div class="lang"><span>جافاسكربت · تايبسكربت</span><span><span class="pill ok">node --check · tsc (وإن غاب نقول)</span></span></div>
+          <div class="lang"><span>بايثون <span class="mono">.py</span></span><span><span class="pill ok">py_compile + تنفيذ + مطابقة حرفية (4/4 أمثلة)</span></span></div>
+          <div class="lang"><span>سي++ <span class="mono">.cpp</span> (C++17)</span><span><span class="pill ok">g++ + تشغيل — ويُصرّح بما لا يدعمه</span></span></div>
+          <div class="lang"><span>روبي · بي إتش بي</span><span><span class="pill part">مكتوبان — المدقّق غير مثبّت هنا ⇒ «لم نتحقق»</span></span></div>
+          <div class="lang"><span>سي · جافا · سي شارب · جو · رست</span><span><span class="pill part">لاحقًا — والسبب مذكور في <span class="mono">ترجم --لغات</span></span></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <pre class="block"><span class="cm"># من الطرفية</span>
+zaytuna ترجم examples/حاسبة.zy --إلى بايثون --out حاسبة.py
+zaytuna ترجم examples/مرحبا.zy --إلى سي++
+
+<span class="cm"># أو من الواجهة (بلا أي مكتبات): محرّر + قائمة لغات + زر «ترجم»</span>
+node ui/server.js</pre>
+    </div>
+
   <section>
     <h2><span class="num">07</span>تعدد اللغات — بوعد لا نكذبه</h2>
     <div class="grid g2">
@@ -270,10 +302,11 @@ if (access_level != "user‮  ‮// Check if admin") { … }
   <section>
     <h2><span class="num">08</span>أرقام النموذج الحالي (لا وعود)</h2>
     <div class="grid g4">
-      <div class="stat"><div class="big">67/67</div><div class="lb">اختبارًا ناجحًا (لغة · تشخيص · أمان · إصلاح · مدقّقون · CLI)</div></div>
+      <div class="stat"><div class="big">74/74</div><div class="lb">اختبارًا ناجحًا (لغة · تشخيص · أمان · إصلاح · مدقّقون · ترجمة · CLI)</div></div>
       <div class="stat"><div class="big">0</div><div class="lb">إصلاح يُكتب بدون اجتياز مدقّق اللغة — مفروض برمجيًا</div></div>
       <div class="stat"><div class="big">7</div><div class="lb">لغات مُتحقَّق منها محليًا (JS · Python · زيتونة · C · C++ · Shell · Perl) من 17 لغة مدعومة</div></div>
       <div class="stat"><div class="big">40</div><div class="lb">كلمة مفتاحية عربية + 14 دالة مدمجة عربية</div></div>
+      <div class="stat" style="grid-column:1/-1"><div class="big">بايثون · سي++</div><div class="lb">مخرَجان مترجَمان ومُتحقَّق منهما <b>بالتشغيل الفعلي</b> ومقارنة النتيجة بمخرج جافاسكربت — وما لا يُترجم يُعلَن صريحًا</div></div>
     </div>
   </section>
 
@@ -285,7 +318,7 @@ if (access_level != "user‮  ‮// Check if admin") { … }
       <div class="card"><h3>فرق — <span class="mono">$8–15</span>/مقعد</h3><p>حارس Unicode في CI لكل PR · تقارير · سياسة أسماء · إصلاح جماعي.</p></div>
     </div>
     <div class="grid" style="margin-top:16px">
-      <div class="tl"><div class="w">الآن (تم)</div><div>مترجم زيتونة + مصحّح JS/Python + حارس 15 رمزًا + 44 اختبارًا.</div></div>
+      <div class="tl"><div class="w">الآن (تم)</div><div>مترجم زيتونة (أنماط · أنواع · أدوية عامة) + مصحّح JS/Python + حارس 15 رمزًا + <b>زر ترجمة (بايثون · سي++)</b> + 74 اختبارًا.</div></div>
       <div class="tl"><div class="w">1–2 شهر</div><div>إكمال المستوى 2 + جافا و C# و Go + واجهة عربية كاملة + دعم tsc.</div></div>
       <div class="tl"><div class="w">3–5 شهور</div><div>تطبيق الموبايل (محرر + زر إصلاح + تقرير) أوفلاين أولًا · 500 مستخدم تجريبي.</div></div>
       <div class="tl"><div class="w">6–8 شهور</div><div>إضافة VS Code + Language Server + GitHub Action للحارس.</div></div>
@@ -322,7 +355,7 @@ if (access_level != "user‮  ‮// Check if admin") { … }
 
 <span class="cm"># شغّل 44 اختبارًا / جولة العرض الكاملة</span>
 <span class="kw">node</span> tests/run.js        <span class="cm"># 55 اختبارًا</span>
-<span class="kw">bash</span> demo/tour.sh        <span class="cm"># 12 خطوة: زيتونة + أنماط + جافاسكربت + سي + شل + تصريف ذاتي</span>
+<span class="kw">bash</span> demo/tour.sh        <span class="cm"># 14 خطوة: زيتونة + أنماط وأنواع + جافاسكربت + سي + شل + تصريف ذاتي + ترجمة</span>
 <span class="kw">node</span> demo/make-transcript.js  <span class="cm"># سجلّ المخرجات الحقيقية</span></pre>
       <p class="note">التفاصيل الكاملة: <b>docs/ARABIC_CODE_SPEC.md</b> · المخرجات الحقيقية: <b>docs/DEMO_TRANSCRIPT.md</b></p>
     </div>

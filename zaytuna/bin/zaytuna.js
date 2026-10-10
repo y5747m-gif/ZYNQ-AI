@@ -284,6 +284,96 @@ function cmdSuggest(word, flags) {
   return sug ? 0 : 1;
 }
 
+// ------------------------------------------------------------------ ترجم
+/** علامة تعليق كل لغة هدف */
+const TARGET_COMMENT = { py: '# ', rb: '# ', php: '// ', cpp: '// ', c: '// ', java: '// ', cs: '// ', go: '// ', rs: '// ', ts: '// ', js: '// ' };
+
+function targetTable() {
+  return api.listTargets().map((t) => {
+    const mark = t.planned ? '·' : '✔';
+    const ext = t.ext ? paint(t.ext.padEnd(6), 'cyan', useColor) : '      ';
+    return `  ${mark} ${t.label.padEnd(12)} ${ext} ${t.planned ? paint(t.desc, 'dim', useColor) : t.desc}`;
+  }).join('\n');
+}
+
+/** يُترجم ملف زيتونة إلى اللغة المطلوبة، ويتحقق من المخرج إن أمكن */
+function cmdTranslate(file, flags) {
+  const to = flags['إلى'] || flags.to || flags.target;
+  if (!to || flags['لغات'] || flags.langs) {
+    console.log(paint('لغات الترجمة المتاحة:', 'cyan', useColor));
+    console.log(targetTable());
+    console.log('');
+    console.log('  مثال: zaytuna ترجم examples/حاسبة.zy --إلى بايثون');
+    return to ? 0 : 1;
+  }
+  const source = readSource(file);
+  const res = api.translateReport(source, to, {
+    file,
+    verify: !flags['بلا-تحقق'],
+    run: !flags['بلا-تشغيل'],
+    compare: !flags['بلا-مقارنة'],
+    timeout: flags['مهلة'] ? Number(flags['مهلة']) : undefined,
+  });
+
+  if (!res.ok) {
+    if (res.diagnostics && res.diagnostics.length) printDiagnostics(res.diagnostics, source, file);
+    else console.error(paint('✖ ' + (res.reason || 'تعذّرت الترجمة'), 'error', useColor));
+    return 2;
+  }
+
+  const c = TARGET_COMMENT[res.target] || '// ';
+  let code = res.code;
+  if (!flags['بلا-رأس']) {
+    const block = [c + `تُرجم آليًا من زيتونة: ${path.basename(file)} ← ${res.label}`];
+    if (res.unsupported.length) {
+      block.push(c + `⚠ تنبيه: ${res.unsupported.length} موضعًا لم يُترجم — انظر التقرير أدناه.`);
+    }
+    code = block.join('\n') + '\n' + code;
+  }
+
+  const reportLines = [];
+  const t = api.findTarget(res.target) || {};
+  reportLines.push(paint(`🌐 ترجمة: ${path.basename(file)} ← ${res.label} (${t.ext || ''})`, 'cyan', useColor));
+  if (!res.unsupported.length) reportLines.push(paint('   كل السطور تُرجمت — لا شيء غير مدعوم.', 'green', useColor));
+  else {
+    reportLines.push(paint(`   ⚠ مواضع غير مدعومة (${res.unsupported.length}):`, 'yellow', useColor));
+    for (const u of res.unsupported.slice(0, 8)) reportLines.push(`     · ${u.kind}${u.line ? ` (سطر ${u.line})` : ''}`);
+  }
+  for (const n of (res.notes || []).slice(0, 5)) reportLines.push(paint(`   ملاحظة: ${n}`, 'dim', useColor));
+  if (res.verification) {
+    const v = res.verification;
+    const tone = v.verified && v.syntax.ok ? (res.unsupported.length ? 'yellow' : 'green') : 'error';
+    reportLines.push(paint('   التحقق: ' + v.summary, tone, useColor));
+    if (v.syntax.output && !v.syntax.ok) reportLines.push(paint('     ' + v.syntax.output.split('\n').slice(0, 4).join('\n     '), 'dim', useColor));
+    if (v.run.stderr && !v.run.ok) reportLines.push(paint('     ' + v.run.stderr.split('\n').slice(0, 4).join('\n     '), 'dim', useColor));
+  }
+  if (res.reference) {
+    reportLines.push(paint(res.reference.match
+      ? '   ✔ النتيجة مطابقة تمامًا لمخرج جافاسكربت (نفس الطبعات).'
+      : '   ⚠ النتيجة مختلفة عن مخرج جافاسكربت — راجع المواضع غير المدعومة.', res.reference.match ? 'green' : 'yellow', useColor));
+  } else if (res.verification && res.verification.run.ran) {
+    reportLines.push(paint('   (لم تُقارن بجافاسكربت: التشغيل المرجعي لم يكتمل.)', 'dim', useColor));
+  }
+
+  if (flags.out) {
+    fs.writeFileSync(flags.out, code, 'utf8');
+    console.log(reportLines.join('\n'));
+    console.log(paint(`   كُتب المخرج: ${flags.out} (${Buffer.byteLength(code, 'utf8')} بايت)`, 'green', useColor));
+  } else if (flags.json) {
+    console.log(JSON.stringify({
+      target: res.target, label: res.label, ext: t.ext, code,
+      unsupported: res.unsupported, notes: res.notes,
+      verification: res.verification ? { verified: res.verification.verified, summary: res.verification.summary, syntaxOk: res.verification.syntax.ok, ran: res.verification.run.ran, runOk: res.verification.run.ok, stdout: res.verification.run.stdout } : null,
+      reference: res.reference ? { match: res.reference.match } : null,
+    }, null, 2));
+  } else {
+    process.stdout.write(code);
+    console.error(reportLines.join('\n'));
+  }
+  const bad = res.verification && res.verification.verified && !res.verification.syntax.ok;
+  return bad ? 1 : 0;
+}
+
 function cmdTest() {
   const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'tests', 'run.js')], { stdio: 'inherit' });
   return r.status ?? 1;
@@ -335,6 +425,13 @@ ${paint('أمثلة:', 'cyan', useColor)}
   zaytuna إصلاح examples/كود_به_أخطاء.js --write
   zaytuna تشغيل examples/حاسبة.zy
   zaytuna اقترح طالم
+  zaytuna ترجم examples/حاسبة.zy --إلى بايثون --out حاسبة.py
+  zaytuna ترجم examples/حاسبة.zy --إلى سي++ --بلا-تشغيل
+
+${paint('زر الترجمة (ترجم):', 'cyan', useColor)}
+  يكتب المخرج إلى الطرفية (أو ملفًا مع --out)، ويتحقق منه بمدقّق اللغة الحقيقي،
+  ثم يشغّله إن أمكن ويقارن النتيجة بمخرج جافاسكربت — ولا يقول «تحقّق» بغير ذلك.
+${targetTable()}
 `);
 }
 
@@ -369,6 +466,9 @@ async function main() {
       return cmdMap(file, flags);
     case 'اقترح': case 'suggest':
       return cmdSuggest(positional[1], flags);
+    case 'ترجم': case 'translate': case 'حوّل': case 'حول':
+      if (!file && !flags['لغات'] && !flags.langs) die('حدّد ملفًا: zaytuna ترجم ملف.zy --إلى بايثون');
+      return cmdTranslate(file, flags);
     case 'اختبار': case 'test':
       return cmdTest();
     default:

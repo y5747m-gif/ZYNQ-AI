@@ -63,4 +63,13 @@ line "12) تصريف ذاتي: «اقترح» بتنفيذ مكتوب بلغة �
 $Z اقترح طالم
 $Z اقترح متغيّر
 
+line "13) زر الترجمة: زيتونة ← بايثون (ثم تنفيذ المخرج فعليًا)"
+$Z ترجم examples/حاسبة.zy --إلى بايثون --out /tmp/zaytuna-tour.py
+head -3 /tmp/zaytuna-tour.py
+python3 /tmp/zaytuna-tour.py | head -3
+
+line "14) الترجمة إلى سي++ — تحقق بـg++ ومقارنة بالنتيجة المرجعية"
+$Z ترجم examples/مرحبا.zy --إلى سي++ --out /tmp/zaytuna-tour.cpp
+g++ -std=c++17 -fsyntax-only /tmp/zaytuna-tour.cpp && echo "g++ -fsyntax-only: سليم ✔"
+
 printf '\n\033[32mانتهت الجولة.\033[0m\n'

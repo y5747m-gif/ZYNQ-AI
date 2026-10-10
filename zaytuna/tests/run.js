@@ -673,6 +673,91 @@ test('CLI: «zaytuna اقترح» يعمل بتنفيذ زيتونة ويكشف 
   eq(none.status, 1, 'لا اقتراح ⇒ كود خروج 1');
 });
 
+// ---------------------------------------------------------------- زر الترجمة
+const { resolveTool } = require('../src/checkers');
+const { translateReport } = require('../src/index');
+
+test('ترجم: أسماء اللغات بالعربية والإنجليزية والامتداد', () => {
+  const { findTarget } = api;
+  for (const name of ['بايثون', 'python', 'py', '.py', 'Python3']) eq(findTarget(name).id, 'py', `الاسم: ${name}`);
+  for (const name of ['سي++', 'c++', 'cpp', '.cpp', 'سي بلاس بلاس']) eq(findTarget(name).id, 'cpp', `الاسم: ${name}`);
+  eq(findTarget('روبي').id, 'rb');
+  eq(findTarget('بي إتش بي').id, 'php');
+  eq(findTarget('جافاسكربت').id, 'js');
+  eq(findTarget('كوبول'), null, 'لغة غير موجودة ⇒ null');
+});
+
+test('ترجم: جافاسكربت وتايبسكربت يطابقان المترجم الأساسي', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'examples', 'أنماط_وأنواع.zy'), 'utf8');
+  const base = compile(src);
+  const js = api.translate(src, 'js');
+  const ts = api.translate(src, 'ts');
+  const tsBase = api.compile(src, { types: true });
+  ok(js.ok && ts.ok, 'يجب أن تنجح الترجمة');
+  eq(js.code, base.code, 'مخرج جافاسكربت');
+  eq(ts.code, tsBase.code, 'مخرج تايبسكربت (مع الأنواع)');
+});
+
+test('ترجم: بايثون — بنية سليمة وتنفيذ مطابق لجافاسكربت (وإن غاب المدقّق نقول ذلك)', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'examples', 'حاسبة.zy'), 'utf8');
+  const r = translateReport(src, 'بايثون', { file: 'حاسبة.zy' });
+  ok(r.ok, 'يجب أن تنجح الترجمة');
+  eq(r.ext, '.py');
+  eq(r.unsupported.length, 0, 'مثال الحاسبة كله مترجم');
+  includes(r.code, 'def اجمع');
+  includes(r.code, 'class مركبة');
+  if (!resolveTool(['python3', 'python'])) {
+    eq(r.verification.verified, false, 'بلا مدقّق: لا يجوز إعلان التحقق');
+    return;
+  }
+  ok(r.verification.verified && r.verification.syntax.ok, r.verification.summary);
+  ok(r.verification.run.ran && r.verification.run.ok, 'يجب أن يعمل المخرج');
+  ok(r.reference && r.reference.match, 'النتيجة يجب أن تطابق مخرج جافاسكربت');
+});
+
+test('ترجم: سي++ — يُتحقق به من g++، والمواضع غير المدعومة تُصرَّح', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'examples', 'مرحبا.zy'), 'utf8');
+  const r = translateReport(src, 'سي++');
+  ok(r.ok, 'يجب أن تنجح الترجمة');
+  eq(r.ext, '.cpp');
+  includes(r.code, '#include <iostream>');
+  includes(r.code, 'int main()');
+  if (!resolveTool(['g++', 'clang++', 'c++'])) {
+    eq(r.verification.verified, false, 'بلا مدقّق: لا يجوز إعلان التحقق');
+    return;
+  }
+  ok(r.verification.verified && r.verification.syntax.ok, r.verification.summary);
+  ok(r.reference === null || r.reference.match === true, 'نتيجة سي++ يجب أن تطابق جافاسكربت');
+});
+
+test('ترجم: ما لا يُترجم يُقال صراحةً (لا يمرّ بصمت)', () => {
+  const src = 'متغير كائن = { اسم: "سارة" }\nاطبع(مفاتيح(كائن))\n';
+  const r = api.translate(src, 'سي++');
+  ok(r.ok, 'الترجمة تُنتج كودًا');
+  ok(r.unsupported.length >= 1, 'يجب تسجيل موضع غير مدعوم (الكائن/المفاتيح)');
+  ok(r.unsupported.some((u) => /كائن|مفاتيح/.test(u.kind)), 'نوع الموضع غير المدعوم واضح: ' + JSON.stringify(r.unsupported));
+});
+
+test('CLI: «zaytuna ترجم» يطبع المخرج بالعربية ويقبل --json', () => {
+  const cli = path.join(__dirname, '..', 'bin', 'zaytuna.js');
+  const r = spawnSync(process.execPath, [cli, 'ترجم', path.join(__dirname, '..', 'examples', 'مرحبا.zy'), '--إلى', 'تايبسكربت', '--بلا-تحقق', '--بلا-تشغيل'], { encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' } });
+  eq(r.status, 0, r.stderr);
+  includes(r.stdout, 'console.log');
+  const j = spawnSync(process.execPath, [cli, 'ترجم', path.join(__dirname, '..', 'examples', 'حاسبة.zy'), '--إلى', 'بايثون', '--json', '--بلا-تشغيل'], { encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' } });
+  eq(j.status, 0, j.stderr);
+  const data = JSON.parse(j.stdout.slice(j.stdout.indexOf('{')));
+  eq(data.target, 'py');
+  eq(data.ext, '.py');
+  includes(data.code, 'def اجمع');
+});
+
+test('CLI: ترجم بلغة غير معروفة ⇒ رسالة عربية وقائمة اللغات', () => {
+  const cli = path.join(__dirname, '..', 'bin', 'zaytuna.js');
+  const r = spawnSync(process.execPath, [cli, 'ترجم', path.join(__dirname, '..', 'examples', 'مرحبا.zy'), '--إلى', 'كوبول'], { encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' } });
+  eq(r.status, 2, 'كود خروج 2 للغة غير معروفة');
+  includes(r.stdout + r.stderr, 'بايثون');
+});
+
 // ---------------------------------------------------------------- النتيجة
 console.log(`\n═══ النتيجة: ${passed} ناجح · ${failed} فاشل ═══\n`);
 if (failed) {
