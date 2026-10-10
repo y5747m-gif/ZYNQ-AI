@@ -10,7 +10,8 @@ node bin/zaytuna.js مساعدة              # كل الأوامر + جدول �
 node bin/zaytuna.js تشغيل examples/حاسبة.zy
 node bin/zaytuna.js فحص   examples/كود_به_أخطاء.js
 node bin/zaytuna.js إصلاح examples/كود_به_أخطاء.js --tier 1 --write
-node tests/run.js                       # 64 اختبارًا
+node bin/zaytuna.js اقترح طالم                 # تصريف ذاتي: التنفيذ مكتوب بزيتونة (selfhost/اقتراح.zy)
+node tests/run.js                       # 67 اختبارًا
 node bin/zaytuna.js بناء examples/أنماط_وأنواع.zy --ts   # مخرج تايبسكربت بالأنواع
 bash demo/tour.sh                       # جولة عرض (10 خطوات)
 node demo/make-transcript.js            # إعادة توليد سجلّ المخرجات الحقيقية
@@ -44,6 +45,8 @@ node demo/make-transcript.js            # إعادة توليد سجلّ الم�
 ثابت النتيجة = ٨٧ >= ٥٠ ؟ "ناجح" : "راسب"      # شرط ثلاثي عربي
 اطبع(انضم(اقسم("زيتونة-لغة"، "-")، " + "))
 ```
+
+**تصريف ذاتي:** `selfhost/اقتراح.zy` — مقترح الكلمات المفتاحية مكتوب بزيتونة ومُترجَم بمترجمها، ومُختبَر على 229 مدخلًا مقابل تنفيذ جافاسكربت (0 اختلافات).
 
 المعجم الكامل والمستويات والضمانات في [`../docs/ARABIC_CODE_SPEC.md`](../docs/ARABIC_CODE_SPEC.md)، والمخرجات الحقيقية في [`../docs/DEMO_TRANSCRIPT.md`](../docs/DEMO_TRANSCRIPT.md).
 

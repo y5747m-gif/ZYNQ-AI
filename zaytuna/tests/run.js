@@ -620,6 +620,59 @@ test('مثال الأنماط والأنواع الكامل يعمل + مخرج�
   includes(ts.code, 'class صندوق<س>');
 });
 
+
+// ------------------------------------------------ التصريف الذاتي (زيتونة بزيتونة)
+console.log('\nالتصريف الذاتي (زيتونة تكتب زيتونة):');
+
+/** يُترجم selfhost/اقتراح.zy بمترجم زيتونة ويُحمّله كوحدة */
+function loadSelfHost() {
+  const f = path.join(__dirname, '..', 'selfhost', 'اقتراح.zy');
+  const res = api.compile(fs.readFileSync(f, 'utf8'), { file: f });
+  ok(res.ok, 'يجب أن تُترجم: ' + JSON.stringify(res.diagnostics.filter((d) => d.severity !== 'info')));
+  return { code: res.code, mod: new Function(`${res.code}\nreturn { اقترح, طبيع, مسافة };`)() };
+}
+
+test('التصريف الذاتي: التطبيع العربي المكتوب بزيتونة يطابق تنفيذ جافاسكربت', () => {
+  const { normalizeArabic } = require('../src/dictionary');
+  const { mod } = loadSelfHost();
+  const samples = ['طالما', 'طَالِما', 'صُنّف', 'ازيتونة', 'متَغير', 'أحمد', 'مصطفي', 'كتابةـ', 'إلى', 'ةه'];
+  for (const w of samples) eq(mod.طبيع(w), normalizeArabic(w), 'تطبيع مختلف: ' + w);
+  eq(mod.مسافة('كتاب', 'كتابة'), 1);
+  eq(mod.مسافة('', 'نص'), 2);   // «نص» حرفان
+});
+
+test('التصريف الذاتي: اقتراح الكلمات المفتاحية يطابق تنفيذ جافاسكربت على 200+ مدخل', () => {
+  const { suggestKeyword, KEYWORD_WORDS } = require('../src/dictionary');
+  const { mod } = loadSelfHost();
+  const corpus = [];
+  for (const k of KEYWORD_WORDS) {
+    corpus.push(k);
+    if (k.length > 1) corpus.push(k.slice(0, -1));
+    if (k.length > 2) corpus.push(k[0] + k.slice(2));
+    corpus.push(k + k[k.length - 1]);
+    corpus.push(k.replace('ا', 'أ'));
+  }
+  let mismatches = 0;
+  for (const w of corpus) {
+    const js = suggestKeyword(w);
+    const zy = mod.اقترح(w, KEYWORD_WORDS);
+    if (js !== zy) mismatches++;
+  }
+  ok(corpus.length >= 200, 'حجم المدخلات ' + corpus.length);
+  eq(mismatches, 0, 'يجب تطابق التنفيذين تمامًا');
+  eq(mod.اقترح('طالم', KEYWORD_WORDS), 'طالما');
+  eq(mod.اقترح('صتعب', KEYWORD_WORDS), null, 'كلمة بعيدة جدًا ⇒ لا اقتراح');
+});
+
+test('CLI: «zaytuna اقترح» يعمل بتنفيذ زيتونة ويكشف الاقتراح', () => {
+  const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'bin', 'zaytuna.js'), 'اقترح', 'طالم'], { encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' } });
+  eq(r.status, 0, r.stderr);
+  includes(r.stdout, 'طالما');
+  includes(r.stdout, 'اقتراح.zy');
+  const none = spawnSync(process.execPath, [path.join(__dirname, '..', 'bin', 'zaytuna.js'), 'اقترح', 'صتعب'], { encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' } });
+  eq(none.status, 1, 'لا اقتراح ⇒ كود خروج 1');
+});
+
 // ---------------------------------------------------------------- النتيجة
 console.log(`\n═══ النتيجة: ${passed} ناجح · ${failed} فاشل ═══\n`);
 if (failed) {

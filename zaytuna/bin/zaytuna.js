@@ -19,6 +19,7 @@ const { runChecker, arabizeCheckerOutput, extractPosition } = require('../src/ch
 const { detectLang, langInfo, LANG_LABEL, LANGS } = require('../src/languages');
 const { formatAll, summaryLine, summarize, lineDiff, paint } = require('../src/diagnostics');
 const { fixText } = require('../src/fixer');
+const { KEYWORD_WORDS } = require('../src/dictionary');
 
 const VERSION = require('../package.json').version;
 const useColor = process.stdout.isTTY && !process.env.NO_COLOR;
@@ -255,6 +256,34 @@ function cmdMap(file, flags) {
   return 0;
 }
 
+/**
+ * «زيتونة تكتب زيتونة»: نُحمّل مقترح الكلمات المفتاحية المكتوب بلغة زيتونة
+ * (selfhost/اقتراح.zy) ونترجمه بمترجم زيتونة نفسه ونستدعيه من الأداة.
+ */
+function loadSelfHostSuggester() {
+  const file = path.join(__dirname, '..', 'selfhost', 'اقتراح.zy');
+  const source = fs.readFileSync(file, 'utf8');
+  const res = api.compile(source, { file });
+  if (!res.ok) {
+    die('فشل ترجمة selfhost/اقتراح.zy: ' + res.diagnostics.map((d) => d.code).join(', '));
+  }
+  return new Function(`${res.code}\nreturn { اقترح, طبيع, مسافة };`)();
+}
+
+function cmdSuggest(word, flags) {
+  if (!word) die('حدّد كلمة: zaytuna اقترح طالم');
+  const mod = loadSelfHostSuggester();
+  const sug = mod.اقترح(word, KEYWORD_WORDS);
+  if (flags.json) {
+    console.log(JSON.stringify({ word, normalized: mod.طبيع(word), suggestion: sug }, null, 2));
+    return sug ? 0 : 1;
+  }
+  console.log(paint('  ⓘ التنفيذ من selfhost/اقتراح.zy — مكتوب بلغة زيتونة ومُترجَم بمترجمها.', 'dim', useColor));
+  if (sug) console.log(`«${word}» ← ${paint('«' + sug + '»', 'green', useColor)}`);
+  else console.log(`«${word}»: لا اقتراح قريب.`);
+  return sug ? 0 : 1;
+}
+
 function cmdTest() {
   const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'tests', 'run.js')], { stdio: 'inherit' });
   return r.status ?? 1;
@@ -285,6 +314,7 @@ ${paint('الأوامر:', 'cyan', useColor)}
   إصلاح | fix <ملف>          إصلاح تلقائي        [--write] [--tier 0|1] [--ai] [--model م] [--json]
   شرح | explain <ملف.zy>     شرح البرنامج بالعربية مع الجافاسكربت المولَّد
   خريطة | map <ملف.zy>       خريطة الأسطر (زيتونة ← جافاسكربت)
+  اقترح | suggest <كلمة>     اقتراح كلمة مفتاحية — بتنفيذ مكتوب بلغة زيتونة (تصريف ذاتي)
   اختبار | test              تشغيل الاختبارات الذاتية
   مساعدة | help  ·  إصدار | version
 
@@ -304,6 +334,7 @@ ${paint('أمثلة:', 'cyan', useColor)}
   zaytuna فحص examples/كود_به_أخطاء.js
   zaytuna إصلاح examples/كود_به_أخطاء.js --write
   zaytuna تشغيل examples/حاسبة.zy
+  zaytuna اقترح طالم
 `);
 }
 
@@ -336,6 +367,8 @@ async function main() {
     case 'خريطة': case 'map':
       if (!file) die('حدّد ملفًا: zaytuna خريطة ملف.zy');
       return cmdMap(file, flags);
+    case 'اقترح': case 'suggest':
+      return cmdSuggest(positional[1], flags);
     case 'اختبار': case 'test':
       return cmdTest();
     default:
