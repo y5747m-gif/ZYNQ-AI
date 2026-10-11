@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- زيتونة — أيقونة زيتونة بسيطة بألوان متناسقة مع الواجهة -->
+  <defs>
+    <radialGradient id="olive" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#7fa654"/>
+      <stop offset="100%" stop-color="#3f6a2a"/>
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0f1410"/>
+  <!-- ورقة -->
+  <path d="M32 8 C18 18 14 32 18 46 C28 44 38 36 42 24 C44 18 40 12 32 8 Z"
+        fill="url(#olive)" stroke="#cfe1a8" stroke-width="1.2"/>
+  <!-- عرق الورقة -->
+  <path d="M22 42 C28 32 34 22 40 14" fill="none" stroke="#cfe1a8" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- نقطة زيت -->
+  <ellipse cx="46" cy="50" rx="6" ry="4" fill="#cfe1a8" opacity="0.85"/>
+</svg>
