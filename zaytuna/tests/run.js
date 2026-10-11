@@ -758,6 +758,114 @@ test('CLI: ترجم بلغة غير معروفة ⇒ رسالة عربية وق�
   includes(r.stdout + r.stderr, 'بايثون');
 });
 
+// ------------------------------------------------- ترجمة: остальные الأهداف
+test('ترجم: سي (C) — gcc يتحقق والتشغيل يطابق جافاسكربت، وما لا يُدعم يُعلَن', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'examples', 'مرحبا.zy'), 'utf8');
+  const r = translateReport(src, 'c');
+  ok(r.ok, 'يجب أن تنجح الترجمة');
+  eq(r.ext, '.c');
+  includes(r.code, '#include <stdio.h>');
+  includes(r.code, 'int main(void)');
+  if (!resolveTool(['gcc', 'cc', 'clang'])) return;
+  ok(r.verification.verified, r.verification.summary);
+  ok(r.reference === null || r.reference.match === true, 'نتيجة سي يجب أن تطابق جافاسكربت');
+
+  // مثال فيه أصناف: تُترجم البقية، ويُعلَن ما لا يُدعم (بلا صمت)
+  const calc = fs.readFileSync(path.join(__dirname, '..', 'examples', 'حاسبة.zy'), 'utf8');
+  const r2 = translateReport(calc, 'c');
+  ok(r2.unsupported.length >= 1, 'يجب الإعلان عن الأصناف غير المدعومة في سي');
+  ok(r2.unsupported.some((u) => /صنف|أصناف/.test(u.kind)), JSON.stringify(r2.unsupported.slice(0, 3)));
+});
+
+test('ترجم: الأهداف العشرة كلها تُنتج كودًا لمثال «مرحبا»', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'examples', 'مرحبا.zy'), 'utf8');
+  const langs = ['js', 'ts', 'py', 'rb', 'php', 'cpp', 'c', 'go', 'rs', 'java', 'cs'];
+  for (const id of langs) {
+    const r = api.translate(src, id);
+    ok(r.ok, `فشلت الترجمة إلى ${id}: ${r.reason || ''}`);
+    ok(r.code && r.code.includes('يا عالم'), `مخرج ${id} لا يحتوي نص البرنامج`);
+    ok(r.ext.startsWith('.'), `امتداد ${id}`);
+  }
+});
+
+test('ترجم: جو/رست/جافا/سي شارب — أصناف تُعلَن صريحة ولا تُترجم بصمت', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'examples', 'حاسبة.zy'), 'utf8');
+  for (const id of ['go', 'rs']) {
+    const r = api.translate(src, id);
+    ok(r.unsupported.some((u) => /صنف|أصناف/.test(u.kind)), `${id}: يجب الإعلان عن الأصناف`);
+  }
+  for (const id of ['java', 'cs']) {
+    const r = api.translate(src, id);
+    includes(r.code, 'class المخرج');
+  }
+});
+
+test('ترجم: طبقة الفحص البنيوي (tree-sitter) تعمل وتكشف الكود المكسور', () => {
+  const { structuralAvailable, structuralCheck } = require('../src/targets/parsecheck');
+  if (!structuralAvailable()) return;                       // البيئة بلا القواعد: نتخطى بهدوء
+  ok(structuralCheck('def f()\n  x = 1\nend\n', 'rb').ok, 'روبي سليم يجب أن يُقبل');
+  const bad = structuralCheck('def f(\n  x =\n}\n', 'rb');
+  ok(!bad.ok, 'روبي مكسور يجب أن يُرفض');
+  ok((bad.errors || []).length >= 1, 'يجب الإبلاغ عن موضع الخطأ');
+  ok(structuralCheck('package main\nfunc main() {}\n', 'go').ok, 'جو سليم');
+  ok(structuralCheck('fn main() { let x: f64 = 1.0; }\n', 'rs').ok, 'رست سليم');
+});
+
+test('ترجم: الدرجة تُعلن بصدق (مترجم · بنيوي · لا شيء)', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'examples', 'مرحبا.zy'), 'utf8');
+  const { structuralAvailable } = require('../src/targets/parsecheck');
+  const js = translateReport(src, 'js');
+  eq(js.verification.tier, 'compiler', 'جافاسكربت: درجة المترجم');
+  if (resolveTool(['python3', 'python'])) eq(translateReport(src, 'py').verification.tier, 'compiler', 'بايثون: درجة المترجم');
+  for (const id of ['rb', 'php', 'go', 'rs', 'java', 'cs']) {
+    const r = translateReport(src, id);
+    eq(r.verification.tier, structuralAvailable() ? 'structural' : 'none', `${id}: الدرجة المتوقعة`);
+    eq(r.verification.verified, false, `${id}: لا يجوز ادّعاء تحقق بمترجم بلا مترجم`);
+    if (structuralAvailable()) ok(r.verification.structuralVerified, `${id}: يجب نجاح الفحص البنيوي`);
+  }
+});
+
+test('CLI: «ترجم» يطبع درجة التحقق ويشرح البنيوي بصراحة', () => {
+  const cli = path.join(__dirname, '..', 'bin', 'zaytuna.js');
+  const r = spawnSync(process.execPath, [cli, 'ترجم', path.join(__dirname, '..', 'examples', 'مرحبا.zy'), '--إلى', 'جافا'], { encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' } });
+  eq(r.status, 0, r.stderr);
+  const out = r.stderr + r.stdout;
+  includes(out, 'التحقق');
+  ok(/tree-sitter|مترجم حقيقي/.test(out), 'يجب توضيح نوع التحقق');
+});
+
+test('ترجم: سي++ (g++) يترجم الأمثلة الأربعة كلها بلا أخطاء', () => {
+  if (!resolveTool(['g++', 'clang++', 'c++'])) return;
+  for (const f of ['مرحبا', 'حاسبة', 'اختر_وبسط', 'أنماط_وأنواع']) {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'examples', `${f}.zy`), 'utf8');
+    const r = translateReport(src, 'cpp', { timeout: 30000 });
+    ok(r.verification.syntax.ok, `${f}: g++ رفض المخرج — ${(r.verification.syntax.output || '').split('\n').slice(0, 2).join(' ')}`);
+    ok(r.verification.tier === 'compiler', `${f}: الدرجة يجب أن تكون «مترجم حقيقي»`);
+  }
+});
+
+test('ترجم: سي (gcc) يترجم الأمثلة الأربعة كلها بلا أخطاء', () => {
+  if (!resolveTool(['gcc', 'cc', 'clang'])) return;
+  for (const f of ['مرحبا', 'حاسبة', 'اختر_وبسط', 'أنماط_وأنواع']) {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'examples', `${f}.zy`), 'utf8');
+    const r = translateReport(src, 'c', { timeout: 30000 });
+    ok(r.verification.syntax.ok, `${f}: gcc رفض المخرج — ${(r.verification.syntax.output || '').split('\n').slice(0, 2).join(' ')}`);
+  }
+});
+
+test('ترجم: كل خليّة في المصفوفة لها درجة معلنة (لا «لم نتحقق» صامتة)', () => {
+  for (const f of ['مرحبا', 'حاسبة', 'اختر_وبسط', 'أنماط_وأنواع']) {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'examples', `${f}.zy`), 'utf8');
+    for (const id of ['js', 'ts', 'py', 'rb', 'php', 'cpp', 'c', 'go', 'rs', 'java', 'cs']) {
+      const r = translateReport(src, id, { timeout: 30000 });
+      const v = r.verification || {};
+      ok(['compiler', 'structural'].includes(v.tier) || v.summary.includes('لم نتحقق'),
+        `${f}/${id}: درجة غير معلنة (${v.tier})`);
+      if (v.tier === 'structural') eq(v.verified, false, `${f}/${id}: لا ندّعي تحققًا بمترجم`);
+    }
+  }
+});
+
 // ---------------------------------------------------------------- النتيجة
 console.log(`\n═══ النتيجة: ${passed} ناجح · ${failed} فاشل ═══\n`);
 if (failed) {

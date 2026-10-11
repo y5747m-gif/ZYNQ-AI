@@ -15,6 +15,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { verifyText } = require('../checkers');
 const { TARGETS } = require('./index');
+const { structuralCheck, structuralAvailable } = require('./parsecheck');
 
 const RUNNERS = {
   js:   { tier: 'run', ext: '.mjs', build: (f) => ['node', [f]] },
@@ -87,8 +88,12 @@ function runProgram(code, targetId, opts = {}) {
 }
 
 /**
- * تحقّق كامل من مخرج مترجم: بنية + تشغيل (إن أمكن).
- * @returns {{syntax:{...}, run:{...}, verified:boolean, kind:string, summary:string}}
+ * تحقّق كامل من مخرج مترجم، بثلاث درجات صراحةً:
+ *   1) «مترجم» — مدقّق/مترجم اللغة الحقيقي (ونُشغّل المخرج إن أمكن).
+ *   2) «بنيوي» — لا مترجم على الجهاز، لكن القواعد النحوية الرسمية (tree-sitter) قبلت المخرج.
+ *      وهذا **ليس** تحققًا بمترجم، ونقولها صريحة.
+ *   3) «بلا تحقق» — نقول ذلك ولا نعلن نجاحًا.
+ * @returns {{syntax, structural, run, verified, structuralVerified, tier, kind, summary}}
  */
 function verifyOutput(code, targetId, opts = {}) {
   const t = TARGETS[targetId];
@@ -99,15 +104,33 @@ function verifyOutput(code, targetId, opts = {}) {
   } catch (e) {
     syntax = { ok: false, verified: false, output: String(e && e.message ? e.message : e), kind: 'مدقّق' };
   }
-  const run = opts.runProgram === false ? { attempted: false, ran: false, ok: false, tool: null, stdout: '', stderr: '', exitCode: null, note: 'التشغيل لم يُطلب.', ms: 0 } : runProgram(code, targetId, opts);
-  const verified = !!(syntax.verified && syntax.ok);
-  const executed = !!(run.ran && run.ok);
+  const compilerTier = !!syntax.verified;
+  let structural = null;
+  if (!compilerTier && opts.structural !== false && structuralAvailable()) {
+    structural = structuralCheck(code, targetId, opts);
+  }
+  const run = opts.runProgram === false
+    ? { attempted: false, ran: false, ok: false, tool: null, stdout: '', stderr: '', exitCode: null, note: 'التشغيل لم يُطلب.', ms: 0 }
+    : runProgram(code, targetId, opts);
+
+  const verified = !!(compilerTier && syntax.ok);
+  const structuralVerified = !!(structural && structural.verified && structural.ok);
+  const tier = compilerTier ? 'compiler' : (structural && structural.verified ? 'structural' : 'none');
+
   const parts = [];
-  if (syntax.verified) parts.push(syntax.ok ? `فحص البنية بـ${syntax.kind} ✅` : `فحص البنية فشل (${syntax.kind}) ❌`);
-  else parts.push(`لم نتحقق من البنية: ${syntax.note || 'لا مدقّق متاح'} ⚠`);
+  if (compilerTier) parts.push(syntax.ok ? `فحص البنية بمترجم حقيقي (${syntax.kind}) ✅` : `فحص البنية بمترجم حقيقي فشل (${syntax.kind}) ❌`);
+  else if (structural && structural.verified) {
+    parts.push(structural.ok
+      ? `فحص بنيوي بقواعد ${structural.grammar} (tree-sitter) ✅ — *لا يوجد مترجم لهذه اللغة على هذا الجهاز، وليس هذا تحققًا بمترجم*`
+      : `فحص بنيوي بقواعد ${structural.grammar} فشل ❌`);
+    if (structural.note && structural.ok) parts.push(structural.note);
+  } else {
+    parts.push(`لم نتحقق من البنية: ${(structural && structural.note) || syntax.note || 'لا مدقّق ولا قواعد متاحة'} ⚠`);
+  }
   if (run.ran) parts.push(run.ok ? `التشغيل بـ${run.tool} نجح ✅` : `التشغيل بـ${run.tool} فشل (رمز ${run.exitCode}) ❌`);
   else if (run.attempted) parts.push(`لم نُشغّل المخرج: ${run.note} ⚠`);
-  return { syntax, run, verified, executed, kind: syntax.kind, summary: parts.join(' · ') };
+
+  return { syntax, structural, run, verified, structuralVerified, executed: !!(run.ran && run.ok), tier, kind: syntax.kind, summary: parts.join(' · ') };
 }
 
 /** هل المخرجان متطابقان سلوكيًا؟ (تطابق نصّ المخرجات) */

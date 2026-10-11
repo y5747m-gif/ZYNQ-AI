@@ -67,9 +67,16 @@ function renderReport(data) {
 
   const v = data.verification;
   if (v) {
-    if (v.verified && v.syntaxOk) add(`✔ فحص البنية بمترجم/مدقّق حقيقي (${esc(v.kind)}).`, 'ok');
-    else if (!v.verified) add(`⚠ لم نتحقق من البنية: المدقّق غير متاح على هذا الجهاز — لا نعلن نجاحًا.`, 'warn');
-    else add(`✖ فحص البنية فشل (${esc(v.kind)}).<br><code>${esc((v.syntaxOutput || '').split('\n').slice(0, 6).join('\n'))}</code>`, 'err');
+    if (v.tier === 'compiler' && v.syntaxOk) add(`✔ فحص البنية بمترجم/مدقّق حقيقي (${esc(v.kind)}).`, 'ok');
+    else if (v.tier === 'compiler') add(`✖ فحص البنية بمترجم حقيقي فشل (${esc(v.kind)}).<br><code>${esc((v.syntaxOutput || '').split('\n').slice(0, 6).join('\n'))}</code>`, 'err');
+    else if (v.tier === 'structural' && v.structural && v.structural.ok) {
+      add(`🔎 فحص بنيوي بقواعد <b>${esc(v.structural.grammar)}</b> (tree-sitter) نجح — <b>لا يوجد مترجم لهذه اللغة على هذا الجهاز، وليس هذا تحققًا بمترجم.</b>`, 'warn');
+    } else if (v.tier === 'structural' && v.structural) {
+      const errs = (v.structural.errors || []).map((e) => `• سطر ${e.line}:${e.col} — ${esc(e.type)}: ${esc(e.text)}`).join('<br>');
+      add(`✖ فحص بنيوي بقواعد ${esc(v.structural.grammar)} فشل.<br>${errs}`, 'err');
+    } else {
+      add('⚠ لم نتحقق من البنية: لا مدقّق ولا قواعد متاحة على هذا الجهاز — لا نعلن نجاحًا.', 'warn');
+    }
 
     if (v.ran) {
       if (v.runOk) add(`✔ شُغّل المخرج فعليًا بـ${esc(v.tool)} ونجح التنفيذ.`, 'ok');

@@ -9,6 +9,9 @@
 const { transpile } = require('../transpiler');
 const { emitDynamic } = require('./dynamic');
 const { emitCpp } = require('./cpp');
+const { emitC } = require('./c');
+const { emitTyped } = require('./typed');
+const { structuralCheck } = require('./parsecheck');
 
 /** اللغات التي نُترجم إليها فعلًا اليوم */
 const TARGETS = {
@@ -36,20 +39,35 @@ const TARGETS = {
     id: 'cpp', label: 'سي++', en: 'C++', ext: '.cpp', verifierLang: 'cpp',
     kind: 'static', desc: 'C++17: قوالب للدوال بلا أنواع، iostream، وstd::vector.',
   },
+  c: {
+    id: 'c', label: 'سي', en: 'C', ext: '.c', verifierLang: 'c', grammar: 'c',
+    kind: 'c', desc: 'C11: أدوات مولَّدة للنص والقوائم العددية، والأنواع مستنتجة من مواضع الاستدعاء.',
+  },
+  go: {
+    id: 'go', label: 'جو', en: 'Go', ext: '.go', verifierLang: 'go', grammar: 'go',
+    kind: 'typed', lang: 'go', desc: 'Go: دوال وقوائم عددية وأدوات مولَّدة — والأصناف غير مدعومة (تُعلَن).',
+  },
+  rs: {
+    id: 'rs', label: 'رست', en: 'Rust', ext: '.rs', verifierLang: 'rs', grammar: 'rust',
+    kind: 'typed', lang: 'rs', desc: 'Rust: دوال وVec<f64> وأدوات مولَّدة — والأصناف غير مدعومة (تُعلَن).',
+  },
+  java: {
+    id: 'java', label: 'جافا', en: 'Java', ext: '.java', verifierLang: 'java', grammar: 'java',
+    kind: 'typed', lang: 'java', desc: 'جافا: صنف واحد باسم «المخرج» ودوال ساكنة (يعمل مع java الملف مباشرة).',
+  },
+  cs: {
+    id: 'cs', label: 'سي شارب', en: 'C#', ext: '.cs', verifierLang: 'cs', grammar: 'c_sharp',
+    kind: 'typed', lang: 'cs', desc: 'C#: صنف «المخرج» بدالة Main ساكنة.',
+  },
 };
 
 /** لغات مدعومة في فحص الملفات لكن الترجمة إليها لم تكتمل بعد — نقولها بصراحة */
 const PLANNED = {
-  c: 'لغة إجرائية بلا نصوص ديناميكية — الترجمة إليها تحتاج تخزينًا يدويًا مؤقتًا.',
-  java: 'يحتاج هيكل ملف/صنف وترجمة النصوص إلى StringBuilder.',
-  cs: 'يحتاج تهيئة .NET ومساحة أسماء.',
-  go: 'يحتاج حزمة main وقواعد صارمة للأنواع غير المستخدمة.',
-  rs: 'يحتاج مُلكية وأنواع صريحة (.to_string() ونُسخ) — عمل قادم.',
   sh: 'لغة صدفة — لا تُترجم إليها برامج عامة.',
   pl: 'لغة نصوص قديمة — ليست هدفًا مناسبًا لبرامج زيتونة.',
   sql: 'لغة استعلامات — لا تُترجم إليها برامج عامة.',
-  swift: 'لم يُختبر مدقّقها هنا بعد.',
-  kt: 'لم يُختبر مدقّقها هنا بعد.',
+  swift: 'لم يُكتمل بعد — قواعده ومدقّقه غير مثبتين هنا، وصياغته مختلفة (بلا فاصلة منقوطة ولا أقواس شرط).',
+  kt: 'لم يُكتمل بعد — لغة على شكل جافا ويمكن إضافتها لاحقًا على عائلة الأقواس.',
   zy: 'زيتونة هي اللغة المصدر نفسها.',
 };
 
@@ -104,6 +122,18 @@ function translateTo(ast, targetName, opts = {}) {
   }
   if (t.id === 'cpp') {
     const r = emitCpp(ast, opts);
+    return { ok: true, code: r.code, map: r.map, ext: t.ext, id: t.id, label: t.label, unsupported: r.unsupported, notes: r.notes };
+  }
+  if (t.id === 'cpp') {
+    const r = emitCpp(ast, opts);
+    return { ok: true, code: r.code, map: r.map, ext: t.ext, id: t.id, label: t.label, unsupported: r.unsupported, notes: r.notes };
+  }
+  if (t.id === 'c') {
+    const r = emitC(ast, opts);
+    return { ok: true, code: r.code, map: r.map, ext: t.ext, id: t.id, label: t.label, unsupported: r.unsupported, notes: r.notes };
+  }
+  if (t.kind === 'typed') {
+    const r = emitTyped(ast, t.lang, opts);
     return { ok: true, code: r.code, map: r.map, ext: t.ext, id: t.id, label: t.label, unsupported: r.unsupported, notes: r.notes };
   }
   return { ok: false, code: null, unsupported: [], notes: [], map: null, id: t.id, label: t.label, ext: t.ext, reason: t.desc };

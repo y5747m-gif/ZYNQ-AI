@@ -90,6 +90,14 @@ const server = http.createServer(async (req, res) => {
         diagnostics: (r.diagnostics || []).map((d) => ({ code: d.code, message: d.message, line: d.line, col: d.col, severity: d.severity, suggestion: d.suggestion })),
         verification: r.verification ? {
           verified: r.verification.verified,
+          tier: r.verification.tier,
+          structural: r.verification.structural ? {
+            verified: r.verification.structural.verified,
+            ok: r.verification.structural.ok,
+            grammar: r.verification.structural.grammar,
+            note: r.verification.structural.note || '',
+            errors: (r.verification.structural.errors || []).slice(0, 6),
+          } : null,
           summary: r.verification.summary,
           syntaxOk: r.verification.syntax.ok,
           syntaxOutput: (r.verification.syntax.output || '').slice(0, 2000),

@@ -72,4 +72,15 @@ line "14) الترجمة إلى سي++ — تحقق بـg++ ومقارنة با�
 $Z ترجم examples/مرحبا.zy --إلى سي++ --out /tmp/zaytuna-tour.cpp
 g++ -std=c++17 -fsyntax-only /tmp/zaytuna-tour.cpp && echo "g++ -fsyntax-only: سليم ✔"
 
+line "15) الترجمة إلى سي (C11) — gcc يتحقق، والمخرج يُنفَّذ ويطابق جافاسكربت"
+$Z ترجم examples/مرحبا.zy --إلى سي --out /tmp/zaytuna-tour.c
+gcc -std=c11 -o /tmp/zaytuna-tour.bin /tmp/zaytuna-tour.c && /tmp/zaytuna-tour.bin
+
+line "16) طبقة الفحص البنيوي: لا مترجم مثبّت؟ نفحص بقواعد اللغة الرسمية ونقولها بصراحة"
+$Z ترجم examples/مرحبا.zy --إلى جافا --out /tmp/zaytuna-tour.java 2>&1 | grep -E "التحقق|بنيوي" | head -2
+$Z ترجم examples/مرحبا.zy --إلى جو --out /tmp/zaytuna-tour.go 2>&1 | grep -E "بنيوي" | head -1
+
+line "17) قائمة الأهداف: 11 هدفًا (4 بمترجم حقيقي · 7 بفحص بنيوي معلَن)"
+$Z ترجم --لغات | head -12
+
 printf '\n\033[32mانتهت الجولة.\033[0m\n'

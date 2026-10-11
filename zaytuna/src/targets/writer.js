@@ -46,6 +46,14 @@ class Writer {
     }
   }
 
+  /** إدراج أسطر في موضع سابق مع تصحيح خريطة الأسطر (للإعلانات المستنتجة لاحقًا) */
+  insert(at, newLines) {
+    if (!newLines.length) return;
+    this.lines.splice(at, 0, ...newLines);
+    for (const m of this.map) if (m.outLine > at) m.outLine += newLines.length;
+    for (let i = 0; i < newLines.length; i++) this.map.push({ outLine: at + i + 1, arLine: null });
+  }
+
   toString() { return this.lines.join('\n') + '\n'; }
 
   /** آخر سطر غير فارغ (للتحقق من أقواس الإغلاق) */

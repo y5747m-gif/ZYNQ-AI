@@ -342,9 +342,17 @@ function cmdTranslate(file, flags) {
   for (const n of (res.notes || []).slice(0, 5)) reportLines.push(paint(`   ملاحظة: ${n}`, 'dim', useColor));
   if (res.verification) {
     const v = res.verification;
-    const tone = v.verified && v.syntax.ok ? (res.unsupported.length ? 'yellow' : 'green') : 'error';
+    const compilerFailed = v.tier === 'compiler' && v.syntax.ok === false;
+    const structuralFailed = v.tier === 'structural' && v.structural && v.structural.ok === false;
+    const tone = (compilerFailed || structuralFailed) ? 'error'
+      : (v.tier === 'compiler' ? (res.unsupported.length ? 'yellow' : 'green') : 'yellow');
     reportLines.push(paint('   التحقق: ' + v.summary, tone, useColor));
-    if (v.syntax.output && !v.syntax.ok) reportLines.push(paint('     ' + v.syntax.output.split('\n').slice(0, 4).join('\n     '), 'dim', useColor));
+    if (compilerFailed && v.syntax.output) reportLines.push(paint('     ' + v.syntax.output.split('\n').slice(0, 4).join('\n     '), 'dim', useColor));
+    if (structuralFailed) {
+      for (const e of (v.structural.errors || []).slice(0, 4)) {
+        reportLines.push(paint(`     سطر ${e.line}:${e.col} — ${e.type}: ${e.text}`, 'dim', useColor));
+      }
+    }
     if (v.run.stderr && !v.run.ok) reportLines.push(paint('     ' + v.run.stderr.split('\n').slice(0, 4).join('\n     '), 'dim', useColor));
   }
   if (res.reference) {
@@ -370,7 +378,8 @@ function cmdTranslate(file, flags) {
     process.stdout.write(code);
     console.error(reportLines.join('\n'));
   }
-  const bad = res.verification && res.verification.verified && !res.verification.syntax.ok;
+  const v = res.verification;
+  const bad = !!v && ((v.tier === 'compiler' && !v.syntax.ok) || (v.tier === 'structural' && v.structural && !v.structural.ok));
   return bad ? 1 : 0;
 }
 

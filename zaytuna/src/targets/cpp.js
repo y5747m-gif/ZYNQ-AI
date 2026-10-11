@@ -22,6 +22,36 @@ const PRELUDE = [
   '#include <algorithm>',
   '#include <sstream>',
   '',
+  '// نصّ القائمة كما تطبعه جافاسكربت: [1, 2, 3]',
+  'template <typename T>',
+  'std::string _ز_نص(const std::vector<T>& قائمة) {',
+  '  std::ostringstream مخرج;',
+  '  مخرج << "[";',
+  '  for (size_t i = 0; i < قائمة.size(); i++) { if (i) مخرج << ", "; مخرج << قائمة[i]; }',
+  '  مخرج << "]";',
+  '  return مخرج.str();',
+  '}',
+  '',
+  '// مقارنة تعمل مع أي نوع (لأن «طابق» قد تعمل على قالب مجهول النوع)',
+  'template <typename A, typename B>',
+  'bool _ز_يساوي(const A& أ, const B& ب) { return أ == ب; }',
+  'inline bool _ز_يساوي(const std::string&, double) { return false; }',
+  'inline bool _ز_يساوي(const std::string&, int) { return false; }',
+  'inline bool _ز_يساوي(double, const std::string&) { return false; }',
+  'inline bool _ز_يساوي(int, const std::string&) { return false; }',
+  'template <typename T> bool _ز_يساوي(const std::vector<T>&, int) { return false; }',
+  'template <typename T> bool _ز_يساوي(const std::vector<T>&, double) { return false; }',
+  'template <typename A, typename B> bool _ز_أكبر_أو_يساوي(const A& أ, const B& ب) { return أ >= ب; }',
+  'template <typename T> bool _ز_أكبر_أو_يساوي(const std::vector<T>&, int) { return false; }',
+  'template <typename T> bool _ز_أكبر_أو_يساوي(const std::vector<T>&, double) { return false; }',
+  'template <typename T> bool _ز_أصغر_أو_يساوي(const std::vector<T>&, int) { return false; }',
+  'template <typename T> bool _ز_أصغر_أو_يساوي(const std::vector<T>&, double) { return false; }',
+  'inline bool _ز_أكبر_أو_يساوي(const std::string&, double) { return false; }',
+  'inline bool _ز_أكبر_أو_يساوي(const std::string&, int) { return false; }',
+  'template <typename A, typename B> bool _ز_أصغر_أو_يساوي(const A& أ, const B& ب) { return أ <= ب; }',
+  'inline bool _ز_أصغر_أو_يساوي(const std::string&, double) { return false; }',
+  'inline bool _ز_أصغر_أو_يساوي(const std::string&, int) { return false; }',
+  '',
   '// تحويل أي قيمة إلى نص (كما يفعل جمع النصوص في زيتونة)',
   'template <typename T>',
   'std::string _ز_نص(const T& قيمة) {',
@@ -320,12 +350,18 @@ class CppEmitter {
   matchStmt(node) {
     const tmp = `__م${++SEQ}`;
     this.stmt(`auto ${tmp} = ${this.expr(node.discriminant)}`, node);
-    this.chain(node.arms.map((a) => ({
-      cond: this.pattern(tmp, a.pattern, a.guard),
-      body: a.body, line: a.line,
-      binds: a.pattern.kind === 'array' ? a.pattern.names.map((n, i) => `auto ${n} = ${tmp}[${i}]`)
-        : a.pattern.kind === 'object' ? a.pattern.keys.map((k) => `auto ${k} = ${tmp}[${JSON.stringify(k)}]`) : [],
-    })), node);
+    const kind = this.kindOf(node.discriminant);
+    const items = [];
+    for (const a of node.arms) {
+      if (a.pattern.kind === 'array' || a.pattern.kind === 'object') {
+        // سي++ بلا خرائط، وقوائم «طابق» على قالب مجهول لا تُفحص وقت التشغيل
+        this.bad(`فرع «${a.pattern.kind === 'array' ? 'نمط قائمة' : 'نمط كائن'}» — لم يُترجم في هذا المخرج (نوع القيمة ${kind})`, a.pattern);
+        continue;
+      }
+      items.push({ cond: this.pattern(tmp, a.pattern, a.guard), body: a.body, line: a.line, binds: [] });
+    }
+    if (!items.length) { this.bad('«طابق» بلا فرع قابل للترجمة في سي++', node); return; }
+    this.chain(items, node);
   }
 
   chain(items, node) {
@@ -353,9 +389,9 @@ class CppEmitter {
     if (pattern.kind === 'default') return g;
     let cond;
     switch (pattern.kind) {
-      case 'lit': cond = `${tmp} == ${this.expr(pattern.value)}`; break;
-      case 'alt': cond = pattern.alts.map((a) => `(${this.pattern(tmp, a, null)})`).join(' || '); break;
-      case 'range': cond = `(${tmp} >= ${this.expr(pattern.from)} && ${tmp} <= ${this.expr(pattern.to)})`; break;
+      case 'lit': cond = `_ز_يساوي(${tmp}, ${this.expr(pattern.value)})`; break;
+      case 'alt': cond = pattern.alts.map((a) => `(${this.pattern(tmp, a, null)})`).join(' || '); break;   // كل نمط بديل
+      case 'range': cond = `(_ز_أكبر_أو_يساوي(${tmp}, ${this.expr(pattern.from)}) && _ز_أصغر_أو_يساوي(${tmp}, ${this.expr(pattern.to)}))`; break;
       case 'type': cond = this.bad(`نمط النوع (${pattern.arg.raw || '?'}) — لا فحص نوع وقت تشغيل في سي++`, pattern) || 'true'; break;
       case 'array': cond = `(${tmp}.size() == ${pattern.names.length})`; break;
       default: cond = 'true';
@@ -411,7 +447,11 @@ class CppEmitter {
     }
   }
 
-  arg(a) { return a.type === 'Spread' ? this.bad('بسط في نداء', a) || this.expr(a.arg) : this.expr(a); }
+  arg(a) {
+    if (a.type === 'Spread') { this.bad('بسط في نداء', a); return this.expr(a.arg); }
+    if (a.type === 'ObjectLit') { this.bad('كائن في نداء (لا خرائط في هذا المخرج) — وُضعت قيمة محايدة كي يظل المخرج يُترجم', a); return '0'; }
+    return this.expr(a);
+  }
 
   arrayLit(node) {
     const kinds = node.elements.map((e) => this.kindOf(e));

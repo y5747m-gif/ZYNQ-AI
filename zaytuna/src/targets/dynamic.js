@@ -15,7 +15,7 @@ const INDENT = { python: '    ', ruby: '  ', php: '    ' };
 const L = {
   python: {
     label: 'بايثون', ext: '.py',
-    comment: '# ',
+    comment: '# ', colon: true,
     trueLit: 'True', falseLit: 'False', nullLit: 'None', undefLit: 'None',
     and: ' and ', or: ' or ', not: 'not ',
     eq: '==', neq: '!=',
@@ -26,6 +26,7 @@ const L = {
     print: (a) => `_ز_طبع(${a.join(', ')})`,
     len: (x) => `len(${x})`,
     array: (els) => `[${els.join(', ')}]`,
+    dict: (pairs) => `{${pairs.join(', ')}}`,
     dictPair: (k, v) => `${k}: ${v}`,
     newExpr: (cls, a) => `${cls}(${a.join(', ')})`,
     ternary: (c, a, b) => `(${a} if ${c} else ${b})`,
@@ -57,7 +58,7 @@ const L = {
   },
   ruby: {
     label: 'روبي', ext: '.rb',
-    comment: '# ',
+    comment: '# ', colon: false,
     trueLit: 'true', falseLit: 'false', nullLit: 'nil', undefLit: 'nil',
     and: ' && ', or: ' || ', not: '!',
     eq: '==', neq: '!=',
@@ -68,6 +69,7 @@ const L = {
     print: (a) => `_ز_طبع(${a.join(', ')})`,
     len: (x) => `(${x}).length`,
     array: (els) => `[${els.join(', ')}]`,
+    dict: (pairs) => `{${pairs.join(', ')}}`,
     dictPair: (k, v) => `${k} => ${v}`,
     newExpr: (cls, a) => `${cls}.new(${a.join(', ')})`,
     ternary: (c, a, b) => `(${c} ? ${a} : ${b})`,
@@ -109,11 +111,12 @@ const L = {
     print: (a) => `_ز_طبع(${a.join(', ')});`,
     len: (x) => `count(${x})`,
     array: (els) => `[${els.join(', ')}]`,
+    dict: (pairs) => `[${pairs.join(', ')}]`,   // بي إتش بي: المصفوفة الترابطية [ ]
     dictPair: (k, v) => `${k} => ${v}`,
     newExpr: (cls, a) => `new ${cls}(${a.join(', ')})`,
     ternary: (c, a, b) => `(${c} ? ${a} : ${b})`,
     forOf: (n, it) => `foreach (${it} as $${n})`,
-    forRange: (n, a, b, inclusive) => `foreach (range(${a}, ${b}${inclusive ? ' - 1' : ''}) as $${n})`,
+    forRange: (n, a, b, inclusive) => `foreach (range(${a}, ${b}${inclusive ? ' - 1' : ''}) as ${n.startsWith('$') ? n : '$' + n})`,
     whileHead: (c) => `while (${c})`,
     ifHead: (c) => `if (${c})`,
     inline: (s) => `$${s}`,
@@ -204,6 +207,8 @@ class DynamicEmitter {
     this.notes = [];
     this.inMethod = false;
     this.usedHelpers = false;
+    this.funcNames = new Set();
+    this.classNames = new Set();
     this.classStack = [];
     this.superName = null;
   }
@@ -219,7 +224,7 @@ class DynamicEmitter {
 
   head(text, node) {                    // بداية كتلة
     if (this.c.brace) this.w.push(text + ' {', node && node.line);
-    else this.w.push(text + ':', node && node.line);
+    else this.w.push(this.c.colon ? text + ':' : text, node && node.line);
     this.w.indent++;
   }
   foot() {                              // نهاية كتلة بسيطة
@@ -300,6 +305,15 @@ class DynamicEmitter {
     this.stmtLine(text, node);
   }
 
+  /**
+   * اسم قابل للنداء: في بي إتش بي الدوال لا تحمل $، أما المتغيّرات الحاملة لدالة فنعم.
+   */
+  callable(name) {
+    if (this.lang !== 'php') return name;
+    if (this.funcNames.has(name) || this.classNames.has(name)) return name;
+    return `$${name}`;
+  }
+
   /** «هذا» بالعربية أو «this» اللاتينية — كلتاهما تشير إلى الكائن الحالي */
   selfRef(node) {
     if (!this.inMethod) return this.bad('«هذا/this» خارج صنف', node);
@@ -316,6 +330,7 @@ class DynamicEmitter {
   }
 
   funcDecl(node) {
+    this.funcNames.add(node.name);
     const params = node.params;
     const kw = node.async ? (this.c.hasAsync ? 'async ' : '') : '';
     if (node.async && !this.c.hasAsync) this.notes.push(`سطر ${node.line}: دالة «غير_متزامن» تُرجمت دالة عادية (لا وعود في ${this.c.label}).`);
@@ -326,6 +341,7 @@ class DynamicEmitter {
   }
 
   classDecl(node) {
+    this.classNames.add(node.name);
     this.classStack.push(node.name);
     const savedSuper = this.superName;
     this.superName = node.superClass;
@@ -413,6 +429,9 @@ class DynamicEmitter {
     this.foot();
   }
 
+  /** متغيّر مؤقّت بأسماء صحيحة لكل لغة (PHP يحتاج $) */
+  tmpRef(name) { return this.lang === 'php' ? '$' + name : name; }
+
   switchStmt(node) {
     // «اختر (صحيح) { حالة شرط: … }» = سلسلة شروط (نمط switch(true) في جافاسكربت)
     if (node.discriminant.type === 'BoolLit' && node.discriminant.value === true) {
@@ -423,8 +442,8 @@ class DynamicEmitter {
       })), node, 'اختر');
       return;
     }
-    const tmp = `__ق${++SEQ}`;
-    this.stmtLine(`${this.lang === 'php' ? '$' : ''}${tmp} = ${this.expr(node.discriminant)}`, node);
+    const tmp = this.tmpRef(`__ق${++SEQ}`);
+    this.stmtLine(`${tmp} = ${this.expr(node.discriminant)}`, node);
     this.chain(node.cases.map((c) => ({
       cond: c.test === null ? null : `${tmp} ${this.c.eq} ${this.expr(c.test)}`,
       body: c.test === null ? c.body : this.stripBreaks(c.body),
@@ -433,8 +452,8 @@ class DynamicEmitter {
   }
 
   matchStmt(node) {
-    const tmp = `__م${++SEQ}`;
-    this.stmtLine(`${this.lang === 'php' ? '$' : ''}${tmp} = ${this.expr(node.discriminant)}`, node);
+    const tmp = this.tmpRef(`__م${++SEQ}`);
+    this.stmtLine(`${tmp} = ${this.expr(node.discriminant)}`, node);
     const arms = node.arms.map((a) => {
       const r = this.pattern(tmp, a.pattern, a.guard);
       const binds = [];
@@ -527,7 +546,11 @@ class DynamicEmitter {
         break;
       }
       case 'array': cond = `(${this.c.instanceOf['قائمة'](tmp)}${this.c.and}${this.c.len(tmp)} == ${pattern.names.length})`; break;
-      case 'object': cond = `(${this.c.instanceOf['كائن'](tmp)}${this.c.and}${pattern.keys.map((k) => `${JSON.stringify(k)} in ${tmp}`).join(' and ')})`; break;
+      case 'object': {
+        const check = { python: (k) => `${k} in ${tmp}`, ruby: (k) => `${tmp}.key?(${k})`, php: (k) => `array_key_exists(${k}, ${tmp})` }[this.lang];
+        cond = `(${this.c.instanceOf['كائن'](tmp)}${this.c.and}${pattern.keys.map((k) => check(JSON.stringify(k))).join(this.c.and)})`;
+        break;
+      }
       default: cond = this.c.trueLit;
     }
     return { cond: g ? `(${cond})${this.c.and}${g}` : cond };
@@ -554,14 +577,15 @@ class DynamicEmitter {
           const val = p.shorthand ? this.c.inline(p.key) : this.expr(p.value);
           return this.c.dictPair(key, val);
         });
-        return `{${pairs.join(', ')}}`;
+        return this.c.dict(pairs);
       }
       case 'Member': {
         if (isThis(node.object) && this.inMethod) return this.c.selfMember(node.computed ? this.expr(node.property) : node.property);
         if (!node.computed && node.property === 'length') return this.c.len(this.expr(node.object));
         const obj = this.expr(node.object);
+        if (node.computed) return `${obj}[${this.expr(node.property)}]`;
         if (this.lang === 'php') return `${obj}->${node.property}`;
-        return node.computed ? `${obj}[${this.expr(node.property)}]` : `${obj}.${node.property}`;
+        return `${obj}.${node.property}`;
       }
       case 'Index': return `${this.expr(node.object)}[${this.expr(node.property)}]`;
       case 'Bin': case 'Logical': return this.bin(node);
@@ -680,7 +704,7 @@ class DynamicEmitter {
           default: break;
         }
       }
-      return `${this.c.inline(name)}(${args.join(', ')})`;
+      return `${this.callable(name)}(${args.join(', ')})`;
     }
     if (node.callee.type === 'Member') {
       const m = node.callee;
