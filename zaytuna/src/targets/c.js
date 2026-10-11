@@ -405,6 +405,12 @@ class CEmitter {
     });
     const ret = f.retKind === 'str' ? 'const char*' : f.retKind === 'list' ? '_ز_قائمة*' : f.retKind === 'bool' ? 'int' : f.retKind === 'void' ? 'void' : 'double';
     if (node.typeParams && node.typeParams.length) this.bad('أدوية عامة (generics) — سي لا تدعمها', node);
+    // نُسجّل أنواع الوسائط كي يُعرَف داخل الجسم أنها (قائمة/نصّ/عدد)
+    node.params.forEach((p, i) => {
+      const name = p.replace(/^\.\.\./, '');
+      const type = params[i].split(' ')[0];
+      this.kinds.set(name, p.startsWith('...') ? 'list' : this.kindFromType(type));
+    });
     this.w.push(`static ${ret} ${node.name}(${params.length ? params.join(', ') : 'void'}) {`, node.line);
     this.body(node.body.body);
     if (f.retKind !== 'void' && !this.endsWithReturn(node.body.body)) {
