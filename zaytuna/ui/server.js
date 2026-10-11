@@ -13,7 +13,25 @@ const fs = require('fs');
 const path = require('path');
 const api = require('../src/index');
 
-const HERE = __dirname;
+// أين يقع مجلد الواجهة؟ محليًا بجوار هذا الملف، لكن على فيرسل قد يُجمَّع المدخل
+// في مجلد غير المجلد الذي تُنسخ إليه ملفات includeFiles، لذلك نبحث عن
+// index.html في المواضع المتوقعة قبل الرجوع إلى __dirname.
+function findUiDir() {
+  const candidates = [
+    __dirname,
+    path.join(__dirname, 'zaytuna', 'ui'),
+    path.resolve(__dirname, '..', 'zaytuna', 'ui'),
+    path.resolve(__dirname, '..', '..', 'zaytuna', 'ui'),
+    path.join(process.cwd(), 'zaytuna', 'ui'),
+    path.join(process.cwd(), 'ui'),
+  ];
+  for (const c of candidates) {
+    try { if (fs.existsSync(path.join(c, 'index.html'))) return c; } catch (_) { /* تجاهل */ }
+  }
+  return __dirname;
+}
+
+const HERE = findUiDir();
 const PORT = Number((process.argv.find((a) => a.startsWith('--port=')) || '').split('=')[1]) || Number(process.env.PORT) || 4173;
 const HOST = process.env.HOST || '0.0.0.0';
 const EXAMPLES = path.join(HERE, '..', 'examples');
@@ -48,7 +66,11 @@ function listExamples() {
   } catch (_) { return []; }
 }
 
-const server = http.createServer(async (req, res) => {
+// المعالج نفسه يعمل بطريقتين:
+//   محليًا:  http.createServer(handler).listen(...)
+//   على فيرسل: فيرسل يستدعي الدالة المُصدَّرة (أسفل الملف) كدالة بلا خادم —
+//   لذلك لا نستدعي listen إلا إذا شُغّل الملف مباشرة (node ui/server.js).
+async function handler(req, res) {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const p = url.pathname;
 
@@ -122,9 +144,16 @@ const server = http.createServer(async (req, res) => {
   } catch (err) {
     return send(res, 500, JSON.stringify({ ok: false, reason: String(err && err.message ? err.message : err) }));
   }
-});
+}
 
-server.listen(PORT, HOST, () => {
-  console.log(`زيتونة — واجهة الترجمة تعمل على http://${HOST}:${PORT}`);
-  console.log('اختر لغة من القائمة، اكتب كودًا عربيًا، ثم اضغط «ترجم».');
-});
+if (require.main === module) {
+  const server = http.createServer(handler);
+  server.listen(PORT, HOST, () => {
+    console.log(`زيتونة — واجهة الترجمة تعمل على http://${HOST}:${PORT}`);
+    console.log('اختر لغة من القائمة، اكتب كودًا عربيًا، ثم اضغط «ترجم».');
+  });
+}
+
+// تصدير المعالج ليُستخدم كدالة بلا خادم على فيرسل (@vercel/node) —
+// نفس الملف يعمل محليًا (أعلاه) وعلى الاستضافة بلا أي تغيير في المنطق.
+module.exports = handler;

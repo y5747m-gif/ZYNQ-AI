@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "builds": [
+    {
+      "src": "zaytuna/ui/server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["zaytuna/ui/**", "zaytuna/examples/**"]
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "zaytuna/ui/server.js" }
+  ]
+}
