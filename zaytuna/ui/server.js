@@ -18,7 +18,8 @@ const PORT = Number((process.argv.find((a) => a.startsWith('--port=')) || '').sp
 const HOST = process.env.HOST || '0.0.0.0';
 const EXAMPLES = path.join(HERE, '..', 'examples');
 
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
+const FAVICON = path.join(HERE, 'favicon.svg');
 
 function send(res, code, body, type = 'application/json; charset=utf-8') {
   const buf = Buffer.isBuffer(body) ? body : Buffer.from(String(body), 'utf8');
@@ -55,9 +56,13 @@ const server = http.createServer(async (req, res) => {
     if (p === '/' || p === '/index.html') {
       return send(res, 200, fs.readFileSync(path.join(HERE, 'index.html')), MIME['.html']);
     }
-    if (p === '/app.js' || p === '/style.css') {
+    if (p === '/app.js' || p === '/style.css' || p === '/favicon.svg') {
       const f = path.join(HERE, p.slice(1));
       if (fs.existsSync(f)) return send(res, 200, fs.readFileSync(f), MIME[path.extname(f)]);
+    }
+    // المتصفحات تطلب /favicon.ico تلقائيًا — نعيد نفس الأيقونة حتى لا يظهر 404 في الكونسول.
+    if (p === '/favicon.ico') {
+      if (fs.existsSync(FAVICON)) return send(res, 200, fs.readFileSync(FAVICON), MIME['.svg']);
     }
     if (p === '/api/targets') {
       return send(res, 200, JSON.stringify({ targets: api.listTargets() }));

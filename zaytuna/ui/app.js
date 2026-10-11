@@ -146,8 +146,14 @@ function download() {
 
 async function loadExample(name) {
   if (!name) return;
-  const { source } = await jget('/api/example?name=' + encodeURIComponent(name));
-  $('source').value = source;
+  try {
+    const { source } = await jget('/api/example?name=' + encodeURIComponent(name));
+    $('source').value = source;
+    $('status').textContent = 'تم تحميل المثال: ' + name;
+  } catch (e) {
+    $('status').textContent = 'تعذّر تحميل المثال: ' + name;
+    $('examples').value = '';
+  }
 }
 
 async function boot() {
@@ -155,7 +161,10 @@ async function boot() {
   fillTargets(targets);
   await fillExamples();
   const preferred = state.examples.find((e) => e.name === 'حاسبة.zy') || state.examples[0];
-  if (preferred) { await loadExample(preferred.name); $('examples').value = preferred.name; }
+  if (preferred) {
+    $('examples').value = preferred.name;
+    try { await loadExample(preferred.name); } catch (_) { /* fall through — leave textarea empty */ }
+  }
 
   $('target').addEventListener('change', updateTitle);
   $('translate').addEventListener('click', translate);
