@@ -289,10 +289,24 @@ function cmdSuggest(word, flags) {
 const TARGET_COMMENT = { py: '# ', rb: '# ', php: '// ', cpp: '// ', c: '// ', java: '// ', cs: '// ', go: '// ', rs: '// ', ts: '// ', js: '// ' };
 
 function targetTable() {
+  const { structuralAvailable, GRAMMAR_FOR } = require('../src/targets/parsecheck');
+  const { resolveTool } = require('../src/checkers');
+  const hasStruct = structuralAvailable();
   return api.listTargets().map((t) => {
     const mark = t.planned ? '·' : '✔';
     const ext = t.ext ? paint(t.ext.padEnd(6), 'cyan', useColor) : '      ';
-    return `  ${mark} ${t.label.padEnd(12)} ${ext} ${t.planned ? paint(t.desc, 'dim', useColor) : t.desc}`;
+    let tier = '';
+    if (!t.planned) {
+      // نفحص الآن أي أداة متاحة على هذا الجهاز، ونقول الدرجة المتوقعة بصراحة
+      const tools = { js: ['node'], ts: ['tsc'], py: ['python3', 'python'], rb: ['ruby'], php: ['php'],
+        cpp: ['g++', 'clang++', 'c++'], c: ['gcc', 'cc', 'clang'], go: ['go'], rs: ['rustc'],
+        java: ['javac'], cs: ['dotnet', 'csc'] }[t.id] || [];
+      const compiler = tools.length ? !!resolveTool(tools) : false;
+      if (compiler) tier = paint(' [مترجم حقيقي]', 'green', useColor);
+      else if (hasStruct && GRAMMAR_FOR[t.id]) tier = paint(' [فحص بنيوي]', 'yellow', useColor);
+      else tier = paint(' [لا تحقق متاح هنا]', 'red', useColor);
+    }
+    return `  ${mark} ${t.label.padEnd(12)} ${ext} ${t.planned ? paint(t.desc, 'dim', useColor) : t.desc}${tier}`;
   }).join('\n');
 }
 
