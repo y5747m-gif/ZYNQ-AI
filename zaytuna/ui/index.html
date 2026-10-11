@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>زيتونة — زر الترجمة</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span class="logo">🫒</span>
+    <div>
+      <h1>زيتونة <span class="tag">زر الترجمة</span></h1>
+      <p class="sub">اكتب بالعربية… ثم اختر اللغة التي تريد التحويل إليها.</p>
+    </div>
+  </div>
+  <div class="badges">
+    <span class="badge ok">تحقّق حقيقي بمترجم اللغة</span>
+    <span class="badge warn">وما لا يُترجم نقوله صريحًا</span>
+  </div>
+</header>
+
+<main>
+  <section class="pane">
+    <div class="pane-head">
+      <h2>الكود العربي (زيتونة)</h2>
+      <div class="row">
+        <select id="examples" title="أمثلة جاهزة"></select>
+        <button id="clear" class="ghost" type="button">تفريغ</button>
+      </div>
+    </div>
+    <textarea id="source" spellcheck="false" dir="auto"></textarea>
+    <div id="diagnostics" class="diagnostics"></div>
+  </section>
+
+  <section class="controls">
+    <label for="target">اللغة الهدف</label>
+    <select id="target"></select>
+    <button id="translate" class="primary" type="button">🌐 ترجم</button>
+    <label class="switch"><input type="checkbox" id="run" checked> شغّل المخرج وقارنه بجافاسكربت</label>
+    <div id="status" class="status"></div>
+  </section>
+
+  <section class="pane">
+    <div class="pane-head">
+      <h2 id="out-title">المخرج</h2>
+      <div class="row">
+        <button id="copy" class="ghost" type="button">نسخ</button>
+        <button id="download" class="ghost" type="button">تنزيل</button>
+      </div>
+    </div>
+    <pre id="code" class="code"><span class="hint">سيظهر الكود المترجم هنا…</span></pre>
+
+    <div id="report" class="report"></div>
+    <pre id="stdout" class="stdout" hidden></pre>
+  </section>
+</main>
+
+<footer>
+  <p>التحقق يتم على الخادم بمدقّق اللغة الحقيقي (python3 · g++ · …) — وإن لم يُثبّت المدقّق على الجهاز نقول ذلك ولا نعلن نجاحًا.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
