@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540">
+<defs>
+
+<filter id="inkblur"><feGaussianBlur stdDeviation="4"/></filter>
+<clipPath id="reveal">
+  <rect x="140" y="120" width="680" height="300">
+    <animate attributeName="width" values="0;680" dur="1.6s" fill="freeze"/>
+  </rect>
+</clipPath>
+</defs>
+<rect width="960" height="540" fill="#0d0c0c"/>
+
+<g clip-path="url(#reveal)">
+  <rect x="140" y="120" width="680" height="300" fill="#ffd23f"/>
+  <rect x="140" y="120" width="680" height="46" fill="#e84545"/>
+</g>
+<g filter="url(#inkblur)" fill="#14110f">
+  <ellipse cx="150" cy="270" rx="42" ry="60"><animate attributeName="cx" values="120;150" dur="1.6s" fill="freeze"/></ellipse>
+  <ellipse cx="150" cy="180" rx="30" ry="34"><animate attributeName="cx" values="100;150" dur="1.6s" fill="freeze"/></ellipse>
+  <ellipse cx="150" cy="360" rx="34" ry="40"><animate attributeName="cx" values="110;150" dur="1.6s" fill="freeze"/></ellipse>
+</g>
+</svg>

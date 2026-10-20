@@ -1,0 +1,4 @@
+fadeTime = 0.6;
+inP = linear(time, inPoint, inPoint + fadeTime, 0, 100);
+outP = linear(time, outPoint - fadeTime, outPoint, 100, 0);
+Math.min(inP, outP)
