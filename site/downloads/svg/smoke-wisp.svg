@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540">
+<defs>
+<filter id="smoke"><feGaussianBlur stdDeviation="26"/></filter>
+</defs>
+<rect width="960" height="540" fill="#0d0c0c"/>
+
+<g filter="url(#smoke)" fill="#8d8680">
+  <ellipse cx="300" cy="380" rx="120" ry="80" opacity="0.5">
+    <animate attributeName="cy" values="400;180" dur="7s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.55;0" dur="7s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="520" cy="400" rx="150" ry="90" opacity="0.4">
+    <animate attributeName="cy" values="420;160" dur="9s" begin="1s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.45;0" dur="9s" begin="1s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="700" cy="390" rx="110" ry="70" opacity="0.45">
+    <animate attributeName="cy" values="410;190" dur="8s" begin="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.5;0" dur="8s" begin="2s" repeatCount="indefinite"/>
+  </ellipse>
+</g>
+</svg>

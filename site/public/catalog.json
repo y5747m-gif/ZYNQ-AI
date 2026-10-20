@@ -1,0 +1,702 @@
+{
+  "version": 1,
+  "programs": [
+    {
+      "id": "after-effects",
+      "name": "أفتر إيفكت",
+      "short": "AE",
+      "color": "#14c8c8"
+    },
+    {
+      "id": "premiere",
+      "name": "بريمير برو",
+      "short": "PR",
+      "color": "#ff8c1a"
+    },
+    {
+      "id": "resolve",
+      "name": "دافنشي ريزولف",
+      "short": "DV",
+      "color": "#e84545"
+    },
+    {
+      "id": "final-cut",
+      "name": "فاينال كت",
+      "short": "FCP",
+      "color": "#2fbf71"
+    },
+    {
+      "id": "web",
+      "name": "الويب والموبايل",
+      "short": "WEB",
+      "color": "#ffd23f"
+    }
+  ],
+  "categories": [
+    {
+      "id": "light",
+      "name": "مؤثرات ضوئية",
+      "tagline": "كنس، وميض، توهّج، عدسات"
+    },
+    {
+      "id": "transitions",
+      "name": "انتقالات",
+      "tagline": "دمج احترافي بين اللقطات"
+    },
+    {
+      "id": "elements",
+      "name": "عناصر حركية",
+      "tagline": "تايتل، لَوَر ثِرْد، بطاقات"
+    },
+    {
+      "id": "logos",
+      "name": "كشف الشعار",
+      "tagline": "افتتاحيات بمستوى الاستوديو"
+    },
+    {
+      "id": "glitch",
+      "name": "تشويش رقمي",
+      "tagline": "انفصال RGB وأشرطة إشارة"
+    },
+    {
+      "id": "particles",
+      "name": "جزيئات ودخان",
+      "tagline": "شرارات، بوكيه، خيوط"
+    },
+    {
+      "id": "hud",
+      "name": "إطارات HUD",
+      "tagline": "زوايا، مسح، بيانات تقنية"
+    },
+    {
+      "id": "info",
+      "name": "إنفوجرافيك",
+      "tagline": "حلقات تقدّم وبيانات متحركة"
+    },
+    {
+      "id": "color",
+      "name": "لوكات ألوان",
+      "tagline": "ملفات .cube سينمائية"
+    },
+    {
+      "id": "tools",
+      "name": "أدوات وتعابير",
+      "tagline": "تعابير AE جاهزة للنسخ"
+    }
+  ],
+  "items": [
+    {
+      "id": "light-sweep-hero",
+      "name": "كنس الضوء الهيرو",
+      "tagline": "شريط ضوء عريض يمسح الكادر بثلاث طبقات سرعة",
+      "category": "light",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/light-sweep-hero.json",
+      "preview": "sweep",
+      "badge": "الأكثر استخدامًا",
+      "description": "مسحة ضوء نظيفة بثلاث طبقات (أبيض + سماوي + ذهبي) بسرعات متدرّجة تمنح إحساس عمق حقيقي عند دمجها بوضع Screen فوق اللقطة. مثالي للإنتروهات وعروض المنتجات واللقطات الإعلانية.",
+      "usage": "في أفتر إيفكت: ثبّت إضافة Lottie (Bodymovin) ثم استورد الملف. في بريمير: إضافة Lottie. وللأوڤرلاي: حوّله لفيديو أو استخدمه على الويب بوضعية دمج Screen."
+    },
+    {
+      "id": "flash-burst",
+      "name": "وميض الاصطدام",
+      "tagline": "فلاش احترافي بحلقة تمدد وصليب ضوئي",
+      "category": "light",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/flash-burst.json",
+      "preview": "burst",
+      "description": "وميض قوي للحظات الذروة: فلاش أبيض + حلقتان متمددتان + صليب ضوئي + نواة توهّج. مصمم لضربات التايتل ولحظات الـ Beat Drop في المونتاج الموسيقي.",
+      "usage": "ضعه في لحظة القطع أو ظهور التايتل. الدمج Screen / Add يمنح أفضل نتيجة فوق اللقطات الداكنة."
+    },
+    {
+      "id": "lens-flare-streak",
+      "name": "وميض العدسة الأفقي",
+      "tagline": "خط ضوئي سينمائي بكرات عدسة متحركة",
+      "category": "light",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/lens-flare-streak.json",
+      "preview": "flare",
+      "badge": "احترافي",
+      "description": "وميض عدسة على طراز Anamorphic: خط ضوئي رئيسي + هالة ناعمة + كرات عدسة ملوّنة تتحرك بانسجام. يمنح إنتاجك مظهر الأفلام السينمائية فورًا.",
+      "usage": "حرّك مسار الوميض ليطابق مصدر الضوء في اللقطة. أفضل نتيجة مع وضع الدمج Screen."
+    },
+    {
+      "id": "glow-pulse",
+      "name": "نبض التوهّج",
+      "tagline": "هالة ضوئية تنبض بطبقات متدرّجة",
+      "category": "light",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/glow-pulse.json",
+      "preview": "pulse",
+      "description": "حلقات توهّج متحدة المركز تنبض بإيقاع هادئ — مثالي كخلفية للنصوص، أو كطبقة حيوية تحت العناصر الرسومية في البث المباشر والريكلز.",
+      "usage": "اضبط سرعة النبض على إيقاع الموسيقى عبر تغيير مدة الكومبوزيشن."
+    },
+    {
+      "id": "bokeh-drift",
+      "name": "البوكيه العائم",
+      "tagline": "كرات ضوء خلفية تطفو بعمق ناعم",
+      "category": "light",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/bokeh-drift.json",
+      "preview": "bokeh",
+      "description": "إحدى عشرة كرة بوكيه بحجم وسرعة مختلفة تمنح خلفيتك حياة وعمقًا دون أن تسرق انتباه المشاهد. حل مثالي للفيديوهات الحوارية والعروض التقديمية.",
+      "usage": "ضعه كطبقة خلفية بشفافية 60-80% مع تمويه خفيف (Gaussian Blur 2-4)."
+    },
+    {
+      "id": "light-leak-sweep",
+      "name": "تسريب الضوء المتحرك",
+      "tagline": "SVG متحركة بضوء دافئ يمسح الكادر",
+      "category": "light",
+      "programs": [
+        "web"
+      ],
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "60fps",
+      "file": "downloads/svg/light-leak-sweep.svg",
+      "preview": "burn",
+      "description": "ملف SVG متحرك بمحرك SMIL يعمل مباشرة في المتصفح بأي موقع أو عرض ويب. ضوء دافئ بحواف ناعمة يشبه التسريبات الفيلمية الحقيقية.",
+      "usage": "ضعه في موقعك مباشرة بـ <img> أو <object> أو inline — الحركة تعمل في كل المتصفحات. لبرامج المونتاج: صدّره كفيديو أو تسلسل صور من المتصفح."
+    },
+    {
+      "id": "electric-bolt",
+      "name": "الصاعقة الكهربائية",
+      "tagline": "ومضة برق متحركة بتوهّج مزدوج",
+      "category": "light",
+      "programs": [
+        "web"
+      ],
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "—",
+      "file": "downloads/svg/electric-bolt.svg",
+      "preview": "sparks",
+      "description": "صاعقة كوميكسية بتوهّج أصفر ومحيط سماوي مع اهتزاز دقيق. مثالية للحظات الصدمة والتأثيرات الكوميدية في المحتوى الترفيهي.",
+      "usage": "يفتح ويتحرك في أي متصفح. لبرامج المونتاج: صدّره كفيديو من المتصفح أو استخدمه كشريحة صور ثابتة."
+    },
+    {
+      "id": "light-leak-overlay",
+      "name": "أوفرلاي تسريب الضوء",
+      "tagline": "GIF أوفرلاي دافئ بالحجم الكامل",
+      "category": "light",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "final-cut"
+      ],
+      "format": "GIF",
+      "quality": "800×450",
+      "fps": "24fps",
+      "file": "downloads/overlays/light-leak-overlay.gif",
+      "preview": "burn",
+      "badge": "سحب وإفلات",
+      "description": "أوفرلاي تسريب ضوء دافئ جاهز للسحب والإفلات فوق أي لقطة في أفتر إيفكت أو بريمير أو فاينال كت — ضعه بوضع الدمج Screen وستحصل فورًا على مظهر فيلمي.",
+      "usage": "اسحب الملف فوق التايم لاين في AE/بريمير/FCP، اضبط Blend Mode على Screen أو Add، وقلّل الشفافية إلى 60-80%."
+    },
+    {
+      "id": "flash-hit-overlay",
+      "name": "أوفرلاي الوميض",
+      "tagline": "فلاش أبيض سريع للضربات القوية",
+      "category": "light",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "final-cut"
+      ],
+      "format": "GIF",
+      "quality": "800×450",
+      "fps": "24fps",
+      "file": "downloads/overlays/flash-hit-overlay.gif",
+      "preview": "burst",
+      "description": "وميض اصطدام قصير (أقل من ثانية) بحواف ناعمة — أداة المونتير السرية لضربات التايتل ولحظات القطع على الإيقاع.",
+      "usage": "ضعه تمامًا لحظة القطع في AE/بريمير/FCP. وضع Screen + شفافية 70%."
+    },
+    {
+      "id": "flash-burst-seq",
+      "name": "تسلسل الوميض المتفجر",
+      "tagline": "24 إطار PNG بشفافية حقيقية",
+      "category": "light",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "format": "PNG Sequence",
+      "quality": "640×360",
+      "fps": "24fps",
+      "file": "downloads/sequences/flash-burst-seq.zip",
+      "preview": "burst",
+      "badge": "شفافية كاملة",
+      "description": "تسلسل إطارات PNG بقناة ألفا حقيقية — يُستورد كشريحة فيديو واحدة في أي برنامج مونتاج. حلقة تمدد ضوئية احترافية قابلة للتكبير دون فقدان جودة الطبقة.",
+      "usage": "فك الضغط، ثم File → Import → اختر أول ملف وفعّل «Image Sequence». يعمل على كل البرامج بشفافية كاملة."
+    },
+    {
+      "id": "whip-transition",
+      "name": "الانتقال الويب",
+      "tagline": "انتقال سريع بخطوط ملوّنة وفلاش",
+      "category": "transitions",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/whip-transition.json",
+      "preview": "whip",
+      "badge": "سريع",
+      "description": "انتقال ويب احترافي بثلاث خطوط ملوّنة تسبق شريطًا داكنًا مع فلاش في المنتصف. التوقيت مضبوط على 25 إطارًا فقط — سريع ونظيف واحترافي.",
+      "usage": "ضعه فوق نقطة القطع بين اللقطتين، مع وضع الدمج Screen أو Normal حسب الخلفية."
+    },
+    {
+      "id": "ink-reveal",
+      "name": "كشف الحبر",
+      "tagline": "SVG متحركة بكشف حبري فني",
+      "category": "transitions",
+      "programs": [
+        "web"
+      ],
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "—",
+      "file": "downloads/svg/ink-reveal.svg",
+      "preview": "ink",
+      "description": "كشف فني بحبر متحرك يكشف لوحة ملوّنة — أسلوب فني مثالي للمحتوى الثقافي والعربي والإعلانات ذات الطابع اليدوي.",
+      "usage": "يتحرك مباشرة في المتصفح. يمكنك استبدال الألوان من داخل الملف النصي، أو تصديره كفيديو من المتصفح لاستخدامه في المونتاج."
+    },
+    {
+      "id": "film-burn-overlay",
+      "name": "أوفرلاي احتراق الفيلم",
+      "tagline": "توهّج فيلمي دافئ بحركة عضوية",
+      "category": "transitions",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "final-cut"
+      ],
+      "format": "GIF",
+      "quality": "800×450",
+      "fps": "24fps",
+      "file": "downloads/overlays/film-burn-overlay.gif",
+      "preview": "burn",
+      "description": "احترق فيلمي (Film Burn) بحركة عضوية غير متكررة — التفاصيل الدافئة التي تفرق بين مونتاج هاوٍ ومونتاج استوديو. مثالي بين اللقطات وبداية الفيديو.",
+      "usage": "اسحب فوق التايم لاين في AE/بريمير/FCP، Blend Mode: Screen، الشفافية 65-85%."
+    },
+    {
+      "id": "light-sweep-seq",
+      "name": "تسلسل الكنس الضوئي",
+      "tagline": "24 إطار PNG بشفافية — تكبير بلا فقدان",
+      "category": "transitions",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "format": "PNG Sequence",
+      "quality": "640×360",
+      "fps": "24fps",
+      "file": "downloads/sequences/light-sweep-seq.zip",
+      "preview": "sweep",
+      "badge": "شفافية كاملة",
+      "description": "مسحة ضوء بشرائح PNG بقناة ألفا — الحل الاحترافي عندما تحتاج دقة أعلى من الـ GIF مع شفافية حقيقية. قابل للتكبير إلى 4K دون فقدان جودة.",
+      "usage": "فك الضغط ثم استورد كـ Image Sequence. Blend Mode: Screen / Add."
+    },
+    {
+      "id": "title-slam-comic",
+      "name": "تايتل الصَمْ الكوميكس",
+      "tagline": "هبوط قوي بظل مزدوج وفلاش",
+      "category": "elements",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/title-slam-comic.json",
+      "preview": "slam",
+      "badge": "ستايل كوميكس",
+      "description": "تايتل يهبط بقوة بظل أسود مزدوج على طراز القصص المصورة — لوحة صفراء + شريط أحمر + سطر داكن. حركة قوية بتوقيت سينمائي (Anticipation → Hit → Settle).",
+      "usage": "اضبط النص فوق اللوحة الصفراء. سرعة الهبوط قابلة للتعديل من التايم لاين."
+    },
+    {
+      "id": "lower-third-pack",
+      "name": "اللَوَر ثِرْد الحديث",
+      "tagline": "شريط أسماء بشريطين ملوّنين",
+      "category": "elements",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/lower-third-pack.json",
+      "preview": "lower",
+      "description": "لَوَر ثِرْد نظيف بشريط أسود + لمسة حمراء + مربع أصفر، مع سطرين جاهزين للاسم والوظيفة. تصميم يليق بالمقابلات والوثائقيات والبودكاست المرئي.",
+      "usage": "استبدل السطرين بالنص المطلوب. مدة الظهور 2 ثانية بمدخل ناعم."
+    },
+    {
+      "id": "neon-underline",
+      "name": "الخط النيوني",
+      "tagline": "SVG يرسم خطًا متوهجًا تحت النص",
+      "category": "elements",
+      "programs": [
+        "web"
+      ],
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "—",
+      "file": "downloads/svg/neon-underline.svg",
+      "preview": "neon",
+      "description": "خط نيون يُرسم تحت النص مع نقطة ضوء تتحرك على طوله — لمسة احترافية صغيرة تغيّر إحساس الصفحة أو الفيديو بالكامل.",
+      "usage": "مثالي للمواقع والواجهات — يعمل مباشرة في المتصفح. في برامج المونتاج استخدمه كشريحة صور أو صدّره كفيديو."
+    },
+    {
+      "id": "glitch-scan",
+      "name": "المسح التشويشي",
+      "tagline": "أشرطة تنطّ + انفصال RGB + خط مسح",
+      "category": "glitch",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/glitch-scan.json",
+      "preview": "glitch",
+      "badge": "قوة عالية",
+      "description": "تشويش رقمي حقيقي: سبعة أشرطة تتنطّ بخطوة 6 إطارات (Step Keyframes) + طبقتا انفصال RGB + خط مسح رأسي. يبدو عشوائيًا لكنه محسوب بعناية ليبقى نظيفًا على الشاشة.",
+      "usage": "مثالي قبل الكشف عن الشعار أو بين المشاهد. جرّب قصّه لثلاثة إطارات فقط للضربات السريعة."
+    },
+    {
+      "id": "glitch-bars-overlay",
+      "name": "أوفرلاي أشرطة التشويش",
+      "tagline": "GIF بأشرطة إشارة ملوّنة",
+      "category": "glitch",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "final-cut"
+      ],
+      "format": "GIF",
+      "quality": "800×450",
+      "fps": "24fps",
+      "file": "downloads/overlays/glitch-bars-overlay.gif",
+      "preview": "glitch",
+      "description": "أشرطة إشارة ملوّنة (أحمر/سماوي/أبيض) تظهر وتختفي بترتيب عشوائي — أوفرلاي جاهز لـ AE وبريمير وFCP يمنح أي لقطة إحساس الخطأ الرقمي المقصود.",
+      "usage": "Blend Mode: Screen أو Normal حسب الخلفية. جرّب قصّه على إيقاع الموسيقى."
+    },
+    {
+      "id": "particles-burst",
+      "name": "انفجار الجزيئات",
+      "tagline": "16 جسيمًا بزوايا وسرعات مدروسة",
+      "category": "particles",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/particles-burst.json",
+      "preview": "particles",
+      "description": "انفجار جزيئات محسوب إحصائيًا: 16 جسيمًا بأربعة ألوان، زوايا وسرعات وتسارع جاذبية مختلف. النتيجة حركة طبيعية غير آلية — كما لو صُنعت يدويًا جسيمًا جسيمًا.",
+      "usage": "مثالي للحظات الاحتفال والكشف والضربات. الدمج Screen فوق الداكن."
+    },
+    {
+      "id": "spark-trails",
+      "name": "ذيول الشرارات",
+      "tagline": "شرارات متوهجة تطير باتجاهات متعددة",
+      "category": "particles",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/spark-trails.json",
+      "preview": "sparks",
+      "description": "اثنا عشر شرارة متوهجة بذيول متلاشية تطير من المركز — تشبه شرارات اللحام والألعاب النارية. كل شرارة بزاوية وطول مختلف لتجنب التكرار البصري.",
+      "usage": "استخدمه مع صوت شرارات لحظة التأثير. ممتاز تحت النصوص المعدنية."
+    },
+    {
+      "id": "halftone-burst",
+      "name": "انفجار الهافتون",
+      "tagline": "SVG بحلقات هافتون كوميكس",
+      "category": "particles",
+      "programs": [
+        "web"
+      ],
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "—",
+      "file": "downloads/svg/halftone-burst.svg",
+      "preview": "particles",
+      "badge": "كوميكس",
+      "description": "انفجار نقطي على طراز الهافتون الكوميكس: حلقتان متوهّجتان تدوران في اتجاهين متعاكسين مع نواة نقطية — هوية بصرية قوية للمحتوى الشبابي.",
+      "usage": "مثالي خلف التايتلز الكوميدية على الويب. غيّر الألوان من داخل الملف النصي."
+    },
+    {
+      "id": "smoke-wisp",
+      "name": "خيوط الدخان",
+      "tagline": "SVG بدخان ناعم يتصاعد ببطء",
+      "category": "particles",
+      "programs": [
+        "web"
+      ],
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "—",
+      "file": "downloads/svg/smoke-wisp.svg",
+      "preview": "bokeh",
+      "description": "ثلاث خيوط دخان ناعمة بتمويه Gaussian تتصاعد وتتلاشى بإيقاعات مختلفة — حركة خلفية هادئة تمنح العمق دون تشتيت.",
+      "usage": "ضعه كطبقة خلفية في موقعك بشفافية منخفضة. يعمل بشكل رائع في المشاهد الليلية."
+    },
+    {
+      "id": "logo-reveal-rings",
+      "name": "كشف الشعار بالحلقات",
+      "tagline": "حلقتان + شريطان + لحظة ظهور قوية",
+      "category": "logos",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/logo-reveal-rings.json",
+      "preview": "rings",
+      "badge": "الأنسب للإنترو",
+      "description": "كشف شعار متكامل: حلقتان ضوئيتان تتمددان، شريطان ينسحبان لكشف المكان، ثم يهبط كتلة الشعار بحركة Overshoot مع شرارتين نهائيتين. توقيت مثالي للاستخدام كإنترو.",
+      "usage": "استبدل الكتلة الحمراء بشعارك (Shape Layer أو PNG). المدة 2.5 ثانية."
+    },
+    {
+      "id": "hud-frame-tech",
+      "name": "إطار HUD التقني",
+      "tagline": "زوايا متحركة + خط مسح + بيانات",
+      "category": "hud",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/hud-frame-tech.json",
+      "preview": "hud",
+      "description": "إطار تقني بأربع زوايا تدخل من الأطراف، نقاط تحذير نابضة، خط مسح رأسي، وشريط بيانات سفلي. المثالي للمحتوى التقني وعروض المنتجات والألعاب.",
+      "usage": "استخدمه كطبقة إطار فوق اللقطة. قابل للتلوين من إعدادات الشكل."
+    },
+    {
+      "id": "progress-ring",
+      "name": "حلقة التقدّم",
+      "tagline": "رسم دائري بـ Trim Path احترافي",
+      "category": "info",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "file": "downloads/lottie/progress-ring.json",
+      "preview": "progress",
+      "description": "حلقة تقدّم صفراء على مسار رمادي مع نواة سماوية — مبنية بـ Trim Path (المسار الصحيح احترافيًا) وليست مجرد دوران. مثالي للإحصائيات وعروض البيانات.",
+      "usage": "عدّل نسبة التقدّم من قيمة End في Trim Path. متوافق مع كل مشغّلات Lottie."
+    },
+    {
+      "id": "cinematic-teal-orange",
+      "name": "تيل وأورانج سينمائي",
+      "tagline": "اللوك الكلاسيكي للأفلام",
+      "category": "color",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "format": "LUT .cube",
+      "quality": "33×33×33",
+      "fps": "—",
+      "file": "downloads/luts/cinematic-teal-orange.cube",
+      "preview": "luts",
+      "badge": "سينمائي",
+      "description": "اللوك الأكثر استخدامًا في هوليوود: ظلال مائلة للسماوي ودرجات بشرة دافئة. مصنوع بعناية ليبقى البشرة طبيعية دون إفراط.",
+      "usage": "في بريمير: Lumetri Color → Creative → Look. في ريزولف: LUTs. في AE: Lumetri. في FCP: Color Board/LUT."
+    },
+    {
+      "id": "warm-film-look",
+      "name": "الفيلم الدافئ",
+      "tagline": "لوك عسلي دافئ للمقاطع العائلية",
+      "category": "color",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "format": "LUT .cube",
+      "quality": "33×33×33",
+      "fps": "—",
+      "file": "downloads/luts/warm-film-look.cube",
+      "preview": "luts",
+      "description": "لوك دافئ بدرجات عسلية وأصفر خفيف — مثالي للسفر والطعام والمحتوى العائلي واللحظات الإنسانية.",
+      "usage": "يطبَّق مباشرةً أو بشفافية 50-70% للتخفيف."
+    },
+    {
+      "id": "neon-night",
+      "name": "النيون الليلي",
+      "tagline": "ظلال أعمق وألوان أقوى للّيل",
+      "category": "color",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "format": "LUT .cube",
+      "quality": "33×33×33",
+      "fps": "—",
+      "file": "downloads/luts/neon-night.cube",
+      "preview": "luts",
+      "description": "لوك ليلي يرفع النيون الأزرق والماجنتا في الإضاءة الملونة ويُعمّق الظلال — مصمم خصيصًا لمدن الليل والحفلات والمحتوى الموسيقي.",
+      "usage": "الأفضل مع لقطات فيها إضاءة ملونة فعلية (نيون، شاشات، أضواء مسرح)."
+    },
+    {
+      "id": "bw-dramatic",
+      "name": "أبيض وأسود درامي",
+      "tagline": "تباين عالٍ بظلال سينمائية",
+      "category": "color",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "format": "LUT .cube",
+      "quality": "33×33×33",
+      "fps": "—",
+      "file": "downloads/luts/bw-dramatic.cube",
+      "preview": "luts",
+      "description": "أبيض وأسود بتباين درامي محسوب (S-Curve) — ليس مجرد إزالة الألوان، بل إعادة صياغة للضوء والظل كما في أفلام نوار.",
+      "usage": "جربه على لقطات بها إضاءة جانبية قوية للحصول على أفضل نتيجة."
+    },
+    {
+      "id": "vintage-fade",
+      "name": "الفينتاج الباهت",
+      "tagline": "تلاشي مطفي بألوان عتيقة",
+      "category": "color",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "format": "LUT .cube",
+      "quality": "33×33×33",
+      "fps": "—",
+      "file": "downloads/luts/vintage-fade.cube",
+      "preview": "luts",
+      "description": "لوك الفينتاج المطفي (Matte Fade) بظلال مرفوعة وألوان عتيقة — الطابع الذي يميّز المحتوى الراقي على إنستغرام واليوتيوب.",
+      "usage": "طبّقه بشفافية 60% ثم ارفع التباين قليلًا حسب اللقطة."
+    },
+    {
+      "id": "ae-expressions-pack",
+      "name": "حزمة تعابير AE",
+      "tagline": "6 تعابير موثّقة تعمل فعليًا في AE",
+      "category": "tools",
+      "programs": [
+        "after-effects"
+      ],
+      "format": "TXT",
+      "quality": "6 تعابير",
+      "fps": "—",
+      "file": "downloads/expressions/ae-expressions-pack.txt",
+      "preview": "code",
+      "badge": "توفير ساعات",
+      "description": "ستة تعابير After Effects مجرّبة وتعمل على المحرّك القياسي: Overshoot، Wiggle أفقي، Auto Fade، Pulsing، Float، Speed Fade — مع شرح عربي لكل تعبير. (حُذف منها أي تعبير لا يعمل بشكل صحيح).",
+      "usage": "انسخ التعبير → Alt/Option + انقر على مؤقت الخاصية → الصق."
+    },
+    {
+      "id": "overshoot-expression",
+      "name": "تعبير Overshoot",
+      "tagline": "ارتداد ناعم بعد نهاية الحركة",
+      "category": "tools",
+      "programs": [
+        "after-effects"
+      ],
+      "format": "TXT",
+      "quality": "تعبير واحد",
+      "fps": "—",
+      "file": "downloads/expressions/overshoot.txt",
+      "preview": "code",
+      "description": "التعبير الكلاسيكي الذي يمنح كل حركتك Overshoot طبيعيًا محسوبًا من السرعة اللحظية — بدون إعداد يدوي.",
+      "usage": "الصقه على Position أو Scale أو Rotation."
+    },
+    {
+      "id": "auto-fade-expression",
+      "name": "تعبير الظهور التلقائي",
+      "tagline": "تلاشٍ داخلي وخارجي تلقائي",
+      "category": "tools",
+      "programs": [
+        "after-effects"
+      ],
+      "format": "TXT",
+      "quality": "تعبير واحد",
+      "fps": "—",
+      "file": "downloads/expressions/auto-fade.txt",
+      "preview": "code",
+      "description": "ظهور وتلاشٍ تلقائيان حسب مدة الطبقة — حرّك الطبقة على التايم لاين وسيتغيّر التلاشي معها تلقائيًا.",
+      "usage": "الصقه على Opacity."
+    }
+  ]
+}

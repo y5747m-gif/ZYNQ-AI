@@ -3,14 +3,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "zaytuna/ui/server.js",
+      "src": "site/server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["zaytuna/ui/**", "zaytuna/examples/**"]
+        "includeFiles": ["site/public/**", "site/downloads/**"]
       }
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "zaytuna/ui/server.js" }
+    { "src": "/(.*)", "dest": "site/server.js" }
   ]
 }

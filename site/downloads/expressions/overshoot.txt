@@ -1,0 +1,9 @@
+amp = 0.06; freq = 2.2; decay = 4.0;
+n = 0;
+if (numKeys > 0) { n = nearestKey(time).index; if (key(n).time > time) n--; }
+if (n == 0) { value } else {
+  t = time - key(n).time;
+  setV = velocityAtTime(key(n).time - thisComp.frameDuration / 100);
+  vel = setV * amp;
+  add(vel * Math.sin(t * freq * 2 * Math.PI) / Math.exp(decay * t), value);
+}
