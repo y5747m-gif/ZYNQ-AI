@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ستيريو — صوت استيريو</string>
+    <string name="toggle_stereo">تفعيل إخراج الاستيريو</string>
+    <string name="status_off">متوقف</string>
+    <string name="status_on">الاستيريو مفعل</string>
+    <string name="balance">موازن اليسار / اليمين</string>
+    <string name="perm_note">
+        يحتاج التطبيق إلى إذن تعديل إعدادات الصوت لتوجيه الإخراج إلى قناتي استيريو.
+    </string>
+</resources>

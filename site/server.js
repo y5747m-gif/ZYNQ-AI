@@ -45,6 +45,7 @@ const MIME = {
   '.txt': 'text/plain; charset=utf-8',
   '.cube': 'text/plain; charset=utf-8',
   '.zip': 'application/zip',
+  '.apk': 'application/vnd.android.package-archive',
 };
 
 function send(res, code, body, type, extra = {}) {
