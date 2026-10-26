@@ -120,12 +120,16 @@ function verifyOutput(code, targetId, opts = {}) {
   const parts = [];
   if (compilerTier) parts.push(syntax.ok ? `فحص البنية بمترجم حقيقي (${syntax.kind}) ✅` : `فحص البنية بمترجم حقيقي فشل (${syntax.kind}) ❌`);
   else if (structural && structural.verified) {
+    // الملاحظة نفسها تُقال في الحالتين: نجاح القواعد أو فشلها ليس تحققًا بمترجم
+    const caveat = '*لا يوجد مترجم لهذه اللغة على هذا الجهاز، وليس هذا تحققًا بمترجم (tree-sitter)*';
     parts.push(structural.ok
-      ? `فحص بنيوي بقواعد ${structural.grammar} (tree-sitter) ✅ — *لا يوجد مترجم لهذه اللغة على هذا الجهاز، وليس هذا تحققًا بمترجم*`
-      : `فحص بنيوي بقواعد ${structural.grammar} فشل ❌`);
+      ? `فحص بنيوي بقواعد ${structural.grammar} (tree-sitter) ✅ — ${caveat}`
+      : `فحص بنيوي بقواعد ${structural.grammar} فشل ❌ — ${caveat}`);
     if (structural.note && structural.ok) parts.push(structural.note);
   } else {
-    parts.push(`لم نتحقق من البنية: ${(structural && structural.note) || syntax.note || 'لا مدقّق ولا قواعد متاحة'} ⚠`);
+    // حالة «بلا تحقق»: نقول لماذا بالضبط — لا مترجم حقيقي ولا قواعد tree-sitter على الجهاز
+    const why = (structural && structural.note) || syntax.note || 'لا مدقّق ولا قواعد متاحة';
+    parts.push(`لم نتحقق من البنية: ${why} — لم نجد مترجمًا حقيقيًا ولا فحصًا بنيويًا (tree-sitter) على هذا الجهاز ⚠`);
   }
   if (run.ran) parts.push(run.ok ? `التشغيل بـ${run.tool} نجح ✅` : `التشغيل بـ${run.tool} فشل (رمز ${run.exitCode}) ❌`);
   else if (run.attempted) parts.push(`لم نُشغّل المخرج: ${run.note} ⚠`);

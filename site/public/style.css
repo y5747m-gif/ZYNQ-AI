@@ -801,6 +801,47 @@ button, input, select { font-family: inherit; }
   border-radius: 4px;
   font-family: ui-monospace, monospace;
 }
+.app-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  justify-content: center;
+  margin: 1.1rem 0 0.4rem;
+}
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+.app-mini {
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: var(--cream);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem 1.1rem;
+}
+.app-mini b {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+.app-mini p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.app-mini code {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85em;
+}
 
 /* ------------------------------------------------------------
    الأسئلة

@@ -1,0 +1,64 @@
+name: بناء تطبيق ستيريو (APK)
+
+# لماذا هذا الملف؟
+#   لا يمكن تخزين ملف APK جاهز في المستودع بلا سلسلة أدوات أندرويد موقّعة،
+#   ولا يجوز تسليم ملف ليس تطبيقًا حقيقيًا. لذلك يُبنى الـ APK على GitHub
+#   Actions فعليًا في كل تغيير على مجلد التطبيق، ويُنزَّل من صفحة التشغيل (Artifacts).
+
+on:
+  push:
+    paths:
+      - 'site/downloads/stereo-sound/**'
+      - '.github/workflows/android-apk.yml'
+  pull_request:
+    paths:
+      - 'site/downloads/stereo-sound/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    name: بناء APK (debug)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: جلب المستودع
+        uses: actions/checkout@v4
+
+      - name: تجهيز جافا 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: تجهيز غرادل
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
+
+      - name: تجهيز أندرويد SDK
+        uses: android-actions/setup-android@v3
+
+      - name: تثبيت منصة 34 وأدوات البناء
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: توليد غلاف غرادل
+        working-directory: site/downloads/stereo-sound
+        run: gradle wrapper --gradle-version 8.7 --distribution-type bin
+
+      - name: بناء APK
+        working-directory: site/downloads/stereo-sound
+        run: ./gradlew --no-daemon --stacktrace assembleDebug
+
+      - name: رفع الـ APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: stereo-sound-apk
+          path: site/downloads/stereo-sound/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30

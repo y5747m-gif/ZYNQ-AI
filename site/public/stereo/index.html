@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ستيريو — صوت استيريو على هاتفك</title>
+<meta name="description" content="تطبيق ستيريو: يحوّل أي صوت أحادي إلى استيريو، مع موازن يمين/يسار، توسيع ستيريو، معادل صوتي، واختبار قنوات — يعمل في المتصفح وبلا تثبيت.">
+<meta name="theme-color" content="#e84545">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ستيريو">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ================= الشريط العلوي ================= -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="./icons/icon-192.png" width="38" height="38" alt="" class="brand-logo">
+      <div>
+        <b>ستيريو</b>
+        <small>Stereo Sound</small>
+      </div>
+    </div>
+    <span class="status-chip" id="status-chip" data-state="idle">
+      <i></i><span id="status-text">جاهز</span>
+    </span>
+  </header>
+
+  <main>
+
+    <!-- ================= التشغيل ================= -->
+    <section class="card">
+      <h2 class="card-title">🎵 الصوت</h2>
+
+      <label class="file-drop" id="file-drop" for="file-input">
+        <input type="file" id="file-input" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg,.oga,.opus,.flac,.webm" hidden>
+        <span class="file-icon" aria-hidden="true">📂</span>
+        <span class="file-text">
+          <b>اختر ملفًا صوتيًا</b>
+          <small>MP3 · M4A · AAC · WAV · OGG · FLAC — من ذاكرة الهاتف</small>
+        </span>
+      </label>
+
+      <div class="now-playing" id="now-playing" hidden>
+        <div class="np-name" id="np-name">—</div>
+        <div class="seek-row">
+          <span class="time" id="time-now">0:00</span>
+          <input type="range" id="seek" class="slider" min="0" max="1000" value="0" step="1" aria-label="موضع التشغيل">
+          <span class="time" id="time-total">0:00</span>
+        </div>
+        <div class="transport">
+          <button class="icon-btn" id="back10" type="button" title="رجوع ١٠ ثوان" aria-label="رجوع عشر ثوان">⟲</button>
+          <button class="play-btn" id="play" type="button" aria-label="تشغيل">▶</button>
+          <button class="icon-btn" id="fwd10" type="button" title="تقدّم ١٠ ثوان" aria-label="تقدّم عشر ثوان">⟳</button>
+          <button class="icon-btn" id="loop" type="button" aria-pressed="false" title="تكرار" aria-label="تكرار">🔁</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= توسيع الستيريو ================= -->
+    <section class="card">
+      <div class="card-head">
+        <h2 class="card-title">↔️ توسيع الستيريو</h2>
+        <output class="value" id="width-value">100%</output>
+      </div>
+      <p class="hint" id="width-hint">الصوت الأصلي كما هو</p>
+      <input type="range" id="width" class="slider" min="0" max="200" step="5" value="100" aria-label="توسيع الستيريو">
+      <div class="scale"><span>أحادي</span><span>طبيعي</span><span>واسع جدًا</span></div>
+      <div class="pill-row" id="width-presets">
+        <button type="button" class="pill" data-width="0">أحادي 0%</button>
+        <button type="button" class="pill" data-width="100">طبيعي 100%</button>
+        <button type="button" class="pill" data-width="145">واسع 145%</button>
+        <button type="button" class="pill" data-width="200">مسرح 200%</button>
+      </div>
+      <p class="note">التوسيع يبني اتساعًا حقيقيًا من فرق القناتين (Mid/Side) — يعمل حتى مع الملفات الأحادية بعد نسخها للقناتين.</p>
+    </section>
+
+    <!-- ================= الموازن ================= -->
+    <section class="card">
+      <div class="card-head">
+        <h2 class="card-title">🎚️ موازن يمين / يسار</h2>
+        <output class="value" id="balance-value">متوازن</output>
+      </div>
+      <div class="balance-wrap">
+        <input type="range" id="balance" class="slider slider-balance" min="-100" max="100" step="5" value="0" aria-label="موازن القنوات">
+        <div class="balance-ends"><span>يسار L</span><span>يمين R</span></div>
+      </div>
+      <div class="row-actions">
+        <button type="button" class="toggle" id="swap" aria-pressed="false">
+          <i></i><span>عكس القناتين</span>
+        </button>
+        <button type="button" class="toggle" id="muteL" aria-pressed="false"><i></i><span>كتم اليسار</span></button>
+        <button type="button" class="toggle" id="muteR" aria-pressed="false"><i></i><span>كتم اليمين</span></button>
+      </div>
+    </section>
+
+    <!-- ================= المعادل ================= -->
+    <section class="card">
+      <h2 class="card-title">🎛️ المعادل الصوتي</h2>
+
+      <div class="eq-row">
+        <label for="bass">بيس <small>Bass</small></label>
+        <output class="value" id="bass-value">0 dB</output>
+        <input type="range" id="bass" class="slider" min="-12" max="12" step="1" value="0">
+      </div>
+      <div class="eq-row">
+        <label for="mid">وسط <small>Mid</small></label>
+        <output class="value" id="mid-value">0 dB</output>
+        <input type="range" id="mid" class="slider" min="-12" max="12" step="1" value="0">
+      </div>
+      <div class="eq-row">
+        <label for="treble">تريبل <small>Treble</small></label>
+        <output class="value" id="treble-value">0 dB</output>
+        <input type="range" id="treble" class="slider" min="-12" max="12" step="1" value="0">
+      </div>
+
+      <div class="row-actions">
+        <button type="button" class="pill" id="eq-flat">تصفير المعادل</button>
+        <button type="button" class="pill" id="eq-vocal">وضوح الكلام</button>
+        <button type="button" class="pill" id="eq-bass">تعزيز البيس</button>
+      </div>
+    </section>
+
+    <!-- ================= الصوت العام ================= -->
+    <section class="card">
+      <div class="card-head">
+        <h2 class="card-title">🔊 مستوى الصوت</h2>
+        <output class="value" id="volume-value">85%</output>
+      </div>
+      <input type="range" id="volume" class="slider" min="0" max="100" step="1" value="85" aria-label="مستوى الصوت">
+      <div class="meter" aria-label="مستوى القناتين">
+        <div class="meter-line"><span>L</span><div class="meter-bar"><i id="meter-l"></i></div></div>
+        <div class="meter-line"><span>R</span><div class="meter-bar"><i id="meter-r"></i></div></div>
+      </div>
+    </section>
+
+    <!-- ================= اختبار القنوات ================= -->
+    <section class="card">
+      <h2 class="card-title">✅ اختبار القناتين</h2>
+      <p class="hint">اضغط لتسمع نغمة في قناة واحدة. إن سمعتها في أذن واحدة فالإخراج استيريو فعلًا.</p>
+      <div class="row-actions">
+        <button type="button" class="pill pill-red" data-beep="left">نغمة يسار ◀</button>
+        <button type="button" class="pill pill-red" data-beep="right">نغمة يمين ▶</button>
+        <button type="button" class="pill pill-red" data-beep="both">الاثنان ⇄</button>
+      </div>
+      <p class="note">الاختبار يمرّ إلى مخرج الصوت مباشرة بلا معالجة، حتى تتأكد من السماعات أو السماعة الخارجية نفسها.</p>
+    </section>
+
+    <!-- ================= الميكروفون ================= -->
+    <section class="card">
+      <div class="card-head">
+        <h2 class="card-title">🎤 الميكروفون</h2>
+        <button type="button" class="toggle" id="mic" aria-pressed="false"><i></i><span>تشغيل</span></button>
+      </div>
+      <p class="hint">يمرّ صوت الميكروفون بنفس التوسيع والمعادل — مفيد للتسجيل والمكالمات عبر سماعات خارجية.</p>
+      <p class="warn" id="mic-warn" hidden>⚠️ استخدم سماعات الآن. تشغيل الميكروفون على سماعة الهاتف يسبب صفيرًا (تغذية راجعة).</p>
+    </section>
+
+    <!-- ================= تثبيت ================= -->
+    <section class="card" id="install-card" hidden>
+      <h2 class="card-title">📲 ثبّت التطبيق</h2>
+      <p class="hint">ثبّته على الشاشة الرئيسية ليعمل كتطبيق مستقل وبلا إنترنت.</p>
+      <button type="button" class="btn-full" id="install-btn">إضافة إلى الشاشة الرئيسية</button>
+    </section>
+
+    <p class="foot-note">
+      يعمل التطبيق بالكامل على جهازك — لا يُرسَل أي صوت إلى أي خادم.
+      <br>
+      <span id="engine-note">محرّك الصوت: Web Audio API</span>
+    </p>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="./app.js"></script>
+</body>
+</html>

@@ -210,21 +210,49 @@
     <div class="section-head reveal">
       <div class="sticker sticker-red">تطبيق موبايل</div>
       <h2>صوت <span class="hl-cyan">استيريو</span> على هاتفك <span class="comic-underline">بلمسة واحدة</span></h2>
-      <p>برنامج APK يحول إخراج صوت هاتفك إلى استيريو (قنوات يمين ويسار) حتى مع الملفات الصوتية الأحادية — مع موازن استيريو ومعادل صوتي مدمج للموسيقى والفيديو.</p>
+      <p>يحوّل أي صوت أحادي إلى استيريو حقيقي: توسيع ستيريو، موازن يمين/يسار، معادل صوتي ثلاثي، ونغمة اختبار لكل قناة — كل المعالجة على جهازك.</p>
     </div>
+
     <div class="app-card reveal">
       <div class="app-icon">🔊</div>
       <div>
         <h3>ستيريو — Stereo Sound</h3>
         <ul class="app-features">
-          <li>إخراج صوتي استيريو مزدوج القنوات</li>
-          <li>تحويل الصوت الأحادي إلى استيريو تلقائيًا</li>
-          <li>موازن يمين/يسار ومعادل صوتي مدمج</li>
-          <li>يعمل في الخلفية مع تطبيقات الموسيقى والفيديو</li>
+          <li>توسيع ستيريو حتى 200% بتقنية Mid/Side (يعمل مع الملفات الأحادية)</li>
+          <li>موازن يمين/يسار + كتم وعكس القناتين</li>
+          <li>معادل ثلاثي (بيس/وسط/تريبل) ومستوى صوت ومؤشرا مستوى للقناتين</li>
+          <li>نغمة اختبار لكل قناة للتأكد أن الإخراج استيريو فعلًا</li>
+          <li>يعمل بلا تثبيت وبلا إنترنت وبلا إرسال أي صوت لأي خادم</li>
         </ul>
-        <a class="btn btn-red btn-lg" href="/downloads/stereo-sound/stereo-sound.apk" download>⬇ تحميل التطبيق (APK)</a>
+        <div class="app-actions">
+          <a class="btn btn-red btn-lg" href="/stereo/">▶ افتح التطبيق الآن</a>
+          <a class="btn btn-ghost btn-lg" href="/api/app/source.zip" download>⬇ مشروع أندرويد (ZIP)</a>
+        </div>
+        <p class="app-note">
+          <b>لماذا لا يوجد ملف APK جاهز للتحميل؟</b>
+          بناء APK يحتاج JDK 17 وAndroid SDK وسلسلة بناء كاملة. الملف الذي كان هنا سابقًا لم يكن تطبيقًا:
+          كان أرشيفًا بحجم 828 بايت بلا كود قابل للتثبيت. لذلك:
+          <br>• <b>على الهاتف الآن:</b> افتح <a href="/stereo/">/stereo/</a> ثم «إضافة إلى الشاشة الرئيسية» — يعمل كتطبيق كامل بلا تثبيت.
+          <br>• <b>ملف APK موقّع:</b> يُبنى تلقائيًا من كود المصدر عبر
+          <code>.github/workflows/android-apk.yml</code> (تبويب Actions ← Artifacts)، أو افتح المشروع في Android Studio واضغط Build ▸ Build APK.
+          <br>• الكود الكامل: <code>site/downloads/stereo-sound/</code> — كوتلن + غرادل + أيقونات.
+        </p>
       </div>
-      <p class="app-note">إصدار تجريبي غير موقّع — ثبّت الملف على هاتفك مباشرة، أو افتح كود المصدر في <code>site/downloads/stereo-sound/</code> عبر Android Studio للتوقيع والنشر.</p>
+    </div>
+
+    <div class="app-grid reveal">
+      <div class="app-mini">
+        <b>كيف أستخدمه على الهاتف؟</b>
+        <p>افتح الرابط ← اختر ملفًا صوتيًا من ذاكرة الهاتف ← شغّل ← عدّل التوسيع والموازن والمعادل. يعمل داخل المتصفح ويُثبَّت على الشاشة الرئيسية.</p>
+      </div>
+      <div class="app-mini">
+        <b>هل يغيّر صوت بقية التطبيقات؟</b>
+        <p>نسخة الويب تعالج صوتها فقط. أما نسخة أندرويد فتطبّق المؤثرات على جلسة الصوت الخاصة بها؛ لمعالجة كل تطبيقات الجهاز تحتاج صلاحية صوت نظامية غير متاحة للتطبيقات العادية.</p>
+      </div>
+      <div class="app-mini">
+        <b>ما المطلوب لبناء الـ APK؟</b>
+        <p>Android Studio (Ladybug أو أحدث) مع JDK 17 وAndroid SDK 34. المشروع جاهز للمزامنة، ويُنتج <code>app-debug.apk</code> قابلًا للتثبيت مباشرة.</p>
+      </div>
     </div>
   </div>
 </section>

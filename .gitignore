@@ -1,3 +1,11 @@
 node_modules/
 *.bak
 __pycache__/
+
+# نتائج بناء أندرويد (تُبنى في CI ولا تُخزَّن)
+site/downloads/stereo-sound/.gradle/
+site/downloads/stereo-sound/build/
+site/downloads/stereo-sound/app/build/
+site/downloads/stereo-sound/local.properties
+site/downloads/stereo-sound/.idea/
+.asset-tmp/

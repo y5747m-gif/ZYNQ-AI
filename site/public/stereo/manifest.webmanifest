@@ -1,0 +1,21 @@
+{
+  "name": "ستيريو — صوت استيريو على هاتفك",
+  "short_name": "ستيريو",
+  "description": "يحوّل أي صوت أحادي إلى استيريو مع وسع ستيريو وموازن يمين/يسار ومعادل صوتي — يعمل على الجهاز بلا خادم.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "/stereo/",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
+  "orientation": "portrait",
+  "background_color": "#f3e9d6",
+  "theme_color": "#e84545",
+  "categories": ["music", "utilities"],
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
