@@ -9,38 +9,37 @@ android {
 
     defaultConfig {
         applicationId = "com.zynq.stereosound"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
     }
 
     buildTypes {
+        debug {
+            // موقّع بمفتاح التصحيح تلقائيًا — يُثبَّت مباشرة على الهاتف
+            isMinifyEnabled = false
+        }
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("debug")
-        }
-        debug {
+            // نسخة الإصدار تُوقَّع بمفتاح التصحيح أيضًا حتى تكون قابلة للتثبيت
+            // من دون إعداد مفتاح خاص. للنشر على Google Play أنشئ مفتاحك:
+            //   Build ▸ Generate Signed Bundle / APK
             signingConfig = signingConfigs.getByName("debug")
         }
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
-    buildFeatures {
-        viewBinding = true
+        jvmTarget = "17"
     }
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
 }

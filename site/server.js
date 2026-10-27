@@ -42,6 +42,11 @@ const MIME = {
   '.gif': 'image/gif',
   '.woff2': 'font/woff2',
   '.ico': 'image/x-icon',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
+  '.manifest': 'application/manifest+json; charset=utf-8',
+  '.webp': 'image/webp',
+  '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav',
   '.txt': 'text/plain; charset=utf-8',
   '.cube': 'text/plain; charset=utf-8',
   '.zip': 'application/zip',
@@ -156,6 +161,42 @@ async function handler(req, res) {
       return send(res, 200, JSON.stringify(loadCatalog()), MIME['.json']);
     }
 
+    // تطبيق «ستيريو» يحتاج الشرطة المائلة في النهاية حتى تعمل المسارات النسبية
+    // (app.js · sw.js · manifest) داخل نطاقه على أي خادم أو استضافة.
+    if (p === '/stereo') {
+      res.writeHead(301, { Location: '/stereo/' });
+      return res.end();
+    }
+
+    // الأيقونة الافتراضية للمتصفح حتى لا يظهر 404 في الكونسول
+    if (p === '/favicon.ico') {
+      const ico = path.join(PUBLIC, 'stereo', 'icons', 'icon-192.png');
+      if (fs.existsSync(ico)) return send(res, 200, fs.readFileSync(ico), MIME['.png']);
+    }
+
+    // مشروع أندرويد كامل كملف ZIP — يُفتح مباشرة في Android Studio ويُبنى منه APK.
+    // (لا يوجد APK جاهز مُخزَّن في المستودع: البناء يحتاج JDK + Android SDK،
+    //  وملف APK مُلفَّق يدويًا لا يُثبَّت على أي هاتف.)
+    if (p === '/api/app/source.zip') {
+      const root = path.join(DOWNLOADS, 'stereo-sound');
+      const skip = new Set(['build', '.gradle', '.idea', 'node_modules']);
+      const entries = [];
+      (function walk(dir) {
+        for (const name of fs.readdirSync(dir)) {
+          if (skip.has(name)) continue;
+          const full = path.join(dir, name);
+          const st = fs.statSync(full);
+          if (st.isDirectory()) { walk(full); continue; }
+          const rel = path.relative(root, full).split(path.sep).join('/');
+          entries.push({ name: `stereo-sound/${rel}`, data: fs.readFileSync(full) });
+        }
+      })(root);
+      if (!entries.length) return send(res, 404, JSON.stringify({ error: 'مشروع التطبيق غير موجود' }), MIME['.json']);
+      return send(res, 200, makeZip(entries), MIME['.zip'], {
+        'Content-Disposition': 'attachment; filename="stereo-sound-source.zip"',
+      });
+    }
+
     if (p.startsWith('/api/pack/')) {
       const key = p.slice('/api/pack/'.length).replace(/\.zip$/i, '');
       const catalog = loadCatalog();
@@ -196,9 +237,12 @@ async function handler(req, res) {
       });
     }
 
-    // ملفات الواجهة الثابتة
+    // ملفات الواجهة الثابتة (مع دعم المجلدات: /stereo/ ⇒ /stereo/index.html)
     const rel = p === '/' ? 'index.html' : p.slice(1);
-    const f = safeJoin(PUBLIC, rel);
+    let f = safeJoin(PUBLIC, rel);
+    if (f && fs.existsSync(f) && fs.statSync(f).isDirectory()) {
+      f = path.join(f, 'index.html');
+    }
     if (f && fs.existsSync(f) && fs.statSync(f).isFile()) {
       return send(res, 200, fs.readFileSync(f), MIME[path.extname(f).toLowerCase()] || 'application/octet-stream');
     }

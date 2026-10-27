@@ -1,10 +1,46 @@
 <resources>
     <string name="app_name">ستيريو — صوت استيريو</string>
-    <string name="toggle_stereo">تفعيل إخراج الاستيريو</string>
-    <string name="status_off">متوقف</string>
-    <string name="status_on">الاستيريو مفعل</string>
-    <string name="balance">موازن اليسار / اليمين</string>
-    <string name="perm_note">
-        يحتاج التطبيق إلى إذن تعديل إعدادات الصوت لتوجيه الإخراج إلى قناتي استيريو.
-    </string>
+
+    <!-- العنوان والحالة -->
+    <string name="tagline">توسيع ستيريو · موازن يمين/يسار · معادل صوتي</string>
+    <string name="status_no_file">لم يُختر ملف بعد</string>
+    <string name="status_loading">جارٍ التحضير…</string>
+    <string name="status_ready">جاهز — اضغط تشغيل</string>
+    <string name="status_playing">يعمل الآن</string>
+    <string name="status_paused">متوقف مؤقتًا</string>
+    <string name="status_done">انتهى الملف</string>
+    <string name="status_error">تعذّر تشغيل هذا الملف</string>
+
+    <!-- الملف والتشغيل -->
+    <string name="pick_file">📂 اختر ملفًا صوتيًا</string>
+    <string name="play">▶ تشغيل</string>
+    <string name="pause">⏸ إيقاف مؤقت</string>
+    <string name="no_file">— لا ملف —</string>
+
+    <!-- ستيريو -->
+    <string name="section_stereo">توسيع الستيريو</string>
+    <string name="width_label">العرض: %1$d%%</string>
+    <string name="width_unsupported">توسيع الستيريو غير مدعوم على هذا الجهاز — استخدم الموازن</string>
+    <string name="balance_label">الموازن: %1$s</string>
+    <string name="balance_center">متوازن</string>
+    <string name="balance_left">يسار %1$d%%</string>
+    <string name="balance_right">يمين %1$d%%</string>
+    <string name="test_left">نغمة يسار ◀</string>
+    <string name="test_right">نغمة يمين ▶</string>
+    <string name="test_both">القناتان ⇄</string>
+    <string name="test_note">الاختبار يشغّل نغمة في قناة واحدة لتتأكد أن الإخراج استيريو فعلًا. استخدم سماعات.</string>
+
+    <!-- الصوت -->
+    <string name="section_audio">الصوت</string>
+    <string name="volume_label">مستوى الصوت: %1$d%%</string>
+    <string name="bass_label">تقوية البيس: %1$d%%</string>
+    <string name="bass_unsupported">تقوية البيس غير مدعومة على هذا الجهاز</string>
+    <string name="section_eq">المعادل الصوتي</string>
+    <string name="eq_unsupported">المعادل الصوتي غير متوفر على هذا الجهاز</string>
+    <string name="eq_band">%1$d هرتز</string>
+    <string name="eq_reset">تصفير المعادل</string>
+    <string name="eq_ready">%1$d نطاقًا جاهزًا للتعديل</string>
+
+    <!-- ملاحظات -->
+    <string name="note_device">المعالجة تجري على جهازك عبر مشغّل أندرويد ومؤثرات الصوت في النظام. يعمل مع الموسيقى والفيديو في أي تطبيق لأن التأثير على جلسة الصوت نفسها.</string>
 </resources>
