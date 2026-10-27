@@ -179,11 +179,11 @@ async function handler(req, res) {
     //  وملف APK مُلفَّق يدويًا لا يُثبَّت على أي هاتف.)
     if (p === '/api/app/source.zip') {
       const root = path.join(DOWNLOADS, 'stereo-sound');
-      const skip = new Set(['build', '.gradle', '.idea', 'node_modules']);
+      const skip = new Set(['build', '.gradle', '.idea', 'node_modules', 'local.properties']);
       const entries = [];
       (function walk(dir) {
         for (const name of fs.readdirSync(dir)) {
-          if (skip.has(name)) continue;
+          if (skip.has(name) || /^\.env(?:\.|$)/i.test(name) || /\.(?:jks|keystore|p12|pfx)$/i.test(name)) continue;
           const full = path.join(dir, name);
           const st = fs.statSync(full);
           if (st.isDirectory()) { walk(full); continue; }

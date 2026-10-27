@@ -6,110 +6,87 @@ import android.media.AudioTrack
 import kotlin.math.PI
 import kotlin.math.sin
 
-/**
- * مولّد نغمة اختبار للقناتين.
- *
- * الغرض: أن يتأكد المستخدم أن الإخراج استيريو فعلًا — نغمة في اليسار فقط،
- * ثم في اليمين فقط. تُكتب النغمة بصيغة PCM 16-bit بقناتين صريحتين
- * (CHANNEL_OUT_STEREO) عبر AudioTrack، بلا أي اعتماد على مكتبات خارجية.
- *
- * (النسخة السابقة كانت تحاول تشغيل نغمة على قناة واحدة عبر AudioTrack ثم
- *  تنسخها يدويًا بضرب Short في Float — وهو ما لا يُترجم في كوتلن أصلًا.)
- */
+/** Short stereo PCM tone, independent of optional device effects. */
 class ChannelTester {
-
     enum class Side { LEFT, RIGHT, BOTH }
 
-    @Volatile
-    private var running = false
-    private var thread: Thread? = null
-    private var track: AudioTrack? = null
+    private class Session(val track: AudioTrack) {
+        @Volatile var cancelled = false
+    }
+    private val lock = Any()
+    private var current: Session? = null
 
     fun play(side: Side, durationMs: Int = 900, onFinished: (() -> Unit)? = null): Boolean {
         stop()
-
         val sampleRate = 44100
         val minBuffer = AudioTrack.getMinBufferSize(
-            sampleRate,
-            AudioFormat.CHANNEL_OUT_STEREO,
-            AudioFormat.ENCODING_PCM_16BIT
+            sampleRate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT
         )
         if (minBuffer <= 0) return false
-
-        val audioTrack = try {
+        val track = try {
             AudioTrack.Builder()
-                .setAudioAttributes(
-                    AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .build()
-                )
-                .setAudioFormat(
-                    AudioFormat.Builder()
-                        .setSampleRate(sampleRate)
-                        .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO)
-                        .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                        .build()
-                )
+                .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
+                .setAudioFormat(AudioFormat.Builder().setSampleRate(sampleRate)
+                    .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO)
+                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT).build())
                 .setBufferSizeInBytes(minBuffer * 2)
                 .setTransferMode(AudioTrack.MODE_STREAM)
                 .build()
-        } catch (t: Throwable) {
+        } catch (_: Exception) { return false }
+        if (track.state != AudioTrack.STATE_INITIALIZED) {
+            track.release()
             return false
         }
-
-        track = audioTrack
-        running = true
-
-        thread = Thread {
-            val totalFrames = (sampleRate.toLong() * durationMs / 1000L).toInt()
-            val chunkFrames = 1024
-            val buffer = ShortArray(chunkFrames * 2) // قناتان متشابكتان
-            val freq = 660.0
-            val amplitude = 8000.0 // ≈ 24% من المدى الكامل — عالٍ وآمن
+        val session = Session(track)
+        synchronized(lock) { current = session }
+        Thread {
+            val totalFrames = (sampleRate.toLong() * durationMs.coerceAtLeast(1) / 1000L).toInt()
+            val buffer = ShortArray(1024 * 2)
             var frame = 0
-
             try {
-                audioTrack.play()
-                while (running && frame < totalFrames) {
-                    val frames = minOf(chunkFrames, totalFrames - frame)
+                track.play()
+                while (!session.cancelled && frame < totalFrames) {
+                    val frames = minOf(1024, totalFrames - frame)
                     for (i in 0 until frames) {
-                        val t = (frame + i).toDouble() / sampleRate
-                        val sample = (sin(2.0 * PI * freq * t) * amplitude).toInt()
-                        val left = if (side == Side.LEFT || side == Side.BOTH) sample else 0
-                        val right = if (side == Side.RIGHT || side == Side.BOTH) sample else 0
-                        buffer[i * 2] = left.toShort()
-                        buffer[i * 2 + 1] = right.toShort()
+                        val n = frame + i
+                        // Brief fade avoids a click at either end of the test tone.
+                        val envelope = minOf(1.0, n / 220.0, (totalFrames - 1 - n) / 220.0).coerceAtLeast(0.0)
+                        val sample = (sin(2.0 * PI * 660.0 * n / sampleRate) * 8000 * envelope).toInt().toShort()
+                        buffer[i * 2] = if (side == Side.LEFT || side == Side.BOTH) sample else 0
+                        buffer[i * 2 + 1] = if (side == Side.RIGHT || side == Side.BOTH) sample else 0
                     }
-                    val written = audioTrack.write(buffer, 0, frames * 2)
-                    if (written < 0) break // خطأ في الكتابة — نتوقف
+                    var offset = 0
+                    while (!session.cancelled && offset < frames * 2) {
+                        val written = track.write(buffer, offset, frames * 2 - offset)
+                        if (written <= 0) { session.cancelled = true; break }
+                        offset += written
+                    }
                     frame += frames
                 }
-            } catch (t: Throwable) {
-                // إيقاف آمن: أي خطأ في الكتابة يعني أننا نغلق
+            } catch (_: Exception) {
+                session.cancelled = true
             } finally {
-                running = false
-                try { audioTrack.stop() } catch (t: Throwable) { }
-                try { audioTrack.release() } catch (t: Throwable) { }
-                if (track === audioTrack) track = null
-                onFinished?.invoke()
+                try { track.stop() } catch (_: Exception) { }
+                try { track.release() } catch (_: Exception) { }
+                val finished = synchronized(lock) {
+                    if (current === session) {
+                        current = null
+                        !session.cancelled
+                    } else false
+                }
+                if (finished) onFinished?.invoke()
             }
-        }.also { it.isDaemon = true; it.start() }
-
+        }.apply { isDaemon = true; start() }
         return true
     }
 
-    fun isPlaying(): Boolean = running
-
     fun stop() {
-        running = false
-        thread?.let { t ->
-            try { t.join(600) } catch (e: InterruptedException) { Thread.currentThread().interrupt() }
-        }
-        thread = null
-        track?.let {
-            try { it.pause() } catch (t: Throwable) { }
-            try { it.flush() } catch (t: Throwable) { }
-        }
+        val session = synchronized(lock) {
+            current?.also { it.cancelled = true; current = null }
+        } ?: return
+        // Unblock a pending write without joining a worker on the UI thread.
+        try { session.track.pause() } catch (_: Exception) { }
+        try { session.track.flush() } catch (_: Exception) { }
     }
 }

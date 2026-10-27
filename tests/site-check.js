@@ -202,6 +202,7 @@ function checkAndroidProject() {
   const badImports = [];
   const androidKnown = new Set([
     'android.Manifest', 'android.content.Context', 'android.content.Intent', 'android.content.SharedPreferences',
+    'android.graphics.Typeface', 'android.media.AudioFocusRequest', 'android.media.AudioManager', 'android.os.Build',
     'android.media.AudioAttributes', 'android.media.AudioFormat', 'android.media.AudioTrack',
     'android.media.MediaPlayer', 'android.media.audiofx.BassBoost', 'android.media.audiofx.Equalizer',
     'android.media.audiofx.Virtualizer', 'android.net.Uri', 'android.os.Bundle', 'android.os.Handler',
@@ -223,6 +224,24 @@ function checkAndroidProject() {
     if (code.includes('android.media.Equalizer')) badImports.push(`${path.basename(f)}: android.media.Equalizer (غير موجود — الصحيح audiofx.Equalizer)`);
   }
   ok(badImports.length === 0, `لا استيرادات لأصناف أندرويد غير موجودة${badImports.length ? ' — ' + badImports.join('؛ ') : ''}`);
+
+  // Native app: no remote website/WebView, no unnecessary file or Internet permission.
+  const nativeSources = kotlinFiles.map((f) => read(f)).join('\n');
+  const layout = read(path.join(appDir, 'res', 'layout', 'activity_main.xml'));
+  const nativeIds = new Set([...layout.matchAll(/@\+id\/([\w]+)/g)].map((m) => m[1]));
+  const usedNativeIds = new Set([...nativeSources.matchAll(/R\.id\.([\w]+)/g)].map((m) => m[1]));
+  const missingNativeIds = [...usedNativeIds].filter((id) => !nativeIds.has(id));
+  ok(missingNativeIds.length === 0, `كل عناصر واجهة أندرويد المرتبطة موجودة${missingNativeIds.length ? ' — ' + missingNativeIds.join('، ') : ''}`);
+  ok(!/android\.permission\.(INTERNET|READ_MEDIA_AUDIO|READ_EXTERNAL_STORAGE)/.test(manifest), 'التطبيق بلا إذن إنترنت أو إذن قراءة شامل للملفات');
+  ok(!/\bWebView\b/.test(nativeSources), 'التطبيق أصلي ولا يعرض موقعًا داخل WebView');
+  const neededDrawables = [...layout.matchAll(/@drawable\/([\w]+)/g)].map((m) => m[1]);
+  const missingDrawables = neededDrawables.filter((name) => !exists(path.join(appDir, 'res', 'drawable', `${name}.xml`)) && !exists(path.join(appDir, 'res', 'drawable-nodpi', `${name}.png`)));
+  ok(missingDrawables.length === 0, `رسومات الكوميكس المحلية موجودة${missingDrawables.length ? ' — ' + missingDrawables.join('، ') : ''}`);
+  ok(exists(path.join(dir, 'gradlew')) && exists(path.join(dir, 'gradlew.bat')) && exists(path.join(dir, 'gradle', 'wrapper', 'gradle-wrapper.jar')), 'غلاف Gradle كامل لبناء التطبيق');
+  ok(/android\.useAndroidX=true/.test(read(path.join(dir, 'gradle.properties'))), 'استخدام AndroidX مفعّل');
+  ok(/targetSdk\s*=\s*36/.test(appGradle), 'التطبيق يستهدف Android API 36');
+  ok(!/signingConfig\s*=\s*signingConfigs\.getByName\(\s*"debug"/.test(appGradle), 'نسخة الإصدار لا تُوقّع بمفتاح التصحيح');
+  ok(exists(path.join(dir, 'app', 'src', 'test', 'java', 'com', 'zynq', 'stereosound', 'SoundMathTest.kt')), 'اختبارات حساب الصوت الأصلي موجودة');
 
   // لا ملف APK مُلفَّق
   const apks = fs.readdirSync(dir).filter((f) => f.endsWith('.apk'));
@@ -297,6 +316,18 @@ async function checkServer(catalog) {
         const wanted = ['settings.gradle.kts', 'build.gradle.kts', 'AndroidManifest.xml', 'MainActivity.kt'];
         const missing = wanted.filter((w) => !raw.includes(w));
         ok(missing.length === 0, `أرشيف المشروع يحتوي ملفات البناء${missing.length ? ' — ناقص: ' + missing.join('، ') : ''}`);
+      }
+
+      // A locally configured signing key must never leak in the public source ZIP.
+      const secretDir = fs.mkdtempSync(path.join(SITE, 'downloads', 'stereo-sound', '.source-zip-test-'));
+      try {
+        fs.writeFileSync(path.join(secretDir, 'test-private-key.jks'), 'must-not-be-shipped');
+        fs.writeFileSync(path.join(secretDir, '.env.release'), 'must-not-be-shipped');
+        const sourceWithSecrets = await fetchPath(port, '/api/app/source.zip');
+        const zipped = sourceWithSecrets.body.toString('latin1');
+        ok(sourceWithSecrets.status === 200 && !zipped.includes('test-private-key.jks') && !zipped.includes('.env.release'), 'أرشيف المصدر يستثني مفاتيح التوقيع وملفات البيئة');
+      } finally {
+        fs.rmSync(secretDir, { recursive: true, force: true });
       }
 
       const notFound = await fetchPath(port, '/لا-يوجد');

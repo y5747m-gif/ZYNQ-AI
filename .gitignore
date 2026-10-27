@@ -9,3 +9,11 @@ site/downloads/stereo-sound/app/build/
 site/downloads/stereo-sound/local.properties
 site/downloads/stereo-sound/.idea/
 .asset-tmp/
+
+# Never commit app signing keys or local release secrets
+*.jks
+*.keystore
+*.p12
+*.pfx
+.env
+.env.*

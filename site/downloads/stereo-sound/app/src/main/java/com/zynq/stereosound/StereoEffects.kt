@@ -5,134 +5,99 @@ import android.media.audiofx.Equalizer
 import android.media.audiofx.Virtualizer
 
 /**
- * مؤثرات الصوت المطبَّقة على جلسة تشغيل الوسائط (audio session).
- *
- * لماذا هذه الطبقة؟
- *   `MediaPlayer` لا يعطينا عيّنات PCM لنعالجها يدويًا، لذلك التوسيع والموازن
- *   والمعادل تُطبَّق عبر مؤثرات النظام على جلسة الصوت نفسها — وهذا يعني أن
- *   التأثير يسمعه المستخدم في كل ما يشغّله التطبيق.
- *
- * كل مؤثر مستقل: بعض الأجهزة لا توفّر Virtualizer أو BassBoost أو Equalizer.
- * لذلك كل واحد يُنشأ داخل محاولة مستقلة، وإن غاب نقول ذلك في الواجهة بدل أن
- * ينهار التطبيق (وهو الخطأ الذي كان في النسخة السابقة: `android.media.Equalizer`
- * كلاس غير موجود أصلًا، فلا يُبنى المشروع).
+ * Effects belong only to the MediaPlayer session, not to other apps. Android
+ * devices may omit any one effect, so each is created and reported separately.
  */
 @Suppress("DEPRECATION")
 class StereoEffects(sessionId: Int) {
-
     private var equalizer: Equalizer? = null
     private var bassBoost: BassBoost? = null
     private var virtualizer: Virtualizer? = null
 
-    /** عدد نطاقات المعادل (0 = غير متوفر) */
     val bandCount: Int
-        get() = try { equalizer?.numberOfBands?.toInt() ?: 0 } catch (t: Throwable) { 0 }
-
-    /** مدى المستوى بالميلي-ديسيبل (مثال: -1500..1500) */
+        get() = try { equalizer?.numberOfBands?.toInt() ?: 0 } catch (_: Exception) { 0 }
     val levelRange: IntRange
         get() {
-            val range = try { equalizer?.bandLevelRange } catch (t: Throwable) { null }
+            val range = try { equalizer?.bandLevelRange } catch (_: Exception) { null }
                 ?: return 0..0
             if (range.size < 2) return 0..0
             return range[0].toInt()..range[1].toInt()
         }
-
     val eqAvailable: Boolean get() = bandCount > 0
     val bassAvailable: Boolean get() = bassBoost != null
     val virtualAvailable: Boolean get() = virtualizer != null
 
     init {
         equalizer = try {
-            Equalizer(0, sessionId).also { if (it.numberOfBands > 0) it.enabled = true }
-        } catch (t: Throwable) {
-            null
-        }
-
+            val effect = Equalizer(0, sessionId)
+            if (effect.numberOfBands > 0) {
+                effect.enabled = true
+                effect
+            } else {
+                effect.release()
+                null
+            }
+        } catch (_: Exception) { null }
         bassBoost = try {
-            BassBoost(0, sessionId).also { if (it.strengthSupported) it.enabled = true }
-        } catch (t: Throwable) {
-            null
-        }
-
+            val effect = BassBoost(0, sessionId)
+            if (effect.strengthSupported) effect else {
+                effect.release()
+                null
+            }
+        } catch (_: Exception) { null }
         virtualizer = try {
-            Virtualizer(0, sessionId).also { if (it.strengthSupported) it.enabled = true }
-        } catch (t: Throwable) {
-            null
-        }
+            val effect = Virtualizer(0, sessionId)
+            if (effect.strengthSupported) effect else {
+                effect.release()
+                null
+            }
+        } catch (_: Exception) { null }
     }
 
-    /** تردد مركز النطاق بالهرتز (مفيد لعنونة الشريحة في الواجهة) */
-    fun bandCenterHz(band: Int): Int {
-        val eq = equalizer ?: return 0
-        return try {
-            val freqRange = eq.getBandFreqRange(band.toShort())
-            if (freqRange.size < 2) 0
-            else (((freqRange[0].toLong() + freqRange[1].toLong()) / 2L) / 1000L).toInt()
-        } catch (t: Throwable) {
-            0
-        }
-    }
+    fun bandCenterHz(band: Int): Int = try {
+        (equalizer?.getCenterFreq(band.toShort()) ?: 0) / 1000
+    } catch (_: Exception) { 0 }
 
-    fun bandLevel(band: Int): Int =
-        try { equalizer?.getBandLevel(band.toShort())?.toInt() ?: 0 } catch (t: Throwable) { 0 }
+    fun bandLevel(band: Int): Int = try {
+        equalizer?.getBandLevel(band.toShort())?.toInt() ?: 0
+    } catch (_: Exception) { 0 }
 
     fun setBandLevel(band: Int, milliBel: Int) {
         val eq = equalizer ?: return
         try {
-            val r = levelRange
-            val clamped = milliBel.coerceIn(r.first, r.last)
-            // setBandLevel يستقبل ميلي-ديسيبل (Short)
-            eq.setBandLevel(band.toShort(), clamped.toShort())
-            if (!eq.enabled) eq.enabled = true
-        } catch (t: Throwable) {
-            // جهاز يرفض الضبط — نتجاهل بهدوء حتى لا يسقط التطبيق
-        }
+            val range = levelRange
+            eq.setBandLevel(band.toShort(), milliBel.coerceIn(range.first, range.last).toShort())
+        } catch (_: Exception) { /* Some vendors revoke an effect while playing. */ }
     }
 
     fun resetEqualizer() {
-        val eq = equalizer ?: return
-        try {
-            for (b in 0 until bandCount) eq.setBandLevel(b.toShort(), 0)
-        } catch (t: Throwable) {
-            // تجاهل
-        }
+        val range = levelRange
+        for (band in 0 until bandCount) setBandLevel(band, 0.coerceIn(range.first, range.last))
     }
 
-    /** تقوية البيس: 0..100% */
     fun setBassPercent(percent: Int) {
-        val bb = bassBoost ?: return
+        val effect = bassBoost ?: return
         try {
-            if (!bb.strengthSupported) return
-            bb.setStrength((percent.coerceIn(0, 100) * 10).toShort()) // 0..1000
-            if (percent > 0 && !bb.enabled) bb.enabled = true
-        } catch (t: Throwable) {
-            // تجاهل
-        }
+            val strength = (percent.coerceIn(0, 100) * 10).toShort()
+            effect.setStrength(strength)
+            effect.enabled = strength > 0
+        } catch (_: Exception) { }
     }
 
-    /**
-     * توسيع الستيريو: 100% = بلا توسيع، 200% = أقوى توسيع يسمح به الجهاز.
-     * أقل من 100% لا يمكن تضييقه بمؤثر Virtualizer (فهو يوسّع فقط).
-     */
+    /** 100% is off. 200% means maximum virtualizer strength, not a measured width. */
     fun setWidthPercent(percent: Int) {
-        val v = virtualizer ?: return
+        val effect = virtualizer ?: return
         try {
-            if (!v.strengthSupported) return
-            val strength = ((percent.coerceIn(100, 200) - 100) * 10) // 0..1000
-            v.setStrength(strength.toShort())
-            if (strength > 0 && !v.enabled) v.enabled = true
-        } catch (t: Throwable) {
-            // تجاهل
-        }
+            val strength = SoundMath.widthStrength(percent)
+            effect.setStrength(strength)
+            effect.enabled = strength > 0
+        } catch (_: Exception) { }
     }
 
     fun release() {
-        try { equalizer?.enabled = false } catch (t: Throwable) { }
-        try { equalizer?.release() } catch (t: Throwable) { }
-        try { bassBoost?.enabled = false } catch (t: Throwable) { }
-        try { bassBoost?.release() } catch (t: Throwable) { }
-        try { virtualizer?.enabled = false } catch (t: Throwable) { }
-        try { virtualizer?.release() } catch (t: Throwable) { }
+        try { equalizer?.release() } catch (_: Exception) { }
+        try { bassBoost?.release() } catch (_: Exception) { }
+        try { virtualizer?.release() } catch (_: Exception) { }
         equalizer = null
         bassBoost = null
         virtualizer = null

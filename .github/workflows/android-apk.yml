@@ -1,18 +1,18 @@
-name: بناء تطبيق ستيريو (APK)
-
-# لماذا هذا الملف؟
-#   لا يمكن تخزين ملف APK جاهز في المستودع بلا سلسلة أدوات أندرويد موقّعة،
-#   ولا يجوز تسليم ملف ليس تطبيقًا حقيقيًا. لذلك يُبنى الـ APK على GitHub
-#   Actions فعليًا في كل تغيير على مجلد التطبيق، ويُنزَّل من صفحة التشغيل (Artifacts).
+name: Android — build installable test APK
 
 on:
   push:
     paths:
       - 'site/downloads/stereo-sound/**'
+      - 'site/public/index.html'
+      - 'tests/site-check.js'
       - '.github/workflows/android-apk.yml'
   pull_request:
     paths:
       - 'site/downloads/stereo-sound/**'
+      - 'site/public/index.html'
+      - 'tests/site-check.js'
+      - '.github/workflows/android-apk.yml'
   workflow_dispatch:
 
 permissions:
@@ -20,45 +20,41 @@ permissions:
 
 jobs:
   apk:
-    name: بناء APK (debug)
-    runs-on: ubuntu-latest
+    name: Test and build the Android APK
+    # This runner includes Android SDK 36. Do not re-run setup-android: the
+    # previous setup action failed before Gradle could build the app.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
-
     steps:
-      - name: جلب المستودع
-        uses: actions/checkout@v4
-
-      - name: تجهيز جافا 17
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-
-      - name: تجهيز غرادل
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '8.7'
-
-      - name: تجهيز أندرويد SDK
-        uses: android-actions/setup-android@v3
-
-      - name: تثبيت منصة 34 وأدوات البناء
+      - name: Verify Android SDK
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-
-      - name: توليد غلاف غرادل
+          test -f "$ANDROID_HOME/platforms/android-36/android.jar"
+          test -x "$ANDROID_HOME/build-tools/36.0.0/apksigner"
+      - name: Check repository and standalone app resources
+        run: node tests/site-check.js
+      - name: Unit tests and APK
         working-directory: site/downloads/stereo-sound
-        run: gradle wrapper --gradle-version 8.7 --distribution-type bin
-
-      - name: بناء APK
-        working-directory: site/downloads/stereo-sound
-        run: ./gradlew --no-daemon --stacktrace assembleDebug
-
-      - name: رفع الـ APK
+        run: |
+          if ! ./gradlew --no-daemon --stacktrace testDebugUnitTest assembleDebug > "$RUNNER_TEMP/android-build.log" 2>&1; then
+            # Surface compiler/Gradle errors as check annotations as well as logs.
+            grep -E '^e: |^FAILURE:|^\* What went wrong:|^> |^Caused by:| error:' "$RUNNER_TEMP/android-build.log" | head -n 25 | while IFS= read -r line; do
+              echo "::error::${line//%/%25}"
+            done
+            tail -n 120 "$RUNNER_TEMP/android-build.log"
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/android-build.log"
+      - name: Verify APK signature
+        run: '"$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose site/downloads/stereo-sound/app/build/outputs/apk/debug/app-debug.apk'
+      - name: Upload installable test APK
         uses: actions/upload-artifact@v4
         with:
-          name: stereo-sound-apk
+          name: stereo-sound-android-test-apk
           path: site/downloads/stereo-sound/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 90

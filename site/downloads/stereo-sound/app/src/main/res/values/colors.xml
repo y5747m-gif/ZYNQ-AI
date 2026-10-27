@@ -6,5 +6,6 @@
     <color name="brand_ink">#14110F</color>
     <color name="brand_cream">#FFF8E7</color>
     <color name="brand_paper">#F3E9D6</color>
-    <color name="brand_muted">#6B6259</color>
+    <color name="brand_white">#FFFFFF</color>
+    <color name="brand_muted">#62574F</color>
 </resources>

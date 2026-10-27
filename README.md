@@ -2,6 +2,16 @@
 
 بناء أدوات برمجية للمطوّر العربي — من تحليل السوق إلى **نموذج يعمل فعلًا**.
 
+## Standalone Android app: Stereo Sound
+
+Stereo Sound is a **native, offline Android app**, not a website or a WebView. Its comic-book interface uses the same cream, ink, red, yellow and cyan palette. It plays locally selected audio and provides balance, channel tests and device-dependent sound effects. It does not alter audio from other apps. Android 6.0+; an iPhone app is not included.
+
+- **Install a test APK:** open the [Android build workflow](https://github.com/y5747m-gif/ZYNQ-AI/actions/workflows/android-apk.yml), select a successful run and download the `stereo-sound-android-test-apk` artifact. Unzip it and install `app-debug.apk` on the phone. GitHub may require sign-in. This debug-signed APK is for testing, not a production store release.
+- **Build:** `cd site/downloads/stereo-sound && ./gradlew testDebugUnitTest assembleDebug` (JDK 17 and Android SDK 36 required).
+- **Release:** a manual workflow can build a release-signed APK and AAB after the owner configures a private signing key as GitHub secrets. Publishing to Google Play is a separate, manual step. See [build and release instructions](site/downloads/stereo-sound/README_BUILD.ar.md).
+
+---
+
 ## الموقع: «ZYNQ FX» — مكتبة الموشن جرافيك والمؤثرات الضوئية ⚡
 
 الموقع الآن **مكتبة تحميل مؤثرات حركية وضوئية احترافية** بستايل كوميكس (أحمر/أصفر/سماوي على ورق كريمي — بلا بنفسجي): ملفات حقيقية تُحمَّل على الجهاز وتُدمج في **أفتر إيفكت / بريمير / دافنشي / فاينال كت / الويب**، والقائمة مرتّبة حسب **النوع** (ضوئية، انتقالات، عناصر، كشف شعار، تشويش، جزيئات، HUD، إنفوجرافيك، لوكات، تعابير) وحسب **البرنامج**.
@@ -11,16 +21,16 @@
 | [`site/public/`](site/public) | الواجهة: صفحة واحدة (RTL عربية) + فلاتر بحسب البرنامج والنوع + معاينات متحركة CSS داخل الصفحة + نافذة تفاصيل + باقات ZIP |
 | [`site/downloads/`](site/downloads) | **34 أصلًا رقميًا حقيقيًا**: 14 Lottie JSON · 6 SVG متحركة · 4 GIF أوفرلاي · 2 تسلسل PNG بشفافية (ZIP) · 5 لوكات `.cube` · 3 ملفات تعابير AE موثّقة + مشروع تطبيق أندرويد «ستيريو» (كوتلن كامل، يُبنى منه APK) |
 | [`site/server.js`](site/server.js) | خادم بلا مكتبات: كتالوج بأحجام حقيقية + تحميل مرفقات + **توليد باقات ZIP عند الطلب** + مشروع أندرويد كامل كـ ZIP — يعمل محليًا وعلى فيرسل |
-| [`site/public/stereo/`](site/public/stereo) | **تطبيق «ستيريو» على الهاتف بلا تثبيت** (PWA): توسيع ستيريو Mid/Side حتى 200% · موازن وكتم وعكس القناتين · معادل ثلاثي · مؤشرا مستوى · نغمة اختبار لكل قناة — كل المعالجة على الجهاز عبر Web Audio |
+| [`site/downloads/stereo-sound/`](site/downloads/stereo-sound) | **تطبيق «ستيريو» الأصلي لأندرويد**: مشغّل محلي، توازن القنوات، مؤثرات حسب دعم الجهاز، معادل، ونغمة اختبار — يعمل بلا متصفح أو إنترنت |
 | [`tests/site-check.js`](tests/site-check.js) | **39 فحصًا آليًا**: كل ملفات الكتالوج موجودة، كل مسار يردّ 200، ملفات التطبيق كاملة، سلامة مشروع أندرويد (namespace، أيقونات، استيرادات، لا APK مُلفَّق) |
-| [`.github/workflows/android-apk.yml`](.github/workflows/android-apk.yml) | **بناء APK حقيقي** على GitHub Actions (JDK 17 + Android SDK 34) — يُنزَّل من Artifacts |
+| [`.github/workflows/android-apk.yml`](.github/workflows/android-apk.yml) | اختبار وبناء APK تجريبي على GitHub Actions (JDK 17 + Android SDK 36) — يُنزَّل من Artifacts |
 | [`tools/gen_assets.py`](tools/gen_assets.py) | مولّد الأصول (قابل لإعادة التشغيل): يبني الـ Lottie والتسلسلات واللوكات من الصفر |
 
 - **الجرّبه محليًا:** `node site/server.js` ثم افتح `http://localhost:4173` (وتطبيق ستيريو على `http://localhost:4173/stereo/`)
 - **افحص كل شيء:** `node tests/site-check.js` — يفشل إن نقص أي ملف أو تعطّل أي مسار أو كسر مشروع أندرويد
 - **الملفات صنعت فعلًا:** Lottie يُفتح في AE/بريمير عبر إضافة Lottie · تسلسلات PNG تُستورد كـ Image Sequence بشفافية كاملة · GIF كأوفرلاي بوضع Screen · `.cube` في Lumetri/Resolve/FCP · تعابير AE جاهزة للنسخ
 - **الباقات:** `/api/pack/all.zip` أو باقة لكل تصنيف — تُولَّد لحظيًا بضغط Deflate
-- **تطبيق الهاتف:** افتح `/stereo/` على هاتفك وأضفه إلى الشاشة الرئيسية (بلا تثبيت)، أو نزّل مشروع أندرويد `/api/app/source.zip` وابنِ `APK` منه — لا يوجد ملف APK مُخزَّن في المستودع لأن الملف السابق كان أرشيفًا بحجم 828 بايت لا يُثبَّت (اقرأ [`README_BUILD.ar.md`](site/downloads/stereo-sound/README_BUILD.ar.md))
+- **تطبيق الهاتف:** نزّل APK التجريبي من GitHub Actions وثبّته على أندرويد، أو ابنِه من مشروع أندرويد `/api/app/source.zip`. نسخة المتصفح القديمة تبقى متاحة للتوافق فقط. خطوات التوقيع والإصدار في [`README_BUILD.ar.md`](site/downloads/stereo-sound/README_BUILD.ar.md).
 - **النشر على فيرسل:** `vercel.json` في جذر المستودع يوجّه كل المسارات إلى `site/server.js`
 
 ---
