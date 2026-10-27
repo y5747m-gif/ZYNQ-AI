@@ -6,12 +6,14 @@ on:
       - 'site/downloads/stereo-sound/**'
       - 'site/public/index.html'
       - 'tests/site-check.js'
+      - 'tools/android-smoke.sh'
       - '.github/workflows/android-apk.yml'
   pull_request:
     paths:
       - 'site/downloads/stereo-sound/**'
       - 'site/public/index.html'
       - 'tests/site-check.js'
+      - 'tools/android-smoke.sh'
       - '.github/workflows/android-apk.yml'
   workflow_dispatch:
 
@@ -51,6 +53,18 @@ jobs:
           cat "$RUNNER_TEMP/android-build.log"
       - name: Verify APK signature
         run: '"$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose site/downloads/stereo-sound/app/build/outputs/apk/debug/app-debug.apk'
+      - name: Exercise release signing with a disposable test key
+        working-directory: site/downloads/stereo-sound
+        run: |
+          set -eu
+          trap 'rm -f "$RUNNER_TEMP/test-only-signing.p12"' EXIT
+          keytool -genkeypair -noprompt -keystore "$RUNNER_TEMP/test-only-signing.p12" \
+            -storetype PKCS12 -storepass android -keypass android -alias test-only \
+            -keyalg RSA -keysize 2048 -validity 1 -dname 'CN=Disposable test key'
+          export STEREO_KEYSTORE_FILE="$RUNNER_TEMP/test-only-signing.p12"
+          export STEREO_KEYSTORE_PASSWORD=android STEREO_KEY_ALIAS=test-only STEREO_KEY_PASSWORD=android
+          ./gradlew --no-daemon assembleRelease bundleRelease
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose app/build/outputs/apk/release/app-release.apk
       - name: Upload installable test APK
         uses: actions/upload-artifact@v4
         with:
@@ -58,3 +72,37 @@ jobs:
           path: site/downloads/stereo-sound/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 90
+
+  device-smoke:
+    name: Launch the app offline on Android 15
+    needs: apk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: stereo-sound-android-test-apk
+          path: ${{ runner.temp }}/stereo-apk
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install and smoke-test native app without network
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          APK_PATH: ${{ runner.temp }}/stereo-apk/app-debug.apk
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          script: bash tools/android-smoke.sh
+      - name: Upload emulator screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stereo-sound-emulator-screenshot
+          path: ${{ runner.temp }}/stereo-smoke.png
+          if-no-files-found: ignore
+          retention-days: 7
