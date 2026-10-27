@@ -1,272 +1,256 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/screenRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/brand_paper"
-    android:fillViewport="true">
+    android:background="@drawable/paper_pattern"
+    android:layoutDirection="rtl">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
-
-        <!-- ======================= العنوان ======================= -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textColor="@color/brand_ink"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/tagline"
-            android:textColor="@color/brand_muted"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/statusText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@color/brand_cream"
-            android:padding="12dp"
-            android:text="@string/status_no_file"
-            android:textColor="@color/brand_ink"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <!-- ======================= الملف والتشغيل ======================= -->
-        <Button
-            android:id="@+id/pickButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:backgroundTint="@color/brand_cream"
-            android:text="@string/pick_file"
-            android:textColor="@color/brand_ink"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/fileName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:ellipsize="middle"
-            android:singleLine="true"
-            android:text="@string/no_file"
-            android:textColor="@color/brand_muted"
-            android:textSize="13sp" />
-
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="24dp">
 
-            <Button
-                android:id="@+id/playButton"
-                android:layout_width="wrap_content"
+            <!-- Brand and live playback state -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/brand_red"
-                android:enabled="false"
-                android:text="@string/play"
-                android:textColor="@color/brand_cream" />
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/ic_launcher" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/app_name"
+                        android:textColor="@color/brand_ink"
+                        android:textSize="21sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/brand_subtitle"
+                        android:textColor="@color/brand_muted"
+                        android:textDirection="ltr"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/statusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:accessibilityLiveRegion="polite"
+                    android:background="@drawable/comic_badge"
+                    android:gravity="center"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="15dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="11dp"
+                    android:text="@string/status_no_file"
+                    android:textColor="@color/brand_ink"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Comic-book cover -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/comic_hero"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="18dp"
+                android:paddingEnd="19dp"
+                android:paddingTop="18dp"
+                android:paddingBottom="22dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/comic_label_red"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="10dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="6dp"
+                        android:text="@string/hero_kicker"
+                        android:textColor="@color/brand_cream"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/hero_title"
+                        android:textColor="@color/brand_ink"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        style="@style/StereoHint"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/hero_subtitle"
+                        android:textColor="@color/brand_ink" />
+                </LinearLayout>
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="6dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/comic_burst" />
+            </LinearLayout>
+
+            <!-- Player -->
+            <LinearLayout style="@style/StereoCard">
+                <TextView style="@style/StereoSectionTitle" android:text="@string/section_player" />
+                <Button
+                    android:id="@+id/pickButton"
+                    style="@style/StereoButton"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/comic_file"
+                    android:gravity="center_vertical|start"
+                    android:text="@string/pick_file" />
+                <TextView style="@style/StereoHint" android:layout_marginTop="5dp" android:text="@string/file_hint" />
+                <TextView
+                    android:id="@+id/fileName"
+                    style="@style/StereoControlLabel"
+                    android:layout_marginTop="14dp"
+                    android:ellipsize="middle"
+                    android:maxLines="1"
+                    android:text="@string/no_file"
+                    android:textDirection="firstStrong" />
+                <SeekBar
+                    android:id="@+id/positionSeek"
+                    style="@style/StereoSeekBar"
+                    android:contentDescription="@string/seek_position"
+                    android:enabled="false"
+                    android:max="1000" />
+                <TextView
+                    android:id="@+id/timeText"
+                    style="@style/StereoHint"
+                    android:gravity="center"
+                    android:text="0:00 / 0:00"
+                    android:textDirection="ltr"
+                    android:textStyle="bold" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/backTen"
+                        style="@style/StereoButton"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:enabled="false"
+                        android:text="@string/back_ten"
+                        android:textSize="11sp" />
+                    <Button
+                        android:id="@+id/playButton"
+                        style="@style/StereoButton"
+                        android:layout_width="0dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1.25"
+                        android:background="@drawable/comic_button_red"
+                        android:enabled="false"
+                        android:text="@string/play"
+                        android:textColor="@color/brand_cream" />
+                    <Button
+                        android:id="@+id/forwardTen"
+                        style="@style/StereoButton"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:enabled="false"
+                        android:text="@string/forward_ten"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Virtualizer: 100 is neutral and 200 is the maximum device strength. -->
+            <LinearLayout style="@style/StereoCard">
+                <TextView style="@style/StereoSectionTitle" android:text="@string/section_stereo" />
+                <TextView
+                    android:id="@+id/widthLabel"
+                    style="@style/StereoControlLabel"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/width_waiting" />
+                <SeekBar
+                    android:id="@+id/widthSeek"
+                    style="@style/StereoSeekBar"
+                    android:contentDescription="@string/width_accessibility"
+                    android:enabled="false"
+                    android:max="100" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <Button android:id="@+id/widthNatural" style="@style/StereoButton" android:layout_width="0dp" android:layout_weight="1" android:enabled="false" android:text="@string/width_natural" />
+                    <Button android:id="@+id/widthWide" style="@style/StereoButton" android:layout_width="0dp" android:layout_marginStart="5dp" android:layout_weight="1" android:background="@drawable/comic_button_cyan" android:enabled="false" android:text="@string/width_wide" />
+                    <Button android:id="@+id/widthMax" style="@style/StereoButton" android:layout_width="0dp" android:layout_marginStart="5dp" android:layout_weight="1" android:background="@drawable/comic_button_yellow" android:enabled="false" android:text="@string/width_max" />
+                </LinearLayout>
+                <TextView style="@style/StereoHint" android:layout_marginTop="10dp" android:text="@string/width_hint" />
+            </LinearLayout>
+
+            <!-- Physical left / right are deliberately laid out LTR. -->
+            <LinearLayout style="@style/StereoCard">
+                <TextView style="@style/StereoSectionTitle" android:text="@string/section_balance" />
+                <TextView android:id="@+id/balanceLabel" style="@style/StereoControlLabel" android:layout_marginTop="12dp" />
+                <SeekBar android:id="@+id/balanceSeek" style="@style/StereoSeekBar" android:contentDescription="@string/balance_accessibility" android:max="200" android:progress="100" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layoutDirection="ltr" android:orientation="horizontal">
+                    <TextView style="@style/StereoHint" android:layout_width="0dp" android:layout_weight="1" android:text="@string/channel_left" />
+                    <TextView style="@style/StereoHint" android:layout_width="0dp" android:layout_weight="1" android:gravity="end" android:text="@string/channel_right" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="horizontal">
+                    <Button android:id="@+id/testLeft" style="@style/StereoButton" android:layout_width="0dp" android:layout_weight="1" android:background="@drawable/comic_button_cyan" android:text="@string/test_left" android:textSize="11sp" />
+                    <Button android:id="@+id/testRight" style="@style/StereoButton" android:layout_width="0dp" android:layout_marginStart="5dp" android:layout_weight="1" android:background="@drawable/comic_button_cyan" android:text="@string/test_right" android:textSize="11sp" />
+                    <Button android:id="@+id/testBoth" style="@style/StereoButton" android:layout_width="0dp" android:layout_marginStart="5dp" android:layout_weight="1" android:background="@drawable/comic_button_yellow" android:text="@string/test_both" android:textSize="11sp" />
+                </LinearLayout>
+                <TextView style="@style/StereoHint" android:layout_marginTop="10dp" android:text="@string/test_note" />
+            </LinearLayout>
+
+            <!-- Volume and device bass effect -->
+            <LinearLayout style="@style/StereoCard">
+                <TextView style="@style/StereoSectionTitle" android:text="@string/section_audio" />
+                <TextView android:id="@+id/volumeLabel" style="@style/StereoControlLabel" android:layout_marginTop="12dp" />
+                <SeekBar android:id="@+id/volumeSeek" style="@style/StereoSeekBar" android:contentDescription="@string/volume_accessibility" android:max="100" android:progress="85" />
+                <TextView android:id="@+id/bassLabel" style="@style/StereoControlLabel" android:layout_marginTop="5dp" android:text="@string/bass_waiting" />
+                <SeekBar android:id="@+id/bassSeek" style="@style/StereoSeekBar" android:contentDescription="@string/bass_accessibility" android:enabled="false" android:max="100" />
+            </LinearLayout>
+
+            <!-- The actual number and range of bands come from the device. -->
+            <LinearLayout style="@style/StereoCard">
+                <TextView style="@style/StereoSectionTitle" android:text="@string/section_eq" />
+                <TextView android:id="@+id/eqNote" style="@style/StereoHint" android:layout_marginTop="8dp" android:text="@string/eq_waiting" />
+                <LinearLayout android:id="@+id/eqContainer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+                <Button android:id="@+id/eqReset" style="@style/StereoButton" android:layout_width="wrap_content" android:layout_marginTop="8dp" android:background="@drawable/comic_button_yellow" android:text="@string/eq_reset" android:visibility="gone" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/timeText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:text="0:00 / 0:00"
-                android:textColor="@color/brand_muted"
-                android:textSize="13sp" />
+                style="@style/StereoHint"
+                android:layout_marginTop="2dp"
+                android:gravity="center"
+                android:text="@string/note_device" />
         </LinearLayout>
-
-        <SeekBar
-            android:id="@+id/positionSeek"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:enabled="false"
-            android:max="1000" />
-
-        <!-- ======================= الستيريو ======================= -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/section_stereo"
-            android:textColor="@color/brand_ink"
-            android:textSize="17sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/widthLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/brand_muted"
-            android:textSize="13sp" />
-
-        <SeekBar
-            android:id="@+id/widthSeek"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="200"
-            android:progress="100" />
-
-        <TextView
-            android:id="@+id/balanceLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/brand_muted"
-            android:textSize="13sp" />
-
-        <SeekBar
-            android:id="@+id/balanceSeek"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="200"
-            android:progress="100" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/testLeft"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/brand_cyan"
-                android:text="@string/test_left"
-                android:textColor="@color/brand_ink"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/testRight"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/brand_cyan"
-                android:text="@string/test_right"
-                android:textColor="@color/brand_ink"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/testBoth"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/brand_yellow"
-                android:text="@string/test_both"
-                android:textColor="@color/brand_ink"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="@string/test_note"
-            android:textColor="@color/brand_muted"
-            android:textSize="11sp" />
-
-        <!-- ======================= الصوت ======================= -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/section_audio"
-            android:textColor="@color/brand_ink"
-            android:textSize="17sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/volumeLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/brand_muted"
-            android:textSize="13sp" />
-
-        <SeekBar
-            android:id="@+id/volumeSeek"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="100"
-            android:progress="85" />
-
-        <TextView
-            android:id="@+id/bassLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/brand_muted"
-            android:textSize="13sp" />
-
-        <SeekBar
-            android:id="@+id/bassSeek"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="1000" />
-
-        <!-- ======================= المعادل ======================= -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/section_eq"
-            android:textColor="@color/brand_ink"
-            android:textSize="17sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/eqNote"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textColor="@color/brand_muted"
-            android:textSize="13sp" />
-
-        <LinearLayout
-            android:id="@+id/eqContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:orientation="vertical" />
-
-        <Button
-            android:id="@+id/eqReset"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/brand_cream"
-            android:text="@string/eq_reset"
-            android:textColor="@color/brand_ink"
-            android:textSize="13sp" />
-
-        <!-- ======================= ملاحظة ======================= -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="12dp"
-            android:text="@string/note_device"
-            android:textColor="@color/brand_muted"
-            android:textSize="11sp" />
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</FrameLayout>
