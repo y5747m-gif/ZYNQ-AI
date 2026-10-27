@@ -7,11 +7,32 @@ package=com.zynq.stereosound
 ui_dump="${RUNNER_TEMP:-/tmp}/stereo-ui.xml"
 
 report_failure() {
-  echo '::error::Android smoke test failed. Recent Android runtime errors follow.'
-  adb logcat -d -s AndroidRuntime:E ActivityManager:E | tail -n 80 || true
+  local failed_command="${1:-unknown}" failed_line="${2:-unknown}"
+  echo "::error title=Smoke test command::line $failed_line: ${failed_command//%/%25}"
+  # Mirror a short runtime diagnosis into check annotations. This also makes
+  # headless CI failures understandable without downloading the full log.
+  local runtime
+  runtime=$(adb logcat -d -s AndroidRuntime:E | tail -n 35 || true)
+  if [[ -n "$runtime" ]]; then
+    runtime=${runtime//%/%25}; runtime=${runtime//$'\n'/%0A}; runtime=${runtime//$'\r'/%0D}
+    echo "::error title=Android runtime::$runtime"
+  fi
+  local activities
+  activities=$(adb shell dumpsys activity activities | grep -i -E 'resumed|topResumed|documentsui' | head -n 8 || true)
+  if [[ -n "$activities" ]]; then
+    activities=${activities//%/%25}; activities=${activities//$'\n'/%0A}; activities=${activities//$'\r'/%0D}
+    echo "::notice title=Android foreground activity::$activities"
+  fi
   adb exec-out screencap -p > "${RUNNER_TEMP:-/tmp}/stereo-smoke.png" || true
+  # Temporarily mirror a failure screenshot into check annotations for diagnosis.
+  if [[ -s "${RUNNER_TEMP:-/tmp}/stereo-smoke.png" ]]; then
+    local i=0
+    while IFS= read -r part; do
+      i=$((i+1)); echo "::notice title=screen-part-$i::$part"
+    done < <(base64 -w0 "${RUNNER_TEMP:-/tmp}/stereo-smoke.png" | fold -w 12000 | head -n 10)
+  fi
 }
-trap report_failure ERR
+trap 'report_failure "$BASH_COMMAND" "$LINENO"' ERR
 
 adb install -r "$APK_PATH"
 adb shell svc wifi disable || true
