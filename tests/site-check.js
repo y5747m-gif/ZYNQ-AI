@@ -141,6 +141,21 @@ function checkFrontend() {
     if (r.status !== 0) syntaxBad.push(path.relative(ROOT, f));
   }
   ok(syntaxBad.length === 0, `كل ملفات JS سليمة نحويًا${syntaxBad.length ? ' — ' + syntaxBad.join('، ') : ''}`);
+
+  // ------------------------------------------------------- تثبيت تطبيق أندرويد
+  // الزر يجب أن يفتح لوحة تثبيت داخل الصفحة نفسها، لا أن ينقل الزائر إلى GitHub.
+  const ghLinks = [...html.matchAll(/href="(https?:\/\/[^"]*)"/g)].map((m) => m[1]);
+  ok(ghLinks.length === 0, `لا روابط خارجية في الصفحة تنقل الزائر بعيدًا${ghLinks.length ? ' — ' + ghLinks.join('، ') : ''}`);
+  ok(!/href="[^"]*github\.com/i.test(html), 'لا يوجد زر يفتح صفحة GitHub عند الضغط');
+  ok(/<button[^>]+id="app-install-btn"[^>]*type="button"/.test(html)
+    || /<button[^>]+type="button"[^>]+id="app-install-btn"/.test(html),
+  'زر تثبيت التطبيق من نوع button (لا ينقّل إلى أي صفحة)');
+  ok(/id="app-install"/.test(html), 'نافذة تثبيت التطبيق موجودة داخل الصفحة');
+  ok(/aria-controls="app-install"/.test(html), 'الزر يشير إلى نافذة التثبيت (aria-controls)');
+  ok(/setupInstallDialog\(\)/.test(appJs) && /openInstallDialog\(\)/.test(appJs), 'منطق فتح لوحة التثبيت داخل الصفحة موجود في app.js');
+  ok(/\/api\/app\/status/.test(appJs) && /\/api\/app\/apk/.test(appJs), 'الواجهة تستعلم عن حالة APK وتنزّله من الخادم نفسه');
+  const installDl = html.match(/id="app-install-download"[^>]*/);
+  ok(!!installDl && /download/.test(installDl[0]), 'رابط التنزيل داخل اللوحة يحمّل الملف بدل فتحه');
 }
 
 // --------------------------------------------------------------- 3) أندرويد
@@ -328,6 +343,48 @@ async function checkServer(catalog) {
         ok(sourceWithSecrets.status === 200 && !zipped.includes('test-private-key.jks') && !zipped.includes('.env.release'), 'أرشيف المصدر يستثني مفاتيح التوقيع وملفات البيئة');
       } finally {
         fs.rmSync(secretDir, { recursive: true, force: true });
+      }
+
+      // لوحة التثبيت داخل الصفحة: الخادم يوفّر حالة APK ويبثّ الملف بنفسه،
+      // فلا حاجة إلى فتح صفحة GitHub. يُختبر بمصدر APK محلي وهمي (بلا شبكة).
+      const apkSource = http.createServer((req, res) => {
+        const fake = Buffer.from('PK\u0003\u0004fake-apk-for-test');
+        if (req.url === '/redirect') { res.writeHead(302, { Location: '/stereo-sound.apk' }); return res.end(); }
+        res.writeHead(200, { 'Content-Type': 'application/vnd.android.package-archive', 'Content-Length': fake.length });
+        res.end(fake);
+      });
+      await new Promise((r) => apkSource.listen(0, '127.0.0.1', r));
+      const apkPort = apkSource.address().port;
+      const apkChild = spawn(process.execPath, [path.join(SITE, 'server.js'), `--port=${port + 1}`], {
+        cwd: ROOT, stdio: 'ignore', env: Object.assign({}, process.env, { STEREO_APK_URL: `http://127.0.0.1:${apkPort}/redirect` }),
+      });
+      try {
+        let apkReady = false;
+        for (let i = 0; i < 40; i++) {
+          const r = await fetchPath(port + 1, '/api/app/status');
+          if (r.status === 200 || r.status === 503) { apkReady = true; break; }
+          await new Promise((res) => setTimeout(res, 100));
+        }
+        ok(apkReady, 'خادم لوحة التثبيت يبدأ ويردّ على /api/app/status');
+
+        if (apkReady) {
+          const st = await fetchPath(port + 1, '/api/app/status');
+          let stBody = null;
+          try { stBody = JSON.parse(st.body.toString('utf8')); } catch (_) { /* يُفحص أدناه */ }
+          ok(st.status === 200 && !!stBody && stBody.ready === true, 'حالة APK تُبلّغ أن الملف جاهز للتنزيل داخل الصفحة');
+          ok(!!stBody && stBody.download === '/api/app/apk', 'الحالة تشير إلى مسار التنزيل داخل الموقع نفسه');
+          ok(!!stBody && Array.isArray(stBody.steps) && stBody.steps.length >= 3, 'خطوات التثبيت تُرسل إلى الواجهة');
+
+          const apk = await fetchPath(port + 1, '/api/app/apk');
+          ok(apk.status === 200, 'ملف APK يُخدم من الخادم (200) بلا تحويل إلى موقع آخر');
+          ok(/attachment/.test(String(apk.headers['content-disposition'] || '')) && /\.apk/.test(String(apk.headers['content-disposition'] || '')),
+            'التنزيل يُرسل كملف مرفق (Content-Disposition: attachment)');
+          ok(String(apk.headers['content-type'] || '').includes('android.package-archive'), 'نوع المحتوى الصحيح لملف APK');
+          ok(apk.body.toString('utf8').includes('fake-apk-for-test'), 'محتوى APK يصل كاملًا عبر الخادم');
+        }
+      } finally {
+        apkChild.kill('SIGTERM');
+        apkSource.close();
       }
 
       const notFound = await fetchPath(port, '/لا-يوجد');

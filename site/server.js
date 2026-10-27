@@ -8,6 +8,7 @@
 // ==========================================================================
 
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
@@ -128,6 +129,150 @@ function makeZip(entries) {
 }
 
 // ---------------------------------------------------------------------------
+// تطبيق «ستيريو» لأندرويد — مصدر APK داخل الموقع نفسه
+// ---------------------------------------------------------------------------
+// الهدف: زر التثبيت في الصفحة يفتح لوحة تثبيت داخل الموقع وينزّل الملف مباشرة،
+// بلا انتقال إلى صفحة GitHub (كانت Artifacts تتطلب تسجيل دخول وتُخرج الزائر).
+// ترتيب البحث عن الملف:
+//   1) STEREO_APK_URL — رابط APK مباشر يعيّنه صاحب النشر (استضافة/CDN).
+//   2) نسخة مبنية محليًا: app/build/outputs/apk/debug/app-debug.apk (خارج git).
+//   3) أحدث إصدار عام على GitHub Releases — يُنزَّل بلا حساب، فيمرّره الخادم.
+const GH_API = 'https://api.github.com';
+const GH_REPO = 'y5747m-gif/ZYNQ-AI';
+const APK_FILENAME = 'stereo-sound.apk';
+const APK_LOCAL_CANDIDATES = [
+  path.join(DOWNLOADS, 'stereo-sound', 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk'),
+  path.join(DOWNLOADS, 'stereo-sound', 'app', 'build', 'outputs', 'apk', 'release', 'app-release.apk'),
+];
+const INSTALL_STEPS = [
+  'اضغط «⬇ نزّل APK» في هذه اللوحة — يبدأ التنزيل وتبقى في الموقع نفسه.',
+  'افتح الإشعار أو مدير الملفات على هاتفك، ثم اضغط ملف stereo-sound.apk.',
+  'إن ظهر تحذير، اسمح بالتثبيت من هذا المصدر (الإعدادات ← التطبيقات ← تثبيت تطبيقات غير معروفة).',
+  'افتح «ستيريو» من شاشة التطبيقات، اختر ملفًا صوتيًا، واضبط القنوات والصوت.',
+];
+const apkCache = { at: 0, info: null };
+const APK_CACHE_MS = 10 * 60 * 1000;
+
+// جلب HTTP(S) بسيط يتبع إعادة التوجيه — بلا أي مكتبات خارجية.
+function httpGet(url, { timeout = 8000, headers = {}, redirects = 3, collect = true } = {}) {
+  return new Promise((resolve, reject) => {
+    const mod = url.startsWith('https:') ? https : http;
+    const req = mod.get(url, { headers: Object.assign({ 'User-Agent': 'ZYNQ-FX-site' }, headers) }, (res) => {
+      const status = res.statusCode || 0;
+      if (status >= 300 && status < 400 && res.headers.location && redirects > 0) {
+        res.resume();
+        const next = new URL(res.headers.location, url).toString();
+        resolve(httpGet(next, { timeout, headers, redirects: redirects - 1, collect }));
+        return;
+      }
+      if (!collect) { resolve({ status, headers: res.headers, body: Buffer.alloc(0), stream: res }); return; }
+      const chunks = [];
+      res.on('data', (c) => chunks.push(c));
+      res.on('end', () => resolve({ status, headers: res.headers, body: Buffer.concat(chunks), stream: res }));
+    });
+    req.setTimeout(timeout, () => req.destroy(new Error('انتهت مهلة الاتصال')));
+    req.on('error', reject);
+  });
+}
+
+async function fetchJson(url) {
+  const r = await httpGet(url, { headers: { Accept: 'application/vnd.github+json' } });
+  if (r.status !== 200) return null;
+  try { return JSON.parse(r.body.toString('utf8')); } catch (_) { return null; }
+}
+
+function localApk() {
+  for (const f of APK_LOCAL_CANDIDATES) {
+    try {
+      const st = fs.statSync(f);
+      if (st.isFile() && st.size > 0) return { file: f, size: st.size };
+    } catch (_) { /* غير مبني محليًا */ }
+  }
+  return null;
+}
+
+function pickApkAsset(release) {
+  const assets = (release && release.assets) || [];
+  const apks = assets.filter((a) => /\.apk$/i.test(a.name || ''));
+  if (!apks.length) return null;
+  return apks.find((a) => /debug/i.test(a.name)) || apks[0];
+}
+
+// حالة ملف التثبيت: تُخزَّن 10 دقائق حتى لا نبطئ الصفحة بكثرة الطلبات.
+async function apkInfo(force = false) {
+  const now = Date.now();
+  if (!force && apkCache.info && now - apkCache.at < APK_CACHE_MS) return apkCache.info;
+
+  let info;
+  try {
+    const envUrl = (process.env.STEREO_APK_URL || '').trim();
+    const local = localApk();
+    if (envUrl) {
+      info = {
+        ready: true, source: 'custom', version: '', size: null, url: envUrl,
+        steps: INSTALL_STEPS,
+        note: 'الرابط معيّن من إعدادات النشر (STEREO_APK_URL)، والتنزيل يمرّ عبر هذا الموقع.',
+      };
+    } else if (local) {
+      info = {
+        ready: true, source: 'local', version: '', size: local.size, url: null, file: local.file,
+        steps: INSTALL_STEPS,
+        note: 'نسخة مبنية على هذا الجهاز (assembleDebug) — تُخدم مباشرة من الموقع.',
+      };
+    } else {
+      const release = (await fetchJson(`${GH_API}/repos/${GH_REPO}/releases/latest`))
+        || (await fetchJson(`${GH_API}/repos/${GH_REPO}/releases?per_page=5`) || []).find((r) => pickApkAsset(r));
+      const asset = pickApkAsset(release);
+      if (asset && asset.browser_download_url) {
+        info = {
+          ready: true, source: 'release', version: release.tag_name || '', size: asset.size || null,
+          url: asset.browser_download_url, steps: INSTALL_STEPS,
+          note: 'أحدث إصدار منشور — ينزّله الخادم ويعيد إرساله إليك، فلا تغادر الصفحة.',
+        };
+      } else {
+        info = {
+          ready: false, source: null, version: '', size: null, url: null, steps: INSTALL_STEPS,
+          reason: release
+            ? 'لا يوجد ملف APK منشور في الإصدارات العامة بعد.'
+            : 'لم يُنشر بعد أي إصدار عام يحتوي ملف APK.',
+        };
+      }
+    }
+  } catch (err) {
+    info = {
+      ready: false, source: null, version: '', size: null, url: null, steps: INSTALL_STEPS,
+      reason: 'تعذّر التحقق من مصدر ملف التثبيت الآن.',
+      error: String((err && err.message) || err),
+    };
+  }
+
+  // نتيجة «غير متاح» تُخزَّن دقيقتين فقط حتى يظهر النشر الجديد بسرعة.
+  apkCache.info = info;
+  apkCache.at = info.ready ? now : now - (APK_CACHE_MS - 2 * 60 * 1000);
+  return info;
+}
+
+// بثّ ملف APK إلى المتصفح: من القرص إن كان محليًا، وإلا بتمرير الرابط العام.
+async function streamApk(res, info) {
+  const head = {
+    'Content-Type': MIME['.apk'],
+    'Content-Disposition': `attachment; filename="${APK_FILENAME}"`,
+    'Cache-Control': 'no-store',
+  };
+  if (info.file) {
+    const st = fs.statSync(info.file);
+    res.writeHead(200, Object.assign(head, { 'Content-Length': st.size }));
+    fs.createReadStream(info.file).pipe(res);
+    return;
+  }
+  const upstream = await httpGet(info.url, { timeout: 20000, collect: false });
+  if (upstream.status !== 200) throw new Error(`مصدر التحميل ردّ بالحالة ${upstream.status}`);
+  const len = upstream.headers['content-length'];
+  res.writeHead(200, len ? Object.assign(head, { 'Content-Length': Number(len) }) : head);
+  upstream.stream.pipe(res);
+}
+
+// ---------------------------------------------------------------------------
 // الكتالوج — البيانات من catalog.json + الأحجام الحقيقية من القرص
 // ---------------------------------------------------------------------------
 function loadCatalog() {
@@ -172,6 +317,35 @@ async function handler(req, res) {
     if (p === '/favicon.ico') {
       const ico = path.join(PUBLIC, 'stereo', 'icons', 'icon-192.png');
       if (fs.existsSync(ico)) return send(res, 200, fs.readFileSync(ico), MIME['.png']);
+    }
+
+    // حالة ملف تثبيت تطبيق «ستيريو» — تستعلم عنها لوحة التثبيت داخل الصفحة.
+    if (p === '/api/app/status') {
+      const info = await apkInfo(url.searchParams.get('refresh') === '1');
+      const body = {
+        ready: !!info.ready,
+        version: info.version || '',
+        size: info.size || null,
+        source: info.source || null,
+        note: info.note || null,
+        reason: info.reason || null,
+        steps: info.steps,
+        download: info.ready ? '/api/app/apk' : null,
+      };
+      return send(res, info.ready ? 200 : 503, JSON.stringify(body), MIME['.json']);
+    }
+
+    // تنزيل APK نفسه من داخل الموقع (بلا مغادرة الصفحة إلى GitHub).
+    if (p === '/api/app/apk') {
+      const info = await apkInfo();
+      if (!info.ready) {
+        return send(res, 404, JSON.stringify({
+          error: 'لا يوجد ملف APK جاهز للتنزيل المباشر بعد',
+          reason: info.reason || null,
+          alternative: '/api/app/source.zip',
+        }), MIME['.json']);
+      }
+      return streamApk(res, info);
     }
 
     // مشروع أندرويد كامل كملف ZIP — يُفتح مباشرة في Android Studio ويُبنى منه APK.
@@ -249,6 +423,8 @@ async function handler(req, res) {
 
     return send(res, 404, MIME['.json'] ? JSON.stringify({ error: 'مسار غير معروف' }) : 'Not found', MIME['.json']);
   } catch (err) {
+    // إن بدأ الإرسال فعلًا (بث APK) فلا يمكن كتابة ترويسات جديدة — أغلق الاتصال.
+    if (res.headersSent) { try { res.destroy(); } catch (_) { /* تجاهل */ } return undefined; }
     return send(res, 500, JSON.stringify({ ok: false, reason: String(err && err.message ? err.message : err) }), MIME['.json']);
   }
 }

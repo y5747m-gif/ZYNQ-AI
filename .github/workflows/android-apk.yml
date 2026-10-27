@@ -5,6 +5,8 @@ on:
     paths:
       - 'site/downloads/stereo-sound/**'
       - 'site/public/index.html'
+      - 'site/public/app.js'
+      - 'site/server.js'
       - 'tests/site-check.js'
       - 'tools/android-smoke.sh'
       - '.github/workflows/android-apk.yml'
@@ -12,10 +14,18 @@ on:
     paths:
       - 'site/downloads/stereo-sound/**'
       - 'site/public/index.html'
+      - 'site/public/app.js'
+      - 'site/server.js'
       - 'tests/site-check.js'
       - 'tools/android-smoke.sh'
       - '.github/workflows/android-apk.yml'
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: 'Publish the test APK as a public GitHub Release (the website downloads it in-page)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -72,6 +82,58 @@ jobs:
           path: site/downloads/stereo-sound/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 90
+
+  # ---------------------------------------------------------------------
+  # نشر APK تجريبي كإصدار عام — حتى ينزّله زر التثبيت داخل الموقع نفسه
+  # (مرفوعات Artifacts تتطلب تسجيل دخول إلى GitHub وتنقل الزائر خارج الصفحة،
+  #  أما أصل Release فيُنزَّل بلا حساب، ويمرّره site/server.js عبر /api/app/apk.)
+  # يعمل على الدفع إلى main أو عند طلبه صراحة في تشغيل يدوي.
+  # ---------------------------------------------------------------------
+  publish:
+    name: Publish installable APK as a public release
+    needs: apk
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish_release == true)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: stereo-sound-android-test-apk
+          path: ${{ runner.temp }}/stereo-apk
+      - name: Publish release asset stereo-sound.apk
+        run: |
+          set -eu
+          APK="${RUNNER_TEMP}/stereo-apk/app-debug.apk"
+          test -s "$APK"
+          TAG="stereo-test-apk"
+          NOTES="${RUNNER_TEMP}/release-notes.md"
+          cat > "$NOTES" <<'NOTES_EOF'
+          نسخة اختبار من تطبيق «ستيريو» لأندرويد (موقّعة بمفتاح التصحيح).
+
+          - التنزيل من الموقع: افتح قسم «تطبيق الموبايل» ثم اضغط «⬇ نزّل APK وثبّته على هاتفك» — يبدأ التنزيل داخل الصفحة نفسها.
+          - التنزيل المباشر: أصل stereo-sound.apk المرفق في هذا الإصدار.
+          - هذه نسخة اختبار وليست إصدار Google Play؛ الإصدار العام يحتاج مفتاح توقيع خاصًا بصاحب التطبيق.
+          NOTES_EOF
+          printf '\n- تشغيل البناء: %s\n' "$RUN_URL" >> "$NOTES"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK#stereo-sound.apk" --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$NOTES" --latest
+          else
+            gh release create "$TAG" "$APK#stereo-sound.apk" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title 'ستيريو — نسخة اختبار قابلة للتثبيت (APK)' \
+              --notes-file "$NOTES" \
+              --latest
+          fi
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json name,assets --jq '.assets[].name'
 
   device-smoke:
     name: Launch the app offline on Android 15
