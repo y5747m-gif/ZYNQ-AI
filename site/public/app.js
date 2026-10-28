@@ -266,7 +266,162 @@ function openModal(id) {
 
 function closeModal() {
   $('#modal').hidden = true;
+  closeInstallDialog();
   document.body.style.overflow = '';
+}
+
+/* ------------------------------------------------------------------
+   لوحة تثبيت تطبيق أندرويد — تعمل داخل الصفحة نفسها
+   ------------------------------------------------------------------
+   الزر لم يعد رابطًا إلى صفحة GitHub Actions: يفتح لوحة داخل الموقع،
+   ويستعلم من الخادم عن ملف APK، وينزّله مباشرة عبر /api/app/apk.
+   وهكذا يبقى الزائر في الصفحة ولا يحتاج حسابًا على GitHub.            */
+const installState = { info: null, at: 0, pending: null };
+const INSTALL_TTL = 60 * 1000;
+
+function renderInstallSteps(steps) {
+  const box = $('#app-install-steps');
+  box.innerHTML = '';
+  for (const text of steps || []) {
+    const li = document.createElement('li');
+    li.textContent = text;
+    box.appendChild(li);
+  }
+}
+
+function applyInstallStatus(info) {
+  installState.info = info;
+  installState.at = Date.now();
+
+  const badge = $('#app-install-badge');
+  if (badge) badge.hidden = !info.ready;
+
+  const statusEl = $('#app-install-state');
+  const descEl = $('#app-install-desc');
+  const dl = $('#app-install-download');
+  const retry = $('#app-install-retry');
+  const note = $('#app-install-note');
+
+  renderInstallSteps(info.steps);
+
+  if (info.ready) {
+    const size = info.size ? ` · ${fmtSize(info.size)}` : '';
+    const version = info.version ? ` · ${info.version}` : '';
+    statusEl.textContent = `✓ جاهز للتنزيل الآن${version}${size}`;
+    statusEl.dataset.tone = 'ready';
+    descEl.textContent = 'اضغط الزر الأحمر فيبدأ تنزيل ملف التثبيت، وتبقى في هذه الصفحة. بعدها افتح الملف من إشعار التنزيل أو من مدير الملفات وثبّته.';
+    dl.hidden = false;
+    dl.href = '/api/app/apk';
+    dl.textContent = '⬇ نزّل APK';
+    dl.classList.remove('is-busy');
+    dl.removeAttribute('aria-disabled');
+    retry.hidden = true;
+    note.textContent = info.note || 'التنزيل يمرّ عبر هذا الموقع — لا تُفتح صفحة GitHub ولا يُطلب تسجيل دخول.';
+  } else {
+    statusEl.textContent = '⏳ ملف التثبيت غير منشور بعد';
+    statusEl.dataset.tone = 'waiting';
+    descEl.textContent = info.reason || 'لم يُنشر بعد ملف APK للتنزيل المباشر.';
+    dl.hidden = true;
+    retry.hidden = false;
+    note.textContent = 'البدائل المتاحة من دون مغادرة الصفحة: نزّل مشروع أندرويد (ZIP) وابنِه في Android Studio، أو استخدم تطبيق ستيريو داخل المتصفح. يمكنك أيضًا بناء الملف محليًا ثم إعادة المحاولة.';
+  }
+}
+
+async function refreshInstallStatus(force = false) {
+  if (!force && installState.info && Date.now() - installState.at < INSTALL_TTL) return installState.info;
+  if (installState.pending) return installState.pending;
+
+  const statusEl = $('#app-install-state');
+  if (statusEl && !installState.info) { statusEl.textContent = 'جارٍ التحقق من ملف التثبيت…'; statusEl.dataset.tone = ''; }
+
+  installState.pending = (async () => {
+    let info = null;
+    try {
+      const r = await fetch(`/api/app/status${force ? '?refresh=1' : ''}`);
+      info = await r.json();
+    } catch (_) {
+      info = { ready: false, reason: 'تعذّر الاتصال بالخادم للتحقق من ملف التثبيت.', steps: [] };
+    }
+    if (!Array.isArray(info.steps) || !info.steps.length) info.steps = [
+      'اضغط «⬇ نزّل APK» — يبدأ التنزيل وتبقى في الصفحة نفسها.',
+      'افتح ملف stereo-sound.apk من إشعار التنزيل أو من مدير الملفات.',
+      'اسمح بالتثبيت من هذا المصدر إن طلب أندرويد ذلك.',
+      'افتح «ستيريو» من شاشة التطبيقات وشغّل ملفاتك.',
+    ];
+    installState.pending = null;
+    applyInstallStatus(info);
+    return info;
+  })();
+
+  return installState.pending;
+}
+
+function openInstallDialog() {
+  const dlg = $('#app-install');
+  dlg.hidden = false;
+  document.body.style.overflow = 'hidden';
+  refreshInstallStatus();
+  const btn = $('#app-install-download');
+  if (btn && !btn.hidden) btn.focus();
+}
+
+function closeInstallDialog() {
+  const dlg = $('#app-install');
+  if (dlg && !dlg.hidden) dlg.hidden = true;
+}
+
+function setupInstallDialog() {
+  const trigger = $('#app-install-btn');
+  const dlg = $('#app-install');
+  if (!trigger || !dlg) return;
+
+  // preventDefault يضمن أن الضغطة لا تنقّل الزائر إلى أي صفحة أخرى.
+  trigger.addEventListener('click', (e) => { e.preventDefault(); openInstallDialog(); });
+
+  dlg.addEventListener('click', (e) => {
+    if (e.target.closest('[data-close-install]')) { e.preventDefault(); closeModal(); }
+  });
+
+  const dl = $('#app-install-download');
+  dl.addEventListener('click', async (e) => {
+    // مهما حدث: لا ننتقل إلى أي صفحة أخرى — التنزيل يتم داخل هذه الصفحة.
+    e.preventDefault();
+    const info = installState.info;
+    if (!info || !info.ready) { refreshInstallStatus(true); return; }
+    if (dl.classList.contains('is-busy')) return;
+
+    const note = $('#app-install-note');
+    dl.classList.add('is-busy');
+    dl.setAttribute('aria-disabled', 'true');
+    dl.textContent = '⏬ جارٍ التنزيل…';
+    try {
+      const r = await fetch('/api/app/apk');
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'stereo-sound.apk';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+      dl.textContent = `✓ تم تنزيل ${fmtSize(blob.size)} — نزّله مرة أخرى`;
+      note.textContent = 'الملف الآن في مجلد التنزيلات على هاتفك. افتحه واضغط «تثبيت»، ثم ارجع إلى هذه الصفحة متى شئت.';
+    } catch (err) {
+      dl.textContent = '⬇ نزّل APK';
+      note.textContent = 'تعذّر بدء التنزيل الآن — اضغط «⟳ أعد المحاولة»، أو نزّل مشروع أندرويد (ZIP) وابنِه محليًا.';
+      refreshInstallStatus(true);
+    } finally {
+      dl.classList.remove('is-busy');
+      dl.removeAttribute('aria-disabled');
+    }
+  });
+
+  $('#app-install-retry').addEventListener('click', () => refreshInstallStatus(true));
+
+  // تجهيز مسبق هادئ: إن كان الملف متاحًا تظهر الشارة على الزر مباشرة.
+  refreshInstallStatus();
 }
 
 /* ------------------------------------------------------------------
@@ -342,6 +497,8 @@ async function boot() {
     const card = e.target.closest('.card');
     if (card) { e.preventDefault(); openModal(card.dataset.id); }
   });
+
+  setupInstallDialog();
 
   $('#modal').addEventListener('click', (e) => {
     if (e.target.closest('[data-close]')) closeModal();

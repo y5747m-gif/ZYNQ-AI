@@ -129,6 +129,20 @@ button, input, select { font-family: inherit; }
 .btn-yellow { background: var(--yellow); color: var(--ink); }
 .btn-ink { background: var(--ink); color: var(--cream); }
 .btn-ghost { background: var(--cream); }
+.btn.is-busy { opacity: .75; cursor: progress; transform: none; box-shadow: var(--shadow-sm); }
+.install-badge {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: .72rem;
+  font-weight: 800;
+  line-height: 1.5;
+  padding: .05rem .5rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--yellow);
+  color: var(--ink);
+}
+.install-badge[hidden] { display: none; }
 
 .comic-underline {
   position: relative; display: inline-block; z-index: 1; white-space: nowrap;
@@ -934,6 +948,58 @@ button, input, select { font-family: inherit; }
   transition: transform .15s;
 }
 .modal-close:hover { transform: rotate(90deg); }
+
+/* ------------------------------------------------------------
+   لوحة تثبيت تطبيق أندرويد (داخل الصفحة نفسها)
+   ------------------------------------------------------------ */
+#app-install .modal-panel { width: min(680px, 96vw); }
+#app-install .modal-body { padding: 1.9rem 1.9rem 1.6rem; }
+.install-steps {
+  counter-reset: install-step;
+  list-style: none;
+  margin-top: 1.25rem;
+  padding: 0;
+  display: grid;
+  gap: .6rem;
+}
+.install-steps li {
+  counter-increment: install-step;
+  position: relative;
+  padding: .7rem 3rem .7rem .9rem;
+  background: var(--cream);
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 var(--ink);
+  line-height: 1.85;
+  font-weight: 600;
+}
+.install-steps li::before {
+  content: counter(install-step);
+  position: absolute;
+  top: 50%;
+  right: .6rem;
+  transform: translateY(-50%);
+  width: 1.85rem;
+  height: 1.85rem;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  background: var(--cyan);
+  border: 2.5px solid var(--ink);
+  border-radius: 50%;
+}
+#app-install-state[data-tone="ready"] { color: var(--cyan-dark); }
+#app-install-state[data-tone="waiting"] { color: var(--red-dark); }
+.install-note {
+  margin-top: 1.15rem;
+  padding: .85rem 1.05rem;
+  background: var(--paper2);
+  border: 2.5px dashed var(--ink);
+  border-radius: 12px;
+  font-size: .94rem;
+  line-height: 1.95;
+}
 .modal-preview {
   position: relative; aspect-ratio: 21 / 9; overflow: hidden;
   background: #0e1216; border-bottom: 4px solid var(--ink);
@@ -990,6 +1056,8 @@ button, input, select { font-family: inherit; }
   .packs-grid { grid-template-columns: 1fr; }
   .footer-inner { grid-template-columns: 1fr; gap: 1.8rem; }
   .modal-body { padding: 1.25rem 1.15rem 1.45rem; }
+  #app-install .modal-body { padding: 1.35rem 1.05rem 1.25rem; }
+  #app-install .modal-actions .btn { flex: 1 1 100%; }
   .modal-preview { aspect-ratio: 16 / 10; }
   .filters-foot { flex-direction: column; align-items: flex-start; }
 }
