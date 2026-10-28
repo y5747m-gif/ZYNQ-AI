@@ -23,7 +23,7 @@ Stereo Sound is a **native, offline Android app**, not a website or a WebView. I
 | [`site/downloads/`](site/downloads) | **34 أصلًا رقميًا حقيقيًا**: 14 Lottie JSON · 6 SVG متحركة · 4 GIF أوفرلاي · 2 تسلسل PNG بشفافية (ZIP) · 5 لوكات `.cube` · 3 ملفات تعابير AE موثّقة + مشروع تطبيق أندرويد «ستيريو» (كوتلن كامل، يُبنى منه APK) |
 | [`site/server.js`](site/server.js) | خادم بلا مكتبات: كتالوج بأحجام حقيقية + تحميل مرفقات + **توليد باقات ZIP عند الطلب** + مشروع أندرويد كامل كـ ZIP + **بثّ APK للتثبيت من داخل الصفحة** (`/api/app/status` و`/api/app/apk`) — يعمل محليًا وعلى فيرسل |
 | [`site/downloads/stereo-sound/`](site/downloads/stereo-sound) | **تطبيق «ستيريو» الأصلي لأندرويد**: مشغّل محلي، توازن القنوات، مؤثرات حسب دعم الجهاز، معادل، ونغمة اختبار — يعمل بلا متصفح أو إنترنت |
-| [`tests/site-check.js`](tests/site-check.js) | **65 فحصًا آليًا**: كل ملفات الكتالوج موجودة، كل مسار يردّ 200، ملفات التطبيق كاملة، سلامة مشروع أندرويد (namespace، أيقونات، استيرادات، لا APK مُلفَّق)، ولا زر ينقل الزائر إلى صفحة خارجية + بثّ APK من الخادم |
+| [`tests/site-check.js`](tests/site-check.js) | **71 فحصًا آليًا**: كل ملفات الكتالوج موجودة، كل مسار يردّ 200، ملفات التطبيق كاملة، سلامة مشروع أندرويد (namespace، أيقونات، استيرادات، لا APK مُلفَّق)، ولا زر ينقل الزائر إلى صفحة خارجية + بثّ APK من الخادم |
 | [`.github/workflows/android-apk.yml`](.github/workflows/android-apk.yml) | اختبار وبناء APK تجريبي على GitHub Actions (JDK 17 + Android SDK 36) + **نشره كأصل في إصدار عام** حتى ينزّله الموقع داخل الصفحة نفسها |
 | [`tools/gen_assets.py`](tools/gen_assets.py) | مولّد الأصول (قابل لإعادة التشغيل): يبني الـ Lottie والتسلسلات واللوكات من الصفر |
 

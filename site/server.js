@@ -157,21 +157,37 @@ const APK_CACHE_MS = 10 * 60 * 1000;
 function httpGet(url, { timeout = 8000, headers = {}, redirects = 3, collect = true } = {}) {
   return new Promise((resolve, reject) => {
     const mod = url.startsWith('https:') ? https : http;
+    let settled = false;
+    const done = (fn, val) => { if (!settled) { settled = true; fn(val); } };
     const req = mod.get(url, { headers: Object.assign({ 'User-Agent': 'ZYNQ-FX-site' }, headers) }, (res) => {
       const status = res.statusCode || 0;
       if (status >= 300 && status < 400 && res.headers.location && redirects > 0) {
         res.resume();
         const next = new URL(res.headers.location, url).toString();
-        resolve(httpGet(next, { timeout, headers, redirects: redirects - 1, collect }));
+        // الأخطاء اللاحقة في هذا الرد لم تعد تعنينا بعد متابعة التحويل
+        res.on('error', () => { /* تجاهل */ });
+        httpGet(next, { timeout, headers, redirects: redirects - 1, collect })
+          .then((r) => done(resolve, r), (e) => done(reject, e));
         return;
       }
-      if (!collect) { resolve({ status, headers: res.headers, body: Buffer.alloc(0), stream: res }); return; }
+      if (!collect) {
+        done(resolve, { status, headers: res.headers, body: Buffer.alloc(0), stream: res });
+        return;
+      }
       const chunks = [];
       res.on('data', (c) => chunks.push(c));
-      res.on('end', () => resolve({ status, headers: res.headers, body: Buffer.concat(chunks), stream: res }));
+      res.on('error', (err) => done(reject, err));
+      res.on('end', () => done(resolve, { status, headers: res.headers, body: Buffer.concat(chunks), stream: res }));
     });
     req.setTimeout(timeout, () => req.destroy(new Error('انتهت مهلة الاتصال')));
-    req.on('error', reject);
+    req.on('error', (err) => done(reject, err));
+    // خطأ TLS على المقبس نفسه (بعد تحويل مثلًا) كان ينهي العملية كاملة بلا معالج
+    req.on('socket', (sock) => {
+      sock.on('error', (err) => {
+        done(reject, err);
+        if (settled) { try { req.destroy(); } catch (_) { /* تجاهل */ } }
+      });
+    });
   });
 }
 
@@ -259,14 +275,39 @@ async function streamApk(res, info) {
     'Content-Disposition': `attachment; filename="${APK_FILENAME}"`,
     'Cache-Control': 'no-store',
   };
+
+  // أي انقطاع في المصدر أو عند الزائر يجب ألّا يُسقِط الخادم:
+  // خطأ بلا معالج على تدفّق (stream) ينهي العملية كلها.
+  const failBeforeHeaders = (err) => {
+    if (res.headersSent || res.writableEnded) { try { res.destroy(); } catch (_) { /* تجاهل */ } return; }
+    send(res, 502, JSON.stringify({
+      error: 'تعذّر جلب ملف التثبيت من مصدره الآن',
+      reason: String((err && err.message) || err),
+      alternative: '/api/app/source.zip',
+    }), MIME['.json']);
+  };
+  res.on('error', () => { /* تجاهل انقطاع اتصال الزائر */ });
+
   if (info.file) {
     const st = fs.statSync(info.file);
+    const src = fs.createReadStream(info.file);
+    src.on('error', failBeforeHeaders);
     res.writeHead(200, Object.assign(head, { 'Content-Length': st.size }));
-    fs.createReadStream(info.file).pipe(res);
+    src.pipe(res);
     return;
   }
-  const upstream = await httpGet(info.url, { timeout: 20000, collect: false });
-  if (upstream.status !== 200) throw new Error(`مصدر التحميل ردّ بالحالة ${upstream.status}`);
+
+  let upstream;
+  try {
+    upstream = await httpGet(info.url, { timeout: 20000, collect: false });
+  } catch (err) {
+    return failBeforeHeaders(err);
+  }
+  if (upstream.status !== 200) {
+    upstream.stream.resume();
+    return failBeforeHeaders(new Error(`مصدر التحميل ردّ بالحالة ${upstream.status}`));
+  }
+  upstream.stream.on('error', failBeforeHeaders);
   const len = upstream.headers['content-length'];
   res.writeHead(200, len ? Object.assign(head, { 'Content-Length': Number(len) }) : head);
   upstream.stream.pipe(res);

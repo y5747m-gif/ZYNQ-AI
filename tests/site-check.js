@@ -270,14 +270,21 @@ function checkAndroidProject() {
 }
 
 // ------------------------------------------------------- 4) الخادم والمسارات
-function fetchPath(port, p, method = 'GET') {
+function fetchPath(port, p, method = 'GET', timeoutMs = 15000) {
   return new Promise((resolve) => {
+    let settled = false;
+    const finish = (val) => { if (!settled) { settled = true; clearTimeout(timer); resolve(val); } };
     const req = http.request({ host: '127.0.0.1', port, path: encodeURI(p), method }, (res) => {
       const chunks = [];
       res.on('data', (c) => chunks.push(c));
-      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks) }));
+      res.on('end', () => finish({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks) }));
+      // الخادم يقطع الرد عمدًا في اختبار «انقطاع المصدر أثناء البثّ»
+      res.on('aborted', () => finish({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks), truncated: true }));
+      res.on('error', () => finish({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks), truncated: true }));
+      res.on('close', () => finish({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks), truncated: true }));
     });
-    req.on('error', (err) => resolve({ status: 0, error: err.message, body: Buffer.alloc(0) }));
+    const timer = setTimeout(() => { req.destroy(); finish({ status: 0, error: 'timeout', body: Buffer.alloc(0) }); }, timeoutMs);
+    req.on('error', (err) => finish({ status: 0, error: err.message, body: Buffer.alloc(0) }));
     req.end();
   });
 }
@@ -350,6 +357,14 @@ async function checkServer(catalog) {
       const apkSource = http.createServer((req, res) => {
         const fake = Buffer.from('PK\u0003\u0004fake-apk-for-test');
         if (req.url === '/redirect') { res.writeHead(302, { Location: '/stereo-sound.apk' }); return res.end(); }
+        if (req.url === '/broken') { res.writeHead(500, { 'Content-Type': 'text/plain' }); return res.end('no apk here'); }
+        if (req.url === '/partial') {
+          // يرسل جزءًا ثم يقطع الاتصال — كان هذا يُسقِط الخادم بالكامل
+          res.writeHead(200, { 'Content-Type': 'application/vnd.android.package-archive', 'Content-Length': 999999 });
+          res.write('PK\u0003\u0004partial');
+          setTimeout(() => res.socket.destroy(), 60);
+          return;
+        }
         res.writeHead(200, { 'Content-Type': 'application/vnd.android.package-archive', 'Content-Length': fake.length });
         res.end(fake);
       });
@@ -384,6 +399,51 @@ async function checkServer(catalog) {
         }
       } finally {
         apkChild.kill('SIGTERM');
+      }
+
+      // مصدر APK معطوب: يجب أن يردّ الخادم بخطأ نظيف وألّا يسقط (كان خطأ التدفّق
+      // غير المعالج يُنهي العملية كلها، فتتعطل المكتبة بأكملها).
+      const badChild = spawn(process.execPath, [path.join(SITE, 'server.js'), `--port=${port + 2}`], {
+        cwd: ROOT, stdio: 'ignore',
+        env: Object.assign({}, process.env, { STEREO_APK_URL: `http://127.0.0.1:${apkPort}/broken` }),
+      });
+      const partialChild = spawn(process.execPath, [path.join(SITE, 'server.js'), `--port=${port + 3}`], {
+        cwd: ROOT, stdio: 'ignore',
+        env: Object.assign({}, process.env, { STEREO_APK_URL: `http://127.0.0.1:${apkPort}/partial` }),
+      });
+      try {
+        let badReady = false;
+        for (let i = 0; i < 40; i++) {
+          const r = await fetchPath(port + 2, '/api/app/status');
+          if (r.status === 200 || r.status === 503) { badReady = true; break; }
+          await new Promise((res) => setTimeout(res, 100));
+        }
+        ok(badReady, 'خادم المصدر المعطوب يبدأ');
+        if (badReady) {
+          const broken = await fetchPath(port + 2, '/api/app/apk');
+          ok(broken.status === 502 && broken.body.toString('utf8').includes('source.zip'),
+            'مصدر APK المعطوب يردّ 502 مع بديل متاح (لا 500 غامض)');
+          const alive = await fetchPath(port + 2, '/');
+          ok(alive.status === 200, 'الخادم يبقى يعمل بعد فشل مصدر APK (لا سقوط)');
+        }
+
+        let partialReady = false;
+        for (let i = 0; i < 40; i++) {
+          const r = await fetchPath(port + 3, '/api/app/status');
+          if (r.status === 200 || r.status === 503) { partialReady = true; break; }
+          await new Promise((res) => setTimeout(res, 100));
+        }
+        ok(partialReady, 'خادم المصدر المنقطع يبدأ');
+        if (partialReady) {
+          const cut = await fetchPath(port + 3, '/api/app/apk');
+          ok(cut.status === 200 && cut.truncated === true, 'البثّ المقطوع يصل كردّ ناقص بدل تعطّل الطلب');
+          await new Promise((res) => setTimeout(res, 350));
+          const stillUp = await fetchPath(port + 3, '/api/app/status');
+          ok(stillUp.status === 200, 'انقطاع المصدر أثناء البثّ لا يُسقِط الخادم');
+        }
+      } finally {
+        badChild.kill('SIGTERM');
+        partialChild.kill('SIGTERM');
         apkSource.close();
       }
 
