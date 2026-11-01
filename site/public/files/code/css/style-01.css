@@ -1,0 +1,9 @@
+/* أنماط زينك رقم 1 */
+.bot-card-1 {
+  border: 2px solid #7c3aed;
+  border-radius: 12px;
+  padding: 16px;
+  color: #fff;
+  background: #0b0e16;
+}
+.bot-card-1:hover { border-color: #ffd23f; }

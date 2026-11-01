@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#0b0e16"/>
+  <path d="M100 20 L130 80 L190 80 L140 120 L160 180 L100 140 L40 180 L60 120 L10 80 L70 80 Z" fill="#ffd23f"/>
+  <text x="100" y="175" text-anchor="middle" fill="#fff" font-size="18" font-weight="bold" font-family="system-ui,sans-serif">ZYNQ كاميرا</text>
+</svg>

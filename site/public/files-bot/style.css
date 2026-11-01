@@ -1,0 +1,95 @@
+/* ==========================================================================
+   ZYNQ FX — صفحة مساعد الملفات
+   أنماط صفحة الروبوت المساعد التي تساعد الزائر في الوصول إلى الملفات وتحميلها.
+   ========================================================================== */
+
+/* ---------- الشريط ---------- */
+.top { border-bottom: 1px solid rgba(255,255,255,.08); }
+.top-in { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff; font-weight:800; font-size:1.15rem; }
+.brand em { color:var(--accent,#a878ff); font-style:normal; }
+.top-links { display:flex; gap:8px; list-style:none; margin:0; padding:0; flex-wrap:wrap; }
+.top-links a { text-decoration:none; color:#c9cfe8; padding:6px 12px; border-radius:8px; font-size:.92rem; }
+.top-links a.is-active, .top-links a:hover { color:#fff; background:rgba(124,58,237,.18); }
+.top-tools { display:flex; gap:8px; align-items:center; }
+.icon-btn { width:36px; height:36px; border-radius:10px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; cursor:pointer; font-size:1.1rem; display:grid; place-items:center; }
+.icon-btn.is-off { opacity:.45; }
+
+/* ---------- الهيرو ---------- */
+.hero { padding:46px 0 34px; }
+.hero-in { display:grid; grid-template-columns: 1.15fr .85fr; gap:34px; align-items:center; }
+@media (max-width: 900px){ .hero-in { grid-template-columns: 1fr; } }
+.eyebrow { color:var(--accent,#a878ff); font-size:.82rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; display:block; margin-bottom:10px; }
+.hero h1 { font-size:1.75rem; margin:0 0 14px; line-height:1.25; }
+.hero h1 .grad { color:var(--accent,#a878ff); }
+.hero p { color:#c9cfe8; margin:0 0 18px; line-height:1.6; font-size:1.02rem; }
+.hero-cta { display:flex; gap:10px; flex-wrap:wrap; }
+.hero-badges { display:flex; gap:10px; flex-wrap:wrap; list-style:none; margin:24px 0 0; padding:0; }
+.hero-badges li { font-size:.85rem; color:#98a0c0; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); padding:7px 12px; border-radius:999px; }
+.hero-badges li b { color:#fff; }
+
+.hero-stage { position:relative; height:320px; display:flex; align-items:center; justify-content:center; }
+.hero-bot { width:210px; height:210px; position:relative; z-index:2; filter:drop-shadow(0 12px 24px rgba(0,0,0,.45)); }
+.hero-bot:active { transform:scale(.96); }
+.hero-bot-hint { position:absolute; bottom:6px; left:50%; transform:translateX(-50%); font-size:.8rem; color:#98a0c0; text-align:center; pointer-events:none; white-space:nowrap; }
+.speech { position:absolute; top:-56px; left:50%; transform:translateX(-50%); padding:8px 14px; border-radius:12px; background:#100f1d; border:1px solid var(--accent,#a878ff); color:#fff; font-size:.85rem; box-shadow:0 10px 30px rgba(124,58,237,.35); white-space:nowrap; }
+.speech[hidden]{ display:none; }
+
+/* ---------- الشريط المتحرك ---------- */
+.ribbon { overflow:hidden; border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06); background:rgba(0,0,0,.25); }
+.ribbon-track { display:flex; gap:22px; padding:10px 0; animation: ribbon 24s linear infinite; white-space:nowrap; will-change:transform; }
+.ribbon-track span { color:rgba(255,255,255,.55); font-size:.8rem; font-weight:700; letter-spacing:.05em; }
+@keyframes ribbon { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+
+/* ---------- الأقسام ---------- */
+.section { padding:40px 0; }
+.section-head { text-align:center; margin-bottom:26px; }
+.section-head h2 { font-size:1.45rem; margin:8px 0 6px; }
+.section-head h2 .grad { color:var(--accent,#a878ff); }
+.section-head p { color:#98a0c0; margin:0; font-size:.98rem; }
+
+/* ---------- عناصر التحكم ---------- */
+.controls { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:22px; }
+.search-wrap { flex:1 1 260px; min-width:220px; }
+.field { display:flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.16); border-radius:10px; background:rgba(0,0,0,.3); padding:0 12px; }
+.field input { border:0; background:transparent; color:#fff; outline:none; flex:1; min-width:0; font-size:.95rem; }
+.field input::placeholder { color:#7880a0; }
+.chips-wrap { display:flex; gap:8px; flex-wrap:wrap; align-items:center; min-width:0; }
+.chip { border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#c9cfe8; padding:6px 14px; border-radius:999px; font-size:.86rem; cursor:pointer; white-space:nowrap; }
+.chip.is-on { background:var(--accent,#a878ff); color:#05040a; border-color:var(--accent,#a878ff); }
+.chip:hover { border-color:var(--accent,#a878ff); color:#fff; }
+.count { color:#98a0c0; font-size:.88rem; margin-left:auto; }
+
+/* ---------- شبكة الملفات ---------- */
+.files-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap:14px; }
+.file-card { border:1px solid rgba(255,255,255,.14); border-radius:12px; background:rgba(0,0,0,.25); display:flex; flex-direction:column; overflow:hidden; transition:transform .16s, border-color .16s; }
+.file-card:hover { border-color:var(--accent,#a878ff); transform:translateY(-3px); }
+.file-thumb { height:128px; background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center; font-size:36px; border-bottom:1px solid rgba(255,255,255,.08); }
+.file-thumb img { max-width:92px; max-height:92px; display:block; border-radius:6px; }
+.file-body { padding:12px; display:flex; flex-direction:column; gap:6px; flex:1; }
+.file-name { font-weight:700; color:#fff; font-size:.93rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.file-meta { font-size:.78rem; color:#98a0c0; display:flex; gap:10px; flex-wrap:wrap; }
+.file-dl { margin-top:8px; }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border:0; border-radius:10px; padding:10px 16px; font-weight:800; font-size:.92rem; cursor:pointer; text-decoration:none; }
+.btn-primary { background:var(--accent,#a878ff); color:#05040a; }
+.btn-ghost { background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.18); }
+.btn-primary:hover { filter:brightness(1.12); }
+.btn-ghost:hover { background:rgba(255,255,255,.16); }
+
+/* ---------- كيف يعمل ---------- */
+.steps { display:flex; gap:14px; flex-wrap:wrap; }
+.step { flex:1 1 220px; border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:18px 16px; background:rgba(0,0,0,.2); }
+.num { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:var(--accent,#a878ff); color:#05040a; font-weight:900; font-size:1rem; margin-bottom:10px; }
+.step h4 { margin:0 0 8px; color:#fff; font-size:1rem; }
+.step p { margin:0; color:#98a0c0; font-size:.9rem; line-height:1.55; }
+
+/* ---------- التذييل ---------- */
+.foot { border-top:1px solid rgba(255,255,255,.08); padding:26px 0; }
+.foot-in { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+.foot p { color:#98a0c0; margin:0; font-size:.88rem; }
+.foot-links { display:flex; gap:12px; list-style:none; margin:0; padding:0; }
+.foot-links a { color:#c9cfe8; text-decoration:none; font-size:.88rem; }
+.foot-links a:hover { color:#fff; }
+
+.reveal { opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.is-in { opacity:1; transform:none; }
