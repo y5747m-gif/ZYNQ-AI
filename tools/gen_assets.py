@@ -60,13 +60,16 @@ def s(v):
     return {"a": 0, "k": v}
 
 def kf(times_values, dims=1):
-    """حركة keyframes خطية: [(t, value), ...]"""
+    """حركة keyframes بمنحنى تباطؤ: [(t, value), ...]"""
     k = []
     for idx, (t, v) in enumerate(times_values):
         item = {"t": t, "s": v if isinstance(v, list) else [v]}
         if idx < len(times_values) - 1:
             nxt = times_values[idx + 1][1]
             item["e"] = nxt if isinstance(nxt, list) else [nxt]
+            # Beziers required by lottie-web: without handles, animated layers can stay empty.
+            item["i"] = {"x": [0.42], "y": [1]}
+            item["o"] = {"x": [0.58], "y": [0]}
         k.append(item)
     prop = {"a": 1, "k": k}
     return prop

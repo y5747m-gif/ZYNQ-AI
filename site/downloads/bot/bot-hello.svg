@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="zy-bot-svg bot-hello" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+<title id="title">تحية البوت</title><desc id="desc">وجه مساعد يتحرك برفق مع نجوم ترحيب.</desc>
+<style>
+.bot-hello .motion{animation:zy-float 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.bot-hello .delay{animation-delay:.6s}.bot-hello .spin{animation:zy-spin 5s linear infinite;transform-origin:256px 256px}
+@keyframes zy-float{0%,100%{transform:translateY(0);opacity:.85}50%{transform:translateY(-12px);opacity:1}}
+@keyframes zy-spin{to{transform:rotate(360deg)}}
+@keyframes zy-scan{0%,100%{transform:translateY(0)}50%{transform:translateY(210px)}}
+@keyframes zy-ring{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+@keyframes zy-dots{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-5px)}}
+@keyframes zy-sleep{0%,100%{opacity:.4;transform:translate(0,0)}50%{opacity:1;transform:translate(10px,-20px)}}
+
+@media(prefers-reduced-motion:reduce){.bot-hello .motion,.bot-hello .spin{animation:none!important}}
+</style><g class="motion"><rect x="156" y="160" width="200" height="165" rx="65" fill="#eeeaff"/><rect x="176" y="183" width="160" height="108" rx="38" fill="#151025"/><path d="M211 231q15-24 30 0m30 0q15-24 30 0" fill="none" stroke="#a878ff" stroke-width="12" stroke-linecap="round"/><path d="M236 264q20 18 40 0" fill="none" stroke="#5fd4ff" stroke-width="8" stroke-linecap="round"/><path d="M365 270q65-55 42-100" fill="none" stroke="#eeeaff" stroke-width="25" stroke-linecap="round"/></g></svg>

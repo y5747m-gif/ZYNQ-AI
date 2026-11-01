@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="zy-bot-svg bot-sleep" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+<title id="title">استراحة البوت</title><desc id="desc">وجه هادئ يدخل في الاستراحة مع نجوم صغيرة تطفو.</desc>
+<style>
+.bot-sleep .motion{animation:zy-float 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.bot-sleep .delay{animation-delay:.6s}.bot-sleep .spin{animation:zy-spin 5s linear infinite;transform-origin:256px 256px}
+@keyframes zy-float{0%,100%{transform:translateY(0);opacity:.85}50%{transform:translateY(-12px);opacity:1}}
+@keyframes zy-spin{to{transform:rotate(360deg)}}
+@keyframes zy-scan{0%,100%{transform:translateY(0)}50%{transform:translateY(210px)}}
+@keyframes zy-ring{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+@keyframes zy-dots{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-5px)}}
+@keyframes zy-sleep{0%,100%{opacity:.4;transform:translate(0,0)}50%{opacity:1;transform:translate(10px,-20px)}}
+.bot-sleep .motion{animation-name:zy-sleep}
+@media(prefers-reduced-motion:reduce){.bot-sleep .motion,.bot-sleep .spin{animation:none!important}}
+</style><rect x="145" y="180" width="222" height="170" rx="65" fill="#eeeaff"/><rect x="166" y="201" width="180" height="115" rx="40" fill="#151025"/><path d="M198 253h38m40 0h38" stroke="#a878ff" stroke-width="10" stroke-linecap="round"/><path class="motion" d="M294 90h55l-55 55h55m20-100h40l-40 40h40" fill="none" stroke="#5fd4ff" stroke-width="8" stroke-linejoin="round"/></svg>

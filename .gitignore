@@ -17,3 +17,6 @@ site/downloads/stereo-sound/.idea/
 *.pfx
 .env
 .env.*
+
+# Browser test screenshots and local tooling
+.browser-test-artifacts/

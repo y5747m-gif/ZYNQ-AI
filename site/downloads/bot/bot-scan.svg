@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="zy-bot-svg bot-scan" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+<title id="title">مسح الملفات</title><desc id="desc">خط سماوي يمسح إطار البحث عن الملفات.</desc>
+<style>
+.bot-scan .motion{animation:zy-float 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.bot-scan .delay{animation-delay:.6s}.bot-scan .spin{animation:zy-spin 5s linear infinite;transform-origin:256px 256px}
+@keyframes zy-float{0%,100%{transform:translateY(0);opacity:.85}50%{transform:translateY(-12px);opacity:1}}
+@keyframes zy-spin{to{transform:rotate(360deg)}}
+@keyframes zy-scan{0%,100%{transform:translateY(0)}50%{transform:translateY(210px)}}
+@keyframes zy-ring{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+@keyframes zy-dots{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-5px)}}
+@keyframes zy-sleep{0%,100%{opacity:.4;transform:translate(0,0)}50%{opacity:1;transform:translate(10px,-20px)}}
+.bot-scan .motion{animation-name:zy-scan}
+@media(prefers-reduced-motion:reduce){.bot-scan .motion,.bot-scan .spin{animation:none!important}}
+</style><rect x="125" y="125" width="262" height="262" rx="38" fill="#151025" stroke="#a878ff" stroke-width="8"/><path d="M170 195h172m-172 60h125m-125 60h150" stroke="#493761" stroke-width="14" stroke-linecap="round"/><rect class="motion" x="140" y="145" width="232" height="10" rx="5" fill="#5fd4ff"/></svg>

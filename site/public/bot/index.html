@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ZYNQ BOT — الروبوت الحيوي وشخصية الموقع</title>
-<meta name="description" content="شخصية روبوت حيّة لموقعك: عشرة أوضاع وحركات، اثنا عشر تعبيرًا متحركًا، صوت روبوت لطيف، وتنويعات لونية مدمجة مع البنفسجي — كلها بلا صور أو مكتبات، تعمل بلا إنترنت.">
+<meta name="description" content="شخصية روبوت حيّة لموقعك: عشرة أوضاع وحركات، اثنا عشر تعبيرًا متحركًا، صوت روبوت لطيف، وتنويعات لونية مدمجة مع البنفسجي — شخصية SVG محلية، مع نطق عربي يعتمد على أصوات الجهاز المثبتة.">
 <meta name="theme-color" content="#7c3aed">
 <link rel="icon" type="image/svg+xml" href="../logo.svg">
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="bot.css">
+<link rel="stylesheet" href="style.css?v=2.0.0">
+<link rel="stylesheet" href="bot.css?v=2.0.0">
 </head>
 <body>
 
@@ -25,6 +25,7 @@
       <a href="#faces">التعبيرات</a>
       <a href="#voice">الصوت</a>
       <a href="#embed">الدمج</a>
+      <a href="../files-bot/index.html">الملفات والمؤثرات</a>
     </nav>
     <div class="top-tools">
       <button class="icon-btn" id="btn-mute" type="button" aria-pressed="false" aria-label="كتم الصوت" title="كتم/تشغيل الصوت">🔊</button>
@@ -170,8 +171,17 @@
       <div class="section-head reveal">
         <span class="eyebrow">صوت روبوت لطيف</span>
         <h2>يتكلّم <span class="grad">بالعربية</span> — أو بلغة الروبوت</h2>
+        <p>يختار صوتًا عربيًا من جهازك، ويفضّل المصرية إن كانت مثبتة. النغمات وضع منفصل تختاره بنفسك.</p>
       </div>
-      <div class="quick-grid">
+      <div class="assistant-voice panel" style="margin-bottom:22px">
+          <label for="voice-select">الصوت العربي</label>
+          <select id="voice-select" disabled><option value="">جارٍ البحث عن صوت عربي…</option></select>
+          <button class="btn btn-ghost btn-sm" type="button" id="voice-refresh">تحديث الأصوات</button>
+          <button class="btn btn-primary btn-sm" type="button" id="voice-test">جرّب نطق جملة</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="voice-stop">إيقاف النطق</button>
+          <p id="voice-status" role="status">الصوت لا يبدأ تلقائيًا.</p>
+        </div>
+        <div class="quick-grid">
         <div class="quick reveal">
           <span aria-hidden="true">🗣️</span>
           <h4>كلام عربي حقيقي</h4>
@@ -180,7 +190,7 @@
         <div class="quick reveal">
           <span aria-hidden="true">🎵</span>
           <h4>لغة الروبوت</h4>
-          <p>عند غياب صوت عربي، يتحوّل تلقائيًا إلى نغمات مُولَّدة بـ Web Audio — بلا ملفات صوت ولا إنترنت.</p>
+          <p>عند غياب صوت عربي تظهر تعليمات تثبيته وتبقى الردود مكتوبة. يمكنك اختيار وضع النغمات يدويًا؛ لا ندّعي أنه كلام عربي.</p>
         </div>
         <div class="quick reveal">
           <span aria-hidden="true">🎚️</span>
@@ -259,7 +269,8 @@
   <div class="buddy-bubble" id="buddy-bubble" hidden></div>
 </div>
 
-<script src="bot-engine.js"></script>
-<script src="app.js"></script>
+<script src="bot-engine.js?v=2.0.0"></script>
+<script src="voice-controls.js?v=2.0.0"></script>
+<script src="app.js?v=2.0.0"></script>
 </body>
 </html>

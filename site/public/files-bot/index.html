@@ -3,136 +3,79 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>مساعد الملفات — الروبوت الآلي لـ ZYNQ FX</title>
-<meta name="description" content="مساعد آلي يتكلم العربية يساعدك في الوصول إلى 100 ملف متنوّع وتحميلها بسهولة — كل الملفات عاملة وجاهزة للتنزيل.">
+<title>مساعد الملفات العربي — مؤثرات وأنيميشن | ZYNQ BOT</title>
+<meta name="description" content="مساعد ملفات يتحدث بالعربية، مع معاينة حقيقية وتنزيل مباشر لمؤثرات Lottie وSVG وGIF والصوت والصور وملفات التصميم.">
+<meta name="theme-color" content="#100b20">
 <link rel="icon" type="image/svg+xml" href="../logo.svg">
-<link rel="stylesheet" href="../bot/bot.css">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../bot/bot.css?v=2.0.0">
+<link rel="stylesheet" href="style.css?v=2.0.0">
 </head>
 <body>
-
-<!-- ============================== الشريط ============================== -->
+<a class="skip-link" href="#files">انتقل إلى الملفات</a>
 <header class="top">
   <div class="container top-in">
-    <a class="brand" href="index.html">
-      <span class="brand-bot" id="brand-bot" aria-hidden="true"></span>
-      <span>ZYNQ <em>مساعد الملفات</em></span>
-    </a>
+    <a class="brand" href="../index.html"><span class="brand-bot" id="brand-bot" aria-hidden="true"></span><span>ZYNQ <em>مساعد الملفات</em></span></a>
     <nav class="top-links" aria-label="التنقل">
-      <a href="../index.html">ZYNQ FX</a>
-      <a href="../bot/index.html">مختبر الروبوت 🤖</a>
-      <a href="#" class="is-active">مساعد الملفات 📁</a>
+      <a href="../index.html">المكتبة الرئيسية</a><a href="../bot/index.html">مختبر البوت</a><a href="#files" aria-current="page">الملفات والمؤثرات</a>
     </nav>
-    <div class="top-tools">
-      <button class="icon-btn" id="btn-mute" type="button" aria-pressed="false" aria-label="كتم الصوت" title="كتم/تشغيل الصوت">🔊</button>
-    </div>
+    <div class="top-tools"><span class="version">الإصدار 2.0</span><button class="icon-btn" id="btn-mute" type="button" aria-pressed="false" aria-label="كتم الصوت" title="كتم الصوت">🔊</button></div>
   </div>
 </header>
-
 <main>
-  <!-- =============================== الهيرو =============================== -->
   <section class="hero">
     <div class="container hero-in">
       <div class="hero-copy">
-        <span class="eyebrow">مساعدك الآلي يتكلم العربية</span>
-        <h1>المساعد الآلي <span class="grad">ZYNQ BOT</span> يساعدك في الوصول لملفاتك</h1>
-        <p>
-          الروبوت يرافقك في صفحة الملفات، يتحدث <b>بالعربية</b>، ويقرأ أسماء الملفات،
-          ويُنبهك عند بدء التحميل. عندك <b>100 ملف</b> متنوّع — صور، صوت، نصوص، بيانات،
-          أكواد، وصفحات ويب — وكلها عاملة وجاهزة للتنزيل المباشر.
-        </p>
-        <div class="hero-cta">
-          <button class="btn btn-primary" type="button" id="hero-hit">👋 حيّني المساعد</button>
-          <a class="btn btn-ghost" href="#files">ابدأ تصفح الملفات</a>
-        </div>
-        <ul class="hero-badges">
-          <li><b>100</b> ملفًا عاملاً</li>
-          <li><b>14</b> تصنيفًا متنوعًا</li>
-          <li><b>اللغة العربية</b> أصلًا</li>
-          <li>تحميل مباشر بلا إنترنت خارجي</li>
-        </ul>
+        <span class="eyebrow">مساعدك العربي للملفات والحركة</span>
+        <h1>اسأل بالعربي.<br>شوف التأثير.<br><span class="grad">وحمّل ملفك.</span></h1>
+        <p>البوت يرشدك للملف المناسب، ويعرض المؤثر قبل التنزيل. أضفنا حزمة جديدة للبوت، وربطنا المكتبة كلها بالمساعد: صور، صوت، نصوص، أكواد، مؤثرات وأنيميشن.</p>
+        <div class="hero-cta"><button class="btn btn-primary" type="button" id="hero-hit">👋 حيّني المساعد</button><a class="btn btn-ghost" href="#files">تصفّح الملفات</a></div>
+        <ul class="hero-badges"><li><b data-total>—</b> ملفًا حقيقيًا</li><li><b data-effects>—</b> مؤثرًا وأنيميشن</li><li><b data-new>—</b> حركة جديدة للبوت</li></ul>
+        <p class="small-note">المعاينات والتنزيلات من ملفات الموقع نفسه. النطق العربي يستخدم أصوات جهازك، ولا يحتاج مفتاح خدمة خارجية.</p>
       </div>
-
       <div class="hero-stage">
-        <div class="speech" id="hero-speech" hidden></div>
-        <button class="hero-bot" id="hero-bot" type="button" aria-label="شغّل صوت المساعد" style="border:0;background:none;padding:0;cursor:pointer"></button>
-        <div class="hero-bot-hint">اضغط على المساعد ليُحييك ويتحدث بالعربية</div>
+        <div class="orbit orbit-one" aria-hidden="true"></div><div class="orbit orbit-two" aria-hidden="true"></div>
+        <span class="float-label label-one" aria-hidden="true">Lottie ✦</span><span class="float-label label-two" aria-hidden="true">SVG ⚡</span>
+        <div class="speech" id="hero-speech" role="status">أهلًا! اسألني عن مؤثر أو ملف، وأنا أرشدك ليه.</div>
+        <button class="hero-bot" id="hero-bot" type="button" aria-label="تحدث مع المساعد بالعربية"></button>
+        <span class="hero-bot-hint">اضغط للتحدث معي بالعربية</span>
       </div>
     </div>
   </section>
 
-  <div class="ribbon" aria-hidden="true">
-    <div class="ribbon-track">
-      <span>100 FILE</span><span>ALL WORKING</span><span>عربي</span><span>تحميل مباشر</span>
-      <span>صور · صوت · نصوص · بيانات · أكواد</span><span>ZYNQ BOT ⚡</span>
-      <span>100 FILE</span><span>ALL WORKING</span><span>عربي</span><span>تحميل مباشر</span>
-      <span>صور · صوت · نصوص · بيانات · أكواد</span><span>ZYNQ BOT ⚡</span>
-    </div>
-  </div>
+  <section class="container assistant-panel" aria-labelledby="assistant-title">
+    <div class="assistant-head"><div><span class="eyebrow">محادثة مع مساعد الملفات</span><h2 id="assistant-title">قول لي أنت محتاج إيه؟</h2></div><button class="btn btn-ghost btn-sm" type="button" id="motion-toggle" aria-pressed="false">⏸ إيقاف الحركة</button></div>
+    <div class="quick-asks" aria-label="أسئلة سريعة"><button type="button" data-ask="وريني الأنيميشن الجديد">ورّيني الأنيميشن الجديد</button><button type="button" data-ask="عايز ملفات صوت">عايز ملفات صوت</button><button type="button" data-ask="إزاي أستخدم Lottie؟">إزاي أستخدم Lottie؟</button></div>
+    <div id="chat-log" class="chat-log" role="log" aria-live="polite" aria-label="ردود المساعد"><p class="chat-message">أهلًا بيك! أقدر أبحث في الملفات وأشرح استخدام المؤثرات. اكتب طلبك بالعربي أو بالإنجليزي.</p></div>
+    <form id="chat-form" class="chat-form"><label class="sr-only" for="chat-input">طلبك للمساعد</label><input id="chat-input" type="text" maxlength="200" autocomplete="off" placeholder="مثلًا: عايز أنيميشن تحميل، أو ابحث عن برق…"><button class="btn btn-primary" type="submit">إرسال <span aria-hidden="true">↖</span></button></form>
+    <details class="voice-settings"><summary>إعدادات الصوت العربي وتجربة النطق</summary><div class="voice-settings-body"><label for="voice-select">الصوت العربي</label><select id="voice-select" disabled><option value="">جارٍ البحث عن صوت عربي…</option></select><button type="button" class="btn btn-ghost btn-sm" id="voice-refresh">تحديث الأصوات</button><button type="button" class="btn btn-ghost btn-sm" id="voice-test">جرّب نطق جملة</button><button type="button" class="btn btn-ghost btn-sm" id="voice-stop">إيقاف النطق</button><p id="voice-status" role="status">الصوت لا يبدأ تلقائيًا. اضغط «جرّب نطق جملة» لاختبار صوت جهازك.</p></div></details>
+  </section>
 
-  <!-- ================================ الملفات ================================ -->
   <section class="section" id="files">
     <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">مكتبة الملفات</span>
-        <h2>ابحث في <span class="grad">الملفات</span> وحمّل ما تحتاجه</h2>
-        <p>اكتب اسم الملف أو اختر تصنيفًا — المساعد يقرأ 결과 البحث بالعربية.</p>
+      <div class="section-head"><span class="eyebrow">المكتبة المحدّثة</span><h2>ملفات فعلية. <span class="grad">ومعاينة فعلية.</span></h2><p>افتح «معاينة» لتشوف الحركة أو تسمع الصوت، وحمّل الملف الأصلي بعد اختياره.</p></div>
+      <div class="new-pack"><div><span class="pill-new">جديد في الإصدار 2.0</span><h3>حزمة حركات البوت</h3><p>ترحيب، تفكير، موجات حديث، تحميل، نجاح، وكتابة… ملفات Lottie وSVG شفافة وقابلة للتعديل.</p></div><div class="pack-actions"><button type="button" class="btn btn-ghost" id="show-new">استعرض الحزمة</button><a class="btn btn-primary" href="/api/pack/bot.zip" download="zynq-bot-motion.zip">⬇ حمّل الحزمة ZIP</a></div></div>
+      <div class="controls">
+        <div class="search-wrap"><label class="sr-only" for="search">ابحث في الملفات</label><span aria-hidden="true">🔍</span><input id="search" type="search" placeholder="ابحث بالعربي أو الإنجليزي… أنيميشن، برق، صوت" autocomplete="off"><button type="button" id="search-clear" aria-label="مسح البحث">✕</button></div>
+        <label class="select-field">التصنيف<select id="category-select"><option value="">كل التصنيفات</option></select></label>
+        <label class="select-field">الترتيب<select id="sort-select"><option value="new">الجديد أولًا</option><option value="name">الاسم</option><option value="size">الأصغر حجمًا</option></select></label>
       </div>
-
-      <div class="controls reveal">
-        <div class="search-wrap">
-          <label class="field"><span aria-hidden="true">🔍</span>
-            <input id="search" type="text" placeholder="ابحث عن ملف بالArabic أو English…">
-          </label>
-        </div>
-        <div class="chips-wrap" id="chips"></div>
-        <div class="count" id="result-count">عرض كل الملفات (100)</div>
-      </div>
-
-      <div class="files-grid" id="files-grid"></div>
+      <div class="group-tabs" id="group-tabs" aria-label="نوع الملفات"><button type="button" data-group="all" aria-pressed="true">الكل</button><button type="button" data-group="effects" aria-pressed="false">المؤثرات والحركة</button><button type="button" data-group="images" aria-pressed="false">الصور والتصميم</button><button type="button" data-group="audio" aria-pressed="false">الصوت</button><button type="button" data-group="documents" aria-pressed="false">النصوص والبيانات</button><button type="button" data-group="code" aria-pressed="false">الأكواد</button></div>
+      <div class="result-bar"><p id="result-count" role="status">جارٍ تحميل قائمة الملفات…</p><button class="text-btn" type="button" id="reset-filters">إعادة ضبط الفلاتر</button></div>
+      <div class="files-grid" id="files-grid" aria-busy="true"></div>
+      <div class="empty" id="empty" hidden><span aria-hidden="true">🔎</span><h3>لم أجد ملفًا بهذا الوصف</h3><p>جرّب كلمة أقصر أو أعد ضبط الفلاتر.</p><button class="btn btn-ghost" type="button" id="empty-reset">اعرض كل الملفات</button></div>
+      <nav class="pagination" aria-label="صفحات الملفات"><button class="btn btn-ghost btn-sm" type="button" id="prev-page">السابق</button><span id="page-label"></span><button class="btn btn-ghost btn-sm" type="button" id="next-page">التالي</button></nav>
+      <p class="download-status" id="download-status" role="status"></p>
     </div>
   </section>
 
-  <!-- ================================ كيف يعمل ================================ -->
-  <section class="section how">
-    <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">كيف يساعدك الروبوت</span>
-        <h2>ثلاث خطوات فقط</h2>
-      </div>
-      <div class="steps">
-        <div class="step reveal">
-          <span class="num">1</span>
-          <h4>ابحث أو صنّف</h4>
-          <p>اكتب اسم الملف في البحث، أو اضغط على تصنيف لعرض ملفاته فقط.</p>
-        </div>
-        <div class="step reveal">
-          <span class="num">2</span>
-          <h4>استمع للمساعد</h4>
-          <p>يقرّرك المساعد عدد النتائج بالعربية، ويُرشدك عند فتح أي ملف.</p>
-        </div>
-        <div class="step reveal">
-          <span class="num">3</span>
-          <h4>حمّل الملف</h4>
-          <p>اضغط «تحميل» على أي بطاقة — الملف يُنزَّل مباشرة إلى جهازك، والمساعد يعلن عن اكتمال البدء.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <section class="section how"><div class="container"><div class="section-head"><span class="eyebrow">من الاختيار إلى الاستخدام</span><h2>ثلاث خطوات واضحة</h2></div><div class="steps"><article class="step"><span class="num">1</span><h3>اسأل أو ابحث</h3><p>اكتب طلبك للمساعد، أو استخدم البحث والتصنيفات. البحث العربي يتجاهل التشكيل ويوحّد الألف والياء.</p></article><article class="step"><span class="num">2</span><h3>عاين قبل التنزيل</h3><p>المؤثرات المتحركة تُعرض من ملفاتها الأصلية. الصوت يعمل فقط عندما تضغط تشغيل.</p></article><article class="step"><span class="num">3</span><h3>حمّل واستخدم</h3><p>حمّل ملفًا مستقلًا أو الحزمة كاملة. كل معاينة تعرض الصيغة وطريقة الاستخدام والبرامج المناسبة.</p></article></div></div></section>
 </main>
-
-<footer class="foot">
-  <div class="container foot-in">
-    <p>ZYNQ FX — مساعد الملفات الآلي © 2026 — الروبوت يتكلم العربية وجميع الملفات عاملة ✓</p>
-    <div class="foot-links">
-      <a href="../index.html">ZYNQ FX</a>
-      <a href="../bot/index.html">مختبر الروبوت</a>
-      <a href="#files">الملفات</a>
-    </div>
-  </div>
-</footer>
-
-<script src="../bot/bot-engine.js"></script>
-<script src="app.js"></script>
+<footer class="foot"><div class="container foot-in"><p>ZYNQ FX © 2026 — مساعد الملفات العربي · الإصدار 2.0</p><div class="foot-links"><a href="../index.html">المكتبة</a><a href="../bot/index.html">مختبر البوت</a><a href="#files">الملفات</a></div></div></footer>
+<dialog id="file-dialog" class="file-dialog" aria-labelledby="dialog-title"><div class="dialog-head"><div><span class="eyebrow" id="dialog-category"></span><h2 id="dialog-title">معاينة الملف</h2></div><button type="button" class="icon-btn" id="dialog-close" aria-label="إغلاق المعاينة">✕</button></div><div id="dialog-preview" class="dialog-preview"></div><div class="dialog-meta" id="dialog-meta"></div><p id="dialog-desc"></p><div class="usage"><h3>طريقة الاستخدام</h3><p id="dialog-usage"></p></div><div class="dialog-actions"><button class="btn btn-primary" type="button" id="dialog-download">⬇ تحميل الملف الأصلي</button><button class="btn btn-ghost" type="button" id="dialog-speak">🔊 اقرأ الوصف</button><button class="btn btn-ghost" type="button" id="preview-toggle" aria-pressed="false" hidden>⏸ إيقاف المعاينة</button></div></dialog>
+<script src="../bot/bot-engine.js?v=2.0.0"></script>
+<script src="../bot/voice-controls.js?v=2.0.0"></script>
+<script src="../vendor/lottie-5.13.0.min.js"></script>
+<script src="../bot/preview.js?v=2.0.0"></script>
+<script src="app.js?v=2.0.0"></script>
 </body>
 </html>

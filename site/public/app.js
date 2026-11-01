@@ -472,6 +472,10 @@ async function boot() {
     }
   }
   state.catalog = catalog;
+  const assetCounter = document.querySelector('.hero-stats [data-count="50"]');
+  const categoryCounter = document.querySelector('.hero-stats [data-count="11"]');
+  if (assetCounter) assetCounter.dataset.count = catalog.items.length;
+  if (categoryCounter) categoryCounter.dataset.count = catalog.categories.length;
 
   renderPrograms();
   renderChips();

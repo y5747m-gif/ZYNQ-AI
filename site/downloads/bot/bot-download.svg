@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="zy-bot-svg bot-download" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+<title id="title">تنزيل هادئ</title><desc id="desc">سهم تنزيل مع حلقة تقدم زخرفية.</desc>
+<style>
+.bot-download .motion{animation:zy-float 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.bot-download .delay{animation-delay:.6s}.bot-download .spin{animation:zy-spin 5s linear infinite;transform-origin:256px 256px}
+@keyframes zy-float{0%,100%{transform:translateY(0);opacity:.85}50%{transform:translateY(-12px);opacity:1}}
+@keyframes zy-spin{to{transform:rotate(360deg)}}
+@keyframes zy-scan{0%,100%{transform:translateY(0)}50%{transform:translateY(210px)}}
+@keyframes zy-ring{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+@keyframes zy-dots{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-5px)}}
+@keyframes zy-sleep{0%,100%{opacity:.4;transform:translate(0,0)}50%{opacity:1;transform:translate(10px,-20px)}}
+
+@media(prefers-reduced-motion:reduce){.bot-download .motion,.bot-download .spin{animation:none!important}}
+</style><circle cx="256" cy="256" r="160" fill="#151025" stroke="#493761" stroke-width="12"/><circle class="spin" cx="256" cy="256" r="160" fill="none" stroke="#a878ff" stroke-width="12" stroke-dasharray="220 785" stroke-linecap="round"/><g class="motion" fill="none" stroke="#5fd4ff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"><path d="M256 155v155m-60-60l60 60 60-60M176 345h160"/></g></svg>

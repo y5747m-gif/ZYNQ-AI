@@ -6,4 +6,6 @@
   color: #fff;
   background: #0b0e16;
 }
-.bot-card-1:hover { border-color: #ffd23f; }
+.bot-card-1:hover { border-color: #ffd23f; animation: card-float-1 1.8s ease-in-out infinite; }
+@keyframes card-float-1 { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { .bot-card-1:hover { animation: none; } }

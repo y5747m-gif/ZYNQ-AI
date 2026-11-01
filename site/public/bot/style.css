@@ -451,3 +451,7 @@ p { margin: 0 0 14px; color: var(--muted); }
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+.assistant-voice{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:22px;font-size:.85rem}
+.assistant-voice select{background:var(--bg);color:var(--ink);border:1px solid var(--line-strong);border-radius:9px;padding:9px;max-width:100%;min-width:200px}
+.assistant-voice p{flex-basis:100%;color:var(--muted);font-size:.8rem;margin:0}
