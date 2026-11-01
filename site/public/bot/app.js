@@ -225,8 +225,6 @@
   const input = $('#say-input');
   const sayBtn = $('#say-btn');
   const log = $('#say-log');
-  const muteBtn = $('#btn-mute');
-  const modeBtn = $('#mode-toggle');
 
   const quick = ['أهلًا بك في ZYNQ FX!', 'ملفّك جاهز للتحميل ⚡', 'فكرة رائعة! لنبدأ.', 'جارٍ معالجة الطلب…'];
 
@@ -238,7 +236,7 @@
       stage.setPose(['stand', 'present', 'thumbs'][Math.floor(Math.random() * 3)]);
     }
     bubble(stageSpeech, t, 4200);
-    if (log) log.innerHTML = `<b>الروبوت:</b> ${t.replace(/[<>&]/g, '')}`;
+    if (log) log.textContent = 'الروبوت: ' + t;
   }
 
   if (sayBtn) sayBtn.addEventListener('click', () => say(input ? input.value : ''));
@@ -264,26 +262,7 @@
     });
   });
 
-  if (muteBtn) {
-    muteBtn.addEventListener('click', () => {
-      const muted = Bot.voice.setMuted(!Bot.voice.muted);
-      muteBtn.textContent = muted ? '🔇' : '🔊';
-      muteBtn.classList.toggle('is-off', muted);
-      muteBtn.setAttribute('aria-pressed', String(muted));
-      if (!muted) Bot.voice.sfx('ok');
-    });
-  }
-
-  if (modeBtn) {
-    modeBtn.addEventListener('click', () => {
-      const beep = Bot.voice.mode !== 'beep';
-      Bot.voice.mode = beep ? 'beep' : 'auto';
-      modeBtn.setAttribute('aria-pressed', String(beep));
-      modeBtn.classList.toggle('is-on', beep);
-      modeBtn.textContent = beep ? 'لغة الروبوت فقط (نغمات) ✓' : 'لغة الروبوت فقط (نغمات)';
-      if (stage) stage.say(beep ? 'أتكلم الآن بلغة الروبوت: بيب بيب!' : 'عدت إلى العربية!', { expression: 'happy', duration: 2400 });
-    });
-  }
+  window.ZynqVoiceControls.init({ testText: () => input && input.value.trim() ? input.value.trim() : 'أهلًا! أنا روبوت زينك، وأتحدث معك بالعربية.' });
 
   // ------------------------------------------------------------ مؤشّر الصوت
   const meterBar = $('#meter-bar');
@@ -355,13 +334,5 @@
     $$('.reveal').forEach((el) => el.classList.add('is-in'));
   }
 
-  // لمسة أخيرة: الروبوت يحيّي الزائر بلا صوت عند أول تفاعل
-  let greeted = false;
-  document.addEventListener('pointerdown', function onFirst() {
-    if (greeted) return;
-    greeted = true;
-    Bot.voice.ensure();
-    if (hero) hero.setPose('wave');
-    document.removeEventListener('pointerdown', onFirst);
-  }, { once: false });
+  // لا ننشئ سياق صوت ولا ننطق عند أي نقرة عشوائية في الصفحة.
 })();

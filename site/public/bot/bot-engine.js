@@ -1,7 +1,7 @@
 /* ==========================================================================
    ZYNQ BOT — محرّك الشخصية
    شخصية الروبوت مرسومة بالكامل بـ SVG (بلا صور)، ووجوهها متحركة بـ CSS،
-   وأصواتها تُولَّد لحظيًا بـ Web Audio (بلا ملفات صوت) — تعمل بلا إنترنت.
+   النطق العربي عبر أصوات الجهاز، والنغمات الاختيارية تُولَّد بـ Web Audio.
    --------------------------------------------------------------------------
    واجهة الاستخدام:
      ZynqBot.mount(element, { pose, eyes, mouth, mini, view, alive, onSay })
@@ -139,9 +139,6 @@
         <text class="logo-text" y="27" text-anchor="middle" font-size="13" font-weight="800" letter-spacing="0.3" fill="#ffffff">ZYNQ <tspan fill="#ffd23f">FX</tspan></text>
       </g>
     </g>
-
-    <!-- الرقبة -->
-    <rect class="neck" x="104" y="140" width="32" height="26" rx="10" fill="#0d1220"/>
 
     <!-- الرقبة -->
     <rect class="neck" x="104" y="140" width="32" height="26" rx="10" fill="#0d1220"/>
@@ -320,20 +317,37 @@
 </svg>`;
   }
 
-  // ================================================================ الأصوات
+  // ================================================================ الصوت العربي
+  // النطق العربي يحتاج صوتًا عربيًا مثبتًا في المتصفح/نظام التشغيل.
+  // لا نستبدله بصوت أجنبي، ولا ندّعي أن النغمات كلام عربي.
+  const VOICE_DEFAULTS = { muted: false, voiceURI: '' };
+  try {
+    VOICE_DEFAULTS.muted = localStorage.getItem('zynq-bot-muted') === '1';
+    VOICE_DEFAULTS.voiceURI = localStorage.getItem('zynq-bot-voice') || '';
+  } catch (_) { /* التخزين اختياري */ }
+
   const Voice = {
     ctx: null,
     master: null,
     analyser: null,
-    muted: false,
-    mode: 'auto', // auto | arabic | beep
+    muted: VOICE_DEFAULTS.muted,
+    mode: 'arabic', // Arabic by default; beeps are an explicit, separate choice.
     speaking: false,
+    pending: false,
+    language: 'ar',
     _voice: null,
-    _raf: null,
+    _voices: [],
+    _preferredURI: VOICE_DEFAULTS.voiceURI,
     _timers: [],
+    _nodes: new Set(),
+    _listeners: new Set(),
+    _generation: 0,
+    _utterance: null,
+    _last: { engine: 'none', reason: 'idle', text: '' },
 
-    /** إنشاء سياق الصوت (يجب أن يكون بعد تفاعل المستخدم). */
+    /** No sound is created here. Call only from an explicit sound action. */
     ensure() {
+      if (this.muted) return null;
       if (!this.ctx) {
         const AC = global.AudioContext || global.webkitAudioContext;
         if (!AC) return null;
@@ -348,48 +362,101 @@
           this.analyser.connect(this.ctx.destination);
         } catch (_) { return null; }
       }
-      if (this.ctx.state === 'suspended') { try { this.ctx.resume(); } catch (_) { /* تجاهل */ } }
-      this._loadVoices();
+      if (this.ctx.state === 'suspended') {
+        try { Promise.resolve(this.ctx.resume()).catch(() => {}); } catch (_) { /* optional */ }
+      }
       return this.ctx;
+    },
+
+    subscribe(listener) {
+      this._listeners.add(listener);
+      return () => this._listeners.delete(listener);
+    },
+
+    _emit(detail) {
+      for (const listener of this._listeners) {
+        try { listener(detail); } catch (_) { /* UI errors must not stop speech */ }
+      }
+      try { global.dispatchEvent(new CustomEvent('zynqbot:voice', { detail })); } catch (_) { /* non-browser test */ }
+    },
+
+    refreshVoices() {
+      if (!('speechSynthesis' in global)) return [];
+      try {
+        const all = global.speechSynthesis.getVoices() || [];
+        this._voices = Array.from(all).filter((v) => /^ar(?:[-_]|$)/i.test(v.lang || ''));
+        const rank = (v) => {
+          const lang = String(v.lang).replace('_', '-').toLowerCase();
+          return lang === 'ar-eg' ? 0 : lang === 'ar-sa' ? 1 : lang === 'ar' ? 2 : 3;
+        };
+        this._voices.sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
+        this._voice = this._voices.find((v) => v.voiceURI === this._preferredURI) || this._voices[0] || null;
+      } catch (_) { this._voices = []; this._voice = null; }
+      this._emit({ state: 'voices', status: this.status() });
+      return this.arabicVoices();
+    },
+
+    _loadVoices() { return this.refreshVoices(); },
+    arabicVoices() { return this._voices.slice(); },
+
+    setVoice(uri) {
+      const voice = this._voices.find((v) => v.voiceURI === uri);
+      if (!voice) return false;
+      this.stop();
+      this._voice = voice;
+      this._preferredURI = uri;
+      try { localStorage.setItem('zynq-bot-voice', uri); } catch (_) { /* optional */ }
+      this._emit({ state: 'voices', status: this.status() });
+      return true;
+    },
+
+    setMode(mode) {
+      this.stop();
+      this.mode = mode === 'beep' ? 'beep' : 'arabic';
+      this._emit({ state: 'mode', status: this.status() });
+      return this.mode;
+    },
+
+    status() {
+      return {
+        supported: 'speechSynthesis' in global && 'SpeechSynthesisUtterance' in global,
+        available: !!this._voice,
+        voice: this._voice ? { name: this._voice.name, lang: this._voice.lang, uri: this._voice.voiceURI } : null,
+        muted: this.muted, mode: this.mode, speaking: this.speaking, pending: this.pending,
+        engine: this._last.engine, reason: this._last.reason,
+      };
     },
 
     setMuted(m) {
       this.muted = !!m;
-      if (this.muted) {
-        this.stop();
-        if ('speechSynthesis' in global) { try { global.speechSynthesis.cancel(); } catch (_) { /* تجاهل */ } }
+      if (this.muted) this.stop();
+      if (this.master && this.ctx) {
+        this.master.gain.cancelScheduledValues(this.ctx.currentTime);
+        this.master.gain.setTargetAtTime(this.muted ? 0 : 0.55, this.ctx.currentTime, 0.015);
       }
-      if (this.master) this.master.gain.value = this.muted ? 0 : 0.55;
+      try { localStorage.setItem('zynq-bot-muted', this.muted ? '1' : '0'); } catch (_) { /* optional */ }
+      this._emit({ state: this.muted ? 'muted' : 'idle', status: this.status() });
       return this.muted;
     },
 
     stop() {
+      ++this._generation;
       this.speaking = false;
-      for (const t of this._timers) clearTimeout(t);
+      this.pending = false;
+      for (const timer of this._timers) clearTimeout(timer);
       this._timers = [];
-      if (this.ctx) {
-        try {
-          // أغلق كل العُقد النشطة عبر إخماد سريع
-          const now = this.ctx.currentTime;
-          this.master.gain.cancelScheduledValues(now);
-          this.master.gain.setTargetAtTime(0, now, 0.03);
-          this.master.gain.setTargetAtTime(this.muted ? 0 : 0.55, now + 0.08, 0.05);
-        } catch (_) { /* تجاهل */ }
+      const utterance = this._utterance;
+      this._utterance = null;
+      if (utterance) { utterance.onstart = utterance.onend = utterance.onerror = null; }
+      if (this._last.engine === 'speech' && 'speechSynthesis' in global) {
+        try { global.speechSynthesis.cancel(); } catch (_) { /* optional */ }
       }
+      for (const node of this._nodes) { try { node.stop(); } catch (_) { /* already stopped */ } }
+      this._nodes.clear();
+      this._last = { engine: 'none', reason: 'stopped', text: '' };
+      this._emit({ state: 'idle', status: this.status() });
     },
 
-    _loadVoices() {
-      if (!('speechSynthesis' in global)) return;
-      const pick = () => {
-        const vs = global.speechSynthesis.getVoices() || [];
-        const ar = vs.filter((v) => /^ar/i.test(v.lang || ''));
-        this._voice = ar.find((v) => /female|هالة|salma|zariyah|hoda|laila|amina/i.test(v.name)) || ar[0] || null;
-      };
-      pick();
-      try { global.speechSynthesis.onvoiceschanged = pick; } catch (_) { /* تجاهل */ }
-    },
-
-    /** نغمة روبوت واحدة */
     tone(freq, dur, opts) {
       const o = opts || {};
       const ctx = this.ensure();
@@ -404,121 +471,173 @@
       osc.type = o.type || 'square';
       osc.frequency.setValueAtTime(freq, t0);
       if (o.glide) osc.frequency.exponentialRampToValueAtTime(o.glide, t0 + dur);
-      const peak = (o.gain == null ? 0.12 : o.gain);
+      const peak = o.gain == null ? 0.12 : o.gain;
       gain.gain.setValueAtTime(0.0001, t0);
       gain.gain.exponentialRampToValueAtTime(peak, t0 + 0.012);
       gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
       osc.connect(filter); filter.connect(gain); gain.connect(this.master);
+      this._nodes.add(osc);
+      osc.onended = () => {
+        this._nodes.delete(osc);
+        osc.disconnect(); filter.disconnect(); gain.disconnect();
+      };
       osc.start(t0);
       osc.stop(t0 + dur + 0.02);
     },
 
     sfx(name) {
       if (this.muted) return;
-      this.ensure();
       const n = String(name || 'click');
       switch (n) {
         case 'greet':
-          [523, 659, 784, 1046].forEach((f, i) => this.tone(f, 0.12, { delay: i * 0.085, type: 'triangle', gain: 0.11 }));
-          this.tone(1568, 0.22, { delay: 0.36, type: 'sine', gain: 0.06 });
+          [523, 659, 784, 1046].forEach((f, i) => this.tone(f, 0.12, { delay: i * 0.085, type: 'triangle', gain: 0.07 }));
           break;
         case 'ok':
-          this.tone(880, 0.1, { gain: 0.1 });
-          this.tone(1318, 0.16, { delay: 0.09, gain: 0.09 });
+          this.tone(880, 0.1, { gain: 0.07 });
+          this.tone(1318, 0.16, { delay: 0.09, gain: 0.06 });
           break;
         case 'error':
-          this.tone(220, 0.16, { gain: 0.11, type: 'sawtooth', cutoff: 900 });
-          this.tone(174, 0.28, { delay: 0.14, gain: 0.1, type: 'sawtooth', cutoff: 700 });
+          this.tone(220, 0.16, { gain: 0.07, type: 'sawtooth', cutoff: 900 });
+          this.tone(174, 0.28, { delay: 0.14, gain: 0.06, type: 'sawtooth', cutoff: 700 });
           break;
         case 'laugh':
-          for (let i = 0; i < 5; i++) {
-            this.tone(720 - i * 26, 0.075, { delay: i * 0.1, type: 'triangle', gain: 0.09, glide: 520 });
-          }
+          for (let i = 0; i < 5; i++) this.tone(720 - i * 26, 0.075, { delay: i * 0.1, type: 'triangle', gain: 0.07, glide: 520 });
           break;
         case 'scan':
-          this.tone(420, 0.5, { type: 'sine', gain: 0.08, glide: 1700, cutoff: 4000 });
-          this.tone(840, 0.5, { type: 'triangle', gain: 0.04, delay: 0.05, glide: 2400 });
+          this.tone(420, 0.5, { type: 'sine', gain: 0.06, glide: 1700, cutoff: 4000 });
           break;
         case 'alert':
-          this.tone(1046, 0.09, { gain: 0.1 });
-          this.tone(1046, 0.09, { delay: 0.14, gain: 0.1 });
+          this.tone(1046, 0.09, { gain: 0.07 });
+          this.tone(1046, 0.09, { delay: 0.14, gain: 0.07 });
           break;
         case 'power':
-          this.tone(160, 0.5, { type: 'sawtooth', gain: 0.09, glide: 900, cutoff: 1600 });
-          this.tone(1200, 0.16, { delay: 0.42, type: 'sine', gain: 0.07 });
-          break;
-        case 'pop':
-          this.tone(980, 0.07, { type: 'sine', gain: 0.1, glide: 1400 });
+          this.tone(160, 0.5, { type: 'sawtooth', gain: 0.06, glide: 900, cutoff: 1600 });
+          this.tone(1200, 0.16, { delay: 0.42, type: 'sine', gain: 0.05 });
           break;
         case 'boing':
-          this.tone(320, 0.24, { type: 'triangle', gain: 0.1, glide: 760, cutoff: 2000 });
+          this.tone(320, 0.24, { type: 'triangle', gain: 0.07, glide: 760, cutoff: 2000 });
           break;
-        default:
-          this.tone(660, 0.07, { gain: 0.09 });
+        case 'pop':
+          this.tone(980, 0.07, { type: 'sine', gain: 0.07, glide: 1400 });
+          break;
+        default: this.tone(660, 0.07, { gain: 0.06 });
       }
     },
 
-    /** لغة الروبوت: نغمة قصيرة لكل مقطع بدل الكلام */
-    chant(text) {
-      if (this.muted) return;
-      this.ensure();
+    /** Explicit robot tones, never represented as Arabic speech. */
+    chant(text, options) {
+      const opt = options || {};
+      if (this.muted) return { spoken: false, text: String(text || ''), engine: 'beep', reason: 'beep-mode' };
+      this.stop();
+      if (!this.ensure()) return { spoken: false, text: String(text || ''), engine: 'none', reason: 'audio-unavailable' };
+      const generation = this._generation;
       const words = String(text || '').trim().split(/\s+/).filter(Boolean);
       const count = Math.max(3, Math.min(14, words.length * 2 + 1));
       const scale = [392, 440, 523, 587, 659, 784, 880];
       let seed = 7;
       for (const ch of String(text || '')) seed = (seed * 31 + ch.charCodeAt(0)) % 9973;
       this.speaking = true;
+      this._last = { engine: 'beep', reason: 'beep-mode', text: String(text || '') };
+      this._emit({ state: 'start', status: this.status() });
+      if (opt.onStart) opt.onStart();
       for (let i = 0; i < count; i++) {
-        const f = scale[(seed + i * 3) % scale.length] * (i % 4 === 0 ? 1 : 1);
-        const dur = 0.075 + ((seed >> i) % 3) * 0.02;
-        this.tone(f, dur, { delay: i * 0.1, type: i % 3 === 0 ? 'triangle' : 'square', gain: 0.085, cutoff: 2600 });
+        this.tone(scale[(seed + i * 3) % scale.length], 0.075 + ((seed >> i) % 3) * 0.02,
+          { delay: i * 0.1, type: i % 3 === 0 ? 'triangle' : 'square', gain: 0.065, cutoff: 2600 });
       }
-      const total = count * 0.1 * 1000 + 220;
-      this._timers.push(setTimeout(() => { this.speaking = false; }, total));
+      this._timers.push(setTimeout(() => {
+        if (generation === this._generation) {
+          const result = { spoken: false, text: String(text || ''), engine: 'beep', reason: 'beep-mode' };
+          if (opt.onEnd) opt.onEnd(result);
+          this.stop();
+        }
+      }, count * 100 + 240));
+      return { spoken: false, text: String(text || ''), engine: 'beep', reason: 'beep-mode' };
     },
 
-    /** يتكلّم: كلام عربي إن توفّر صوت، وإلا لغة الروبوت */
-    speak(text) {
-      const t = String(text || '').trim();
-      if (!t || this.muted) return { spoken: false, text: t };
-      this.ensure();
-
-      const wantArabic = this.mode !== 'beep';
-      const hasAr = this._voice && ('speechSynthesis' in global);
-
-      if (wantArabic && hasAr) {
-        try {
-          const synth = global.speechSynthesis;
-          synth.cancel();
-          const u = new global.SpeechSynthesisUtterance(t);
-          u.voice = this._voice;
-          u.lang = this._voice.lang || 'ar-SA';
-          u.pitch = 1.55;
-          u.rate = 1.02;
-          u.volume = 1;
-          u.onstart = () => { this.speaking = true; };
-          u.onend = () => { this.speaking = false; };
-          u.onerror = () => { this.speaking = false; };
-          this.speaking = true;
-          synth.speak(u);
-          this.sfx('pop');
-          return { spoken: true, engine: 'speech' };
-        } catch (_) { /* يسقط إلى النغمات */ }
+    /** Queues Arabic speech only after a user action; callbacks report real engine events. */
+    speak(text, options) {
+      const t = String(text || '').trim().slice(0, 1200);
+      const opt = options || {};
+      if (!t) return { spoken: false, text: t, engine: 'none', reason: 'empty' };
+      if (this.muted) {
+        this._emit({ state: 'muted', status: this.status() });
+        return { spoken: false, text: t, engine: 'none', reason: 'muted' };
       }
-
-      this.chant(t);
-      return { spoken: true, engine: 'beep' };
+      if (this.mode === 'beep') {
+        return this.chant(t, opt);
+      }
+      this.stop();
+      this.refreshVoices();
+      if (!this._voice || !('SpeechSynthesisUtterance' in global)) {
+        this._last = { engine: 'none', reason: 'no-arabic-voice', text: t };
+        this._emit({ state: 'unavailable', status: this.status() });
+        const result = { spoken: false, text: t, engine: 'none', reason: 'no-arabic-voice' };
+        if (opt.onEnd) opt.onEnd(result);
+        return result;
+      }
+      const generation = this._generation;
+      let settled = false;
+      const finish = (reason) => {
+        if (settled || generation !== this._generation) return;
+        settled = true;
+        this.speaking = false;
+        this.pending = false;
+        this._utterance = null;
+        this._last = { engine: 'speech', reason, text: t };
+        clearTimeout(safety);
+        if (reason === 'timeout' && 'speechSynthesis' in global) {
+          try { global.speechSynthesis.cancel(); } catch (_) { /* optional */ }
+        }
+        const result = { spoken: reason === 'end', text: t, engine: 'speech', reason };
+        // Finish this turn before broadcasting idle: subscribers may retire its generation.
+        if (opt.onEnd) opt.onEnd(result);
+        this._emit({ state: reason === 'end' ? 'idle' : 'error', status: this.status() });
+      };
+      const safety = setTimeout(() => finish('timeout'), 60000);
+      this._timers.push(safety);
+      try {
+        const utterance = new global.SpeechSynthesisUtterance(t);
+        this._utterance = utterance;
+        utterance.voice = this._voice;
+        utterance.lang = this._voice.lang || 'ar-EG';
+        utterance.pitch = 1.12;
+        utterance.rate = 0.98;
+        utterance.volume = 1;
+        utterance.onstart = () => {
+          if (generation !== this._generation || settled) return;
+          this.pending = false;
+          this.speaking = true;
+          this._emit({ state: 'start', status: this.status() });
+          if (opt.onStart) opt.onStart();
+        };
+        utterance.onend = () => finish('end');
+        utterance.onerror = (event) => finish(event && event.error || 'speech-error');
+        this.pending = true;
+        this._last = { engine: 'speech', reason: 'queued', text: t };
+        this._emit({ state: 'pending', status: this.status() });
+        global.speechSynthesis.speak(utterance);
+        return { spoken: false, queued: true, text: t, engine: 'speech', reason: 'queued' };
+      } catch (_) {
+        finish('speech-error');
+        return { spoken: false, text: t, engine: 'none', reason: 'speech-error' };
+      }
     },
 
     level() {
-      if (!this.analyser) return 0;
+      if (!this.analyser || this.muted) return 0;
       const data = new Uint8Array(this.analyser.frequencyBinCount);
       this.analyser.getByteFrequencyData(data);
       let sum = 0;
       for (let i = 0; i < data.length; i++) sum += data[i];
       return sum / data.length / 255;
-    }
+    },
   };
+  Voice.refreshVoices();
+  if ('speechSynthesis' in global) {
+    try { global.speechSynthesis.addEventListener('voiceschanged', () => Voice.refreshVoices()); } catch (_) { /* older browsers */ }
+  }
+  global.addEventListener('pagehide', () => Voice.stop());
+
 
   // ============================================================== النسخة الحيّة
   function mount(host, opts) {
@@ -531,7 +650,23 @@
     let pose = o.pose || 'stand';
     let faceId = o.eyes && FACE_BY_ID[o.eyes] ? o.eyes : (o.expression || 'idle');
     const alive = o.alive !== false;
-    const timers = [];
+    const timers = new Set();
+    let destroyed = false;
+    let sayGeneration = 0;
+    let talking = false;
+    const later = (fn, ms) => {
+      const timer = setTimeout(() => { timers.delete(timer); if (!destroyed) fn(); }, ms);
+      timers.add(timer);
+      return timer;
+    };
+    const unsubscribeVoice = Voice.subscribe((event) => {
+      if (talking && ['idle', 'muted', 'error', 'unavailable'].includes(event.state)) stopTalking();
+    });
+    const stopTalking = () => {
+      ++sayGeneration;
+      talking = false;
+      svg.classList.remove('is-talking');
+    };
 
     const setFace = (id, opts2) => {
       const f = FACE_BY_ID[id] || FACE_BY_ID.idle;
@@ -558,7 +693,7 @@
 
     // تتبّع المؤشّر: العين والرأس يتابعان الزائر
     const onMove = (ev) => {
-      if (!alive) return;
+      if (!alive || global.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const r = svg.getBoundingClientRect();
       if (!r.width || !r.height) return;
       const x = Math.max(-1, Math.min(1, ((ev.clientX - r.left) / r.width) * 2 - 1));
@@ -575,16 +710,16 @@
     const blinkLoop = () => {
       if (!alive) return;
       const wait = 2400 + Math.random() * 4200;
-      timers.push(setTimeout(() => {
+      later(() => {
         if (svg.getAttribute('data-eyes') === 'open' && !this_isBusy()) {
           const g = svg.querySelector('.eyes-open');
           if (g) {
             g.classList.add('is-blinking');
-            timers.push(setTimeout(() => g.classList.remove('is-blinking'), 130));
+            later(() => g.classList.remove('is-blinking'), 130);
           }
         }
         blinkLoop();
-      }, wait));
+      }, wait);
     };
     const this_isBusy = () => svg.classList.contains('is-talking');
 
@@ -605,27 +740,36 @@
       get expression() { return faceId; },
       setPose,
       setExpression(id, opts2) { return setFace(id, opts2); },
-      /** يتكلّم ويُظهر تعبيرًا أثناء الكلام */
+      /** النص يظهر دائمًا؛ النطق العربي مشروط بوجود صوت عربي في الجهاز. */
       say(text, options) {
         const opt = options || {};
-        const expr = opt.expression || 'happy';
         const before = faceId;
-        if (opt.expression !== null) setFace(expr);
-        svg.classList.add('is-talking');
-        const res = Voice.speak(text);
-        if (opt.sfx) Voice.sfx(opt.sfx);
-        if (opt.onSay) { try { opt.onSay(text); } catch (_) { /* تجاهل */ } }
-        const dur = opt.duration || Math.min(7000, Math.max(1400, String(text).length * 95));
-        timers.push(setTimeout(() => {
+        // Cancel the previous utterance before assigning this turn's generation.
+        // Voice.stop notifies subscribers; otherwise it could invalidate this new turn.
+        Voice.stop();
+        const generation = ++sayGeneration;
+        if (opt.expression !== null) setFace(opt.expression || 'happy');
+        if (opt.onSay) { try { opt.onSay(String(text)); } catch (_) { /* تجاهل */ } }
+        const finish = () => {
+          if (destroyed || generation !== sayGeneration) return;
+          talking = false;
           svg.classList.remove('is-talking');
           if (opt.restore !== false) setFace(opt.then || before);
-        }, dur));
+        };
+        const res = Voice.speak(text, {
+          onStart: () => { if (generation === sayGeneration) svg.classList.add('is-talking'); },
+          onEnd: finish,
+        });
+        talking = !!res.queued || res.engine === 'beep';
+        svg.classList.toggle('is-talking', talking);
+        if (opt.sfx) Voice.sfx(opt.sfx);
+        if (!talking) finish();
         return res;
       },
-      wave() {
+      wave(options) {
         setPose('wave');
-        Voice.sfx('greet');
-        timers.push(setTimeout(() => { if (pose === 'wave') setPose('stand'); }, 2600));
+        if (!options || !options.silent) Voice.sfx('greet');
+        later(() => { if (pose === 'wave') setPose('stand'); }, 2600);
       },
       react() {
         const items = [
@@ -640,12 +784,17 @@
         setFace(it.f);
         Voice.sfx(it.s);
         svg.classList.add('is-bouncing');
-        timers.push(setTimeout(() => svg.classList.remove('is-bouncing'), 700));
+        later(() => svg.classList.remove('is-bouncing'), 700);
         return it.f;
       },
+      stop() { stopTalking(); Voice.stop(); },
       destroy() {
+        destroyed = true;
+        unsubscribeVoice();
+        stopTalking();
+        if (talking) Voice.stop();
         for (const t of timers) clearTimeout(t);
-        timers.length = 0;
+        timers.clear();
         if (alive) {
           global.removeEventListener('pointermove', onMove);
           global.removeEventListener('pointerleave', onLeave);
@@ -670,6 +819,7 @@
   }
 
   global.ZynqBot = {
+    version: '2.0.0',
     mount,
     applyTheme,
     POSES,

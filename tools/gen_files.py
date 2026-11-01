@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # ===========================================================================
 #  ZYNQ FX — مولّد ملفات المساعد الآلي (الروبوت)
-#  ينشئ 100 ملف متنوّع عاملاً جميعاً، مع بيانệt عربي (files.json)
+#  ينشئ 100 ملف أساسي ويدمج 50 مؤثرًا من الكتالوج في بيان عربي واحد (files.json)
 #  يستخدم مكتبة Python القياسية فقط — بلا أيّ مكتبات خارجية.
 #  التشغيل:  python3 tools/gen_files.py
 # ===========================================================================
 import os, struct, zlib, json, wave, math, zipfile, io, random
+from pathlib import Path
 from datetime import datetime, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,6 +30,7 @@ CATEGORIES_AR = {
     'js': 'سكريبتات',
     'css': 'أنماط CSS',
     'zip': 'حزم مضغوطة',
+    'effects': 'مؤثرات وأنيميشن',
 }
 
 CAT_ARABIC = {
@@ -60,10 +62,12 @@ MIME = {
     'js': 'text/javascript; charset=utf-8',
     'css': 'text/css; charset=utf-8',
     'zip': 'application/zip',
+    'gif': 'image/gif',
+    'cube': 'text/plain; charset=utf-8',
 }
 
 def png(w, h, px):
-    """مُرمِّز PNG مصغَّر (فلتر無، RGBA مضغوط بـ deflate)."""
+    """مُرمِّز PNG مصغَّر (فلتر صفري، RGBA مضغوط بـ deflate)."""
     raw = bytearray()
     for row in px:
         raw.append(0)  # فلتر لا شيء
@@ -108,7 +112,7 @@ def tone(freq, dur, sr=22050, kind='sine', vol=0.5):
             v = random.uniform(-1, 1)
         else:
             v = 0
-        out.append(v * vol * (1 - i / n))  #微弱 تناقص في النهاية
+        out.append(v * vol * (1 - i / n))  # تناقص تدريجي في النهاية
     return out
 
 def chord(freqs, dur, sr=22050, kind='sine', vol=0.3):
@@ -135,7 +139,16 @@ AR_WORDS = [
 ]
 
 def lorem_ar(n=40):
-    return ' '.join(random.choice(AR_WORDS) for _ in range(n))
+    sentences = [
+        'أهلًا بك في مكتبة زينك العربية للمؤثرات والملفات الرقمية.',
+        'اختر الملف المناسب لمشروعك، ثم استعرض محتواه قبل تنزيله.',
+        'تساعدك هذه الأمثلة على تجربة التصميم والبرمجة وواجهات المستخدم.',
+        'جميع الملفات مولدة محليًا، ويمكن إعادة إنشائها من أدوات المشروع.',
+        'استخدم البحث والتصنيفات للوصول إلى الصور والصوت والحركة بسرعة.',
+        'يمكنك تعديل الألوان والنصوص لتناسب هوية مشروعك الخاص.',
+    ]
+    words = ' '.join(sentences).split()
+    return ' '.join(words[i % len(words)] for i in range(n))
 
 def ensure(d):
     os.makedirs(d, exist_ok=True)
@@ -184,7 +197,7 @@ for i in range(6, 11):
     px = [[(r, g, b, 255) if (x + y) % 2 == 0 else (255, 255, 255, 255) for x in range(120)] for y in range(120)]
     add(f'avatars/avatar-{i:02d}.png', png(120, 120, px), 'avatars',
         f'صورة شخصية بكسل رقم {i}',
-        f'صورة شخصية بكسلية رقم {i} بتصميم 뚜حبان.')
+        f'صورة شخصية بكسلية رقم {i} بمربعات بكسل ملونة.')
 
 # ---------------------------------------------------------------- الشعارات
 logo_shapes = ['برق', 'نجم', 'دائرة', 'مثلث', 'مربع', 'هاتف', 'كاميرا', 'قلب']
@@ -199,16 +212,23 @@ for i, shape in enumerate(logo_shapes, 1):
         f'شعار زينك على شكل {shape} للعمل التجاري والهوية البصرية.')
 
 # ---------------------------------------------------------------- الأيقونات
-icon_symbols = ['تشغيل', 'تحميل', 'مشاركة', 'بحث', 'إعدادات', 'إعجاب', 'تعليق', 'إيقاف']
-for i, sym in enumerate(icon_symbols, 1):
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <circle cx="32" cy="32" r="28" fill="#7c3aed"/>
-  <text x="32" y="40" text-anchor="middle" fill="#fff" font-size="26" font-weight="bold" font-family="system-ui,sans-serif">●</text>
-  <text x="32" y="52" text-anchor="middle" fill="#ffd23f" font-size="14" font-family="system-ui,sans-serif">{sym[:1]}</text>
+icon_symbols = [
+    ('تشغيل', '<path d="M25 18l23 14-23 14z"/>'),
+    ('تحميل', '<path d="M32 14v27m-11-11l11 11 11-11M17 45v7h30v-7" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>'),
+    ('مشاركة', '<path d="M22 32l22-13M22 32l22 13" fill="none" stroke="white" stroke-width="4"/><circle cx="20" cy="32" r="7"/><circle cx="45" cy="18" r="7"/><circle cx="45" cy="46" r="7"/>'),
+    ('بحث', '<circle cx="28" cy="28" r="13" fill="none" stroke="white" stroke-width="4"/><path d="M38 38l12 12" stroke="white" stroke-width="5" stroke-linecap="round"/>'),
+    ('إعدادات', '<path d="M15 22h34M15 42h34" stroke="white" stroke-width="4"/><circle cx="25" cy="22" r="6"/><circle cx="40" cy="42" r="6"/>'),
+    ('إعجاب', '<path d="M32 49L15 32C3 16 24 8 32 22c8-14 29-6 17 10z"/>'),
+    ('تعليق', '<path d="M14 15h36v27H30L19 51v-9h-5z"/>'),
+    ('إيقاف', '<rect x="19" y="17" width="9" height="30" rx="2"/><rect x="36" y="17" width="9" height="30" rx="2"/>'),
+]
+for i, (sym, symbol) in enumerate(icon_symbols, 1):
+    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="{sym}">
+  <title>{sym}</title><rect x="1" y="1" width="62" height="62" rx="16" fill="#7c3aed"/>
+  <g fill="#ffffff">{symbol}</g>
 </svg>'''
-    add(f'icons/icon-{i:02d}.svg', svg.encode('utf-8'), 'icons',
-        f'أيقونة {sym}',
-        f'أيقونة رمز {sym} بتصميم نيون 사용.')
+    add(f'icons/icon-{i:02d}.svg', svg.encode('utf-8'), 'icons', f'أيقونة {sym}',
+        f'أيقونة {sym} متجهية قابلة للتكبير، مناسبة لواجهات المستخدم العربية.')
 
 # ---------------------------------------------------------------- الخلفيات
 for i in range(1, 5):
@@ -239,12 +259,12 @@ for i in range(1, 6):
 for i in range(6, 11):
     s = chord([440, 554, 659], 1.0, kind='sine', vol=0.35) + tone(880, 0.4, kind='tri', vol=0.2)
     add(f'audio/ringtones/ring-{i:02d}.wav', wav(s), 'ringtones',
-        f'نغمة تراثية رقم {i}',
-        f'نغمة تراثية شرقية رقم {i} للعرض والإشعارات.')
+        f'نغمة وترية رقم {i}',
+        f'نغمة وترية شرقية رقم {i} للعرض والإشعارات.')
 
 # ---------------------------------------------------------------- أصوات الطبيعة
-nature = [('أمطار', 'tri'), (('أمواج البحر', 'sine')), ('ريح forest', 'saw'), ('طيور', 'tri'),
-          ('م fogo', 'saw'), ('ثunder', 'sine'), ('شلال', 'tri'), ('رياح شتاء', 'sine')]
+nature = [('أمطار', 'tri'), (('أمواج البحر', 'sine')), ('ريح الغابة', 'saw'), ('طيور', 'tri'),
+          ('مدفأة', 'saw'), ('رعد', 'sine'), ('شلال', 'tri'), ('رياح شتاء', 'sine')]
 for i, (nm, kind) in enumerate(nature, 1):
     s = []
     base = 110 + i * 30
@@ -252,15 +272,15 @@ for i, (nm, kind) in enumerate(nature, 1):
         s += tone(base + random.randint(-40, 40), 0.06, kind=kind, vol=random.uniform(0.15, 0.4))
     add(f'audio/nature/nature-{i:02d}.wav', wav(s), 'nature',
         f'صوت طبيعة — {nm}',
-        f'تسجيل صناعي لصوت {nm} مناسب للاسترخاء والتصميم الصوتي.')
+        f'محاكاة صوتية مولدة لصوت {nm} مناسب للاسترخاء والتصميم الصوتي.')
 
 # ---------------------------------------------------------------- التنبيهات
-alerts = ['تنبيه-success', 'تنبيه-error', 'تنبيه-warning', 'تنبيه-info', 'تنبيه-attention', 'تنبيه-done']
+alerts = ['نجاح', 'خطأ', 'تحذير', 'معلومة', 'انتباه', 'اكتمال']
 for i, nm in enumerate(alerts, 1):
     s2 = tone(900 + i * 60, 0.18, kind='tri', vol=0.5) + tone(1400 + i * 60, 0.25, kind='tri', vol=0.45)
     add(f'audio/alerts/alert-{i:02d}.wav', wav(s2), 'alerts',
-        f'تنبيه {nm.split("-")[1]}',
-        f'صوت تنبيه قصير من نوع {nm.split("-")[1]} لواجهات المستخدم.')
+        f'تنبيه {nm}',
+        f'صوت تنبيه قصير — {nm} — لواجهات المستخدم.')
 
 # ---------------------------------------------------------------- النصوص العربية
 for i in range(1, 6):
@@ -272,7 +292,7 @@ for i in range(1, 6):
 تاريخ الإنشاء: {datetime.now(timezone.utc).strftime("%Y-%m-%d")}
 '''
     add(f'texts/text-{i:02d}.txt', txt.encode('utf-8'), 'texts',
-        f'نص عربي模板 رقم {i}',
+        f'نص عربي تجريبي رقم {i}',
         f'نص عربي تجريبي طويل رقم {i} للاختبار والتصميم.')
 for i in range(6, 11):
     md = f'''# وثيقة رقم {i}
@@ -307,12 +327,12 @@ for i in range(1, 5):
     }
     add(f'data/json/product-{i:02d}.json', (json.dumps(data, ensure_ascii=False, indent=2) + '\n').encode('utf-8'), 'json',
         f'منتج JSON رقم {i}',
-        f'ملف بيانات JSON番号 {i} يحتوي على تفاصيل منتج باللغة العربية.')
+        f'ملف بيانات JSON رقم {i} يحتوي على تفاصيل منتج باللغة العربية.')
 for i in range(5, 9):
     data = {'المستخدم': f'مستخدم {i}', 'البريد': f'user{i}@zynq.test', 'الدور': random.choice(['مدير', 'مصمم', 'مطور']), 'النقاط': random.randint(0, 1000)}
     add(f'data/json/user-{i:02d}.json', (json.dumps(data, ensure_ascii=False, indent=2) + '\n').encode('utf-8'), 'json',
         f'بيانات مستخدم JSON رقم {i}',
-        f'ملف JSON لمستخدم رقم {i}suitable for APIs.')
+        f'ملف JSON لمستخدم رقم {i} مناسب لتجارب واجهات البرمجة.')
 
 # ---------------------------------------------------------------- بيانات CSV
 for i in range(1, 4):
@@ -334,7 +354,7 @@ for i in range(4, 7):
 for i in range(1, 4):
     html = f'''<!DOCTYPE html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>صفحة {i} — ZYNQ</title></head>
-<body><h1>مرحباً بك في صفحة numero {i}</h1>
+<body><h1>مرحباً بك في صفحة رقم {i}</h1>
 <p>{lorem_ar(40)}</p>
 <a href="/">العودة للموقع</a>
 </body></html>'''
@@ -342,14 +362,19 @@ for i in range(1, 4):
         f'صفحة ويب عدد {i}',
         f'صفحة ويب عربية عدد {i} جاهزة للفتح في المتصفح.')
 for i in range(4, 7):
+    effect = ['نبض مضيء', 'طفو ناعم', 'مسح ضوئي'][i-4]
+    keyframes = ['0%,100%{transform:scale(.92);opacity:.65}50%{transform:scale(1.05);opacity:1}', '0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-24px) rotate(3deg)}', '0%,100%{filter:brightness(.7);border-radius:35px}50%{filter:brightness(1.5);border-radius:75px}'][i-4]
     html = f'''<!DOCTYPE html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>باقة {i}</title></head>
-<body><h2>باقة التأثيرات {i}</h2>
-<ul><li>تأثير {lorem_ar(3)}</li><li>تأثير {lorem_ar(3)}</li></ul>
-</body></html>'''
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{effect} — ZYNQ FX</title><style>
+body{{margin:0;min-height:100vh;display:grid;place-content:center;gap:28px;background:#100b20;color:#eeeaff;font-family:system-ui;text-align:center}}
+.sample{{width:150px;height:150px;margin:auto;border-radius:35px;background:#a878ff;box-shadow:0 0 45px #a878ff55;animation:effect 2.4s ease-in-out infinite}}
+@keyframes effect{{{keyframes}}}
+@media(prefers-reduced-motion:reduce){{.sample{{animation:none}}}}
+</style></head><body><h1>{effect}</h1><div class="sample" aria-hidden="true"></div><p>مثال CSS مستقل — رقم {i}</p><a href="/" style="color:#5fd4ff">العودة إلى زينك</a></body></html>'''
     add(f'web/html/fx-{i:02d}.html', html.encode('utf-8'), 'html',
-        f'باقة تأثيرات ويب رقم {i}',
-        f'صفحة عرض لباقة تأثيرات رقم {i} للمواقع والتطبيقات.')
+        f'تأثير ويب — {effect}',
+        f'صفحة مستقلة تعرض تأثير {effect} مع دعم تقليل الحركة، بدون مكتبات خارجية.')
 
 # ---------------------------------------------------------------- سكريبتات
 for i in range(1, 4):
@@ -380,11 +405,13 @@ for i in range(1, 4):
   color: #fff;
   background: #0b0e16;
 }}
-.bot-card-{i}:hover {{ border-color: #ffd23f; }}
+.bot-card-{i}:hover {{ border-color: #ffd23f; animation: card-float-{i} 1.8s ease-in-out infinite; }}
+@keyframes card-float-{i} {{ 0%,100% {{ transform: translateY(0); }} 50% {{ transform: translateY(-6px); }} }}
+@media (prefers-reduced-motion: reduce) {{ .bot-card-{i}:hover {{ animation: none; }} }}
 '''
     add(f'code/css/style-{i:02d}.css', css.encode('utf-8'), 'css',
         f'ملف أنماط CSS رقم {i}',
-        f'ملف أنماط Cascading رقم {i} لتصميم بطاقات واجهة المستخدم.')
+        f'ملف أنماط CSS رقم {i} لتصميم بطاقات واجهة المستخدم.')
 
 # ---------------------------------------------------------------- حزم مضغوطة
 for i in range(1, 4):
@@ -396,13 +423,34 @@ for i in range(1, 4):
         f'حزمة مضغوطة رقم {i}',
         f'ملف ZIP رقم {i} يحتوي على ملفات نصية وبيانات للتجريب.')
 
+# ---------------------------------------------------------------- المؤثرات الحقيقية
+# نفس ملفات المكتبة الرئيسية، بأحجام مقروءة من القرص، دون نسخ أو روابط وهمية.
+catalog = json.loads((Path(ROOT) / 'site' / 'public' / 'catalog.json').read_text(encoding='utf-8'))
+program_names = {p['id']: p['name'] for p in catalog['programs']}
+effect_categories = {c['id']: c['name'] for c in catalog['categories']}
+for item in catalog['items']:
+    full = os.path.join(ROOT, 'site', item['file'])
+    ext = os.path.splitext(full)[1].lstrip('.')
+    entries.append({
+        'id': 'fx-' + item['id'], 'name': item['name'],
+        'category': 'effects', 'categoryAr': CATEGORIES_AR['effects'],
+        'effectCategory': item['category'], 'effectCategoryAr': effect_categories[item['category']],
+        'type': MIME.get(ext, 'application/octet-stream'), 'ext': ext,
+        'size': os.path.getsize(full), 'url': '/' + item['file'],
+        'desc': item['description'], 'tagline': item['tagline'],
+        'format': item['format'], 'quality': item['quality'], 'fps': item['fps'],
+        'usage': item['usage'], 'programs': item['programs'],
+        'tags': item.get('tags', []) + ['مؤثرات', 'أنيميشن', 'effects', 'animation', effect_categories[item['category']]]
+            + [program_names[p] for p in item['programs']],
+    })
+
 # ---------------------------------------------------------------- البيان العربي
 manifest = {
-    'version': 1,
+    'version': 2,
     'count': len(entries),
-    'generated': datetime.now(timezone.utc).isoformat(),
+    'generated': '2026-11-01T00:00:00+00:00',
     'title': 'ملفات مساعد زينك الآلي',
-    'description': '100 ملف متنوّع عاملاً لجميع الأنواع، يساعد الروبوت الزائر على الوصول إليها وتحميلها.',
+    'description': f'{len(entries)} ملفًا حقيقيًا: صور وصوت ونصوص وأكواد، بالإضافة إلى مؤثرات وأنيميشن قابل للمعاينة والتحميل.',
     'lang': 'ar',
     'categories': CATEGORIES_AR,
     'files': entries,
@@ -410,7 +458,7 @@ manifest = {
 with open(MANIFEST, 'w', encoding='utf-8') as f:
     json.dump(manifest, f, ensure_ascii=False, indent=2)
 
-print(f'تم توليد {len(entries)} ملفًا في {FILES_DIR}')
+print(f'تم تحديث {len(entries)} ملفًا في المكتبة، منها {len(catalog["items"])} مؤثرًا')
 print(f'البيان العربي: {MANIFEST}')
 for c in sorted(CATEGORIES_AR):
     n = sum(1 for e in entries if e['category'] == c)

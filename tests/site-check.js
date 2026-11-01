@@ -18,7 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
-const { spawn } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const SITE = path.join(ROOT, 'site');
@@ -90,7 +90,7 @@ function checkFrontend() {
   const html = read(path.join(PUBLIC, 'index.html'));
 
   const localAssets = [...html.matchAll(/(?:href|src)="([^"#:]+)"/g)]
-    .map((m) => m[1])
+    .map((m) => m[1].split('?')[0])
     .filter((p) => !p.startsWith('/') && !p.startsWith('http'));
 
   const missing = localAssets.filter((p) => !exists(path.join(PUBLIC, p)));
@@ -131,6 +131,8 @@ function checkFrontend() {
   // تنظيف JS: تحقّق من أن ملفات JS تُحلَّل نحويًا
   const jsFiles = [
     path.join(PUBLIC, 'app.js'),
+    ...fs.readdirSync(path.join(PUBLIC, 'bot')).filter((f) => f.endsWith('.js')).map((f) => path.join(PUBLIC, 'bot', f)),
+    ...fs.readdirSync(path.join(PUBLIC, 'files-bot')).filter((f) => f.endsWith('.js')).map((f) => path.join(PUBLIC, 'files-bot', f)),
     path.join(stereoDir, 'app.js'),
     path.join(stereoDir, 'sw.js'),
     path.join(SITE, 'server.js'),
@@ -286,7 +288,7 @@ function checkBot() {
   // تشغيل المحرّك في بيئة افتراضية والتأكد من أنه ينتج رسمًا لكل وضع وتعبير
   let api = null;
   try {
-    const sandbox = { window: {}, console: { log() {} }, localStorage: null, navigator: {}, setTimeout, clearTimeout };
+    const sandbox = { window: { addEventListener() {}, removeEventListener() {}, dispatchEvent() {}, matchMedia: () => ({ matches: false }) }, console: { log() {} }, localStorage: null, navigator: {}, setTimeout, clearTimeout };
     sandbox.globalThis = sandbox;
     require('vm').createContext(sandbox);
     require('vm').runInContext(engine, sandbox);
@@ -372,7 +374,7 @@ function checkBot() {
   ok(missingSections.length === 0, `أقسام الصفحة (أوضاع · مختبر · تعبيرات · صوت · دمج)${missingSections.length ? ' — ناقص: ' + missingSections.join('، ') : ''}`);
 
   // ملفات الصفحة المحلية موجودة + لا روابط خارجية
-  const botAssets = [...botHtml.matchAll(/(?:href|src)="([^"#:]+)"/g)].map((m) => m[1]).filter((x) => !x.startsWith('http'));
+  const botAssets = [...botHtml.matchAll(/(?:href|src)="([^"#:]+)"/g)].map((m) => m[1].split('?')[0]).filter((x) => !x.startsWith('http'));
   const botMissing = botAssets.filter((rel) => !exists(path.join(dir, rel)) && !exists(path.join(PUBLIC, rel)));
   ok(botMissing.length === 0, `كل ملفات صفحة الروبوت موجودة${botMissing.length ? ' — ناقص: ' + botMissing.join('، ') : ''}`);
   ok(!/href="https?:\/\//.test(botHtml), 'صفحة الروبوت بلا روابط خارجية');
@@ -381,7 +383,7 @@ function checkBot() {
   const html = read(path.join(PUBLIC, 'index.html'));
   ok(/href="bot\/index\.html"/.test(html), 'الصفحة الرئيسية فيها رابط إلى صفحة الروبوت');
   ok(/bot\/bot\.css/.test(html) && /bot\/bot-engine\.js/.test(html), 'الصفحة الرئيسية تحمّل أنماط الروبوت ومحرّكه');
-  ok(/href="bot\.css"/.test(botHtml) && /href="style\.css"/.test(botHtml), 'صفحة الروبوت تحمّل أنماط الشخصية وأنماط الصفحة');
+  ok(/href="bot\.css(?:\?[^"]*)?"/.test(botHtml) && /href="style\.css(?:\?[^"]*)?"/.test(botHtml), 'صفحة الروبوت تحمّل أنماط الشخصية وأنماط الصفحة');
   ok(!/@import/.test(read(path.join(PUBLIC, 'style.css'))), 'لا استيراد CSS بمسار خاطئ في أنماط الصفحة الرئيسية');
   ok(!/\/bot\/style\.css/.test(botHtml), 'كود الدمج يوجّه إلى ملف أنماط الشخصية الصحيح (bot.css)');
   ok(/data-zynq-buddy/.test(html), 'الرفيق العائم موجود في الصفحة الرئيسية');
@@ -438,16 +440,24 @@ async function checkServer(catalog) {
         '/stereo/sw.js', '/stereo/manifest.webmanifest',
         '/stereo/icons/icon-192.png', '/stereo/icons/icon-512.png', '/stereo/icons/maskable-512.png',
         '/bot/', '/bot/index.html', '/bot/bot-engine.js', '/bot/app.js', '/bot/style.css', '/bot/bot.css',
-        '/bot/buddy.js', '/bot/home-bot.js',
+        '/bot/buddy.js', '/bot/home-bot.js', '/bot/voice-controls.js', '/bot/preview.js',
+        '/files-bot/', '/files-bot/app.js', '/files-bot/style.css',
+        '/files/files.json', '/vendor/lottie-5.13.0.min.js', '/api/pack/bot.zip',
       ];
       // كل ملف أصل + باقة لكل تصنيف
       for (const it of catalog.items) pages.push('/' + it.file);
+      const assistantManifest = JSON.parse(read(path.join(PUBLIC, 'files/files.json')));
+      for (const file of assistantManifest.files) pages.push(file.url);
       for (const c of catalog.categories) pages.push(`/api/pack/${c.id}.zip`);
 
       const results = await Promise.all(pages.map(async (p) => ({ p, r: await fetchPath(port, p) })));
       const broken = results.filter((x) => x.r.status !== 200).map((x) => `${x.p} (${x.r.status})`);
       ok(broken.length === 0, `كل المسارات تردّ 200 (${pages.length} مسارًا)${broken.length ? ' — أعطال: ' + broken.slice(0, 8).join('، ') : ''}`);
 
+      const botRedirect = await fetchPath(port, '/files-bot');
+      ok(botRedirect.status === 301 && botRedirect.headers.location === '/files-bot/', 'مساعد الملفات يحتفظ بالمسارات النسبية عبر إعادة توجيه المجلد');
+      const botPack = await fetchPath(port, '/api/pack/bot.zip');
+      ok(botPack.status === 200 && botPack.body.readUInt32LE(0) === 0x04034b50 && botPack.body.readUInt16LE(botPack.body.length - 12) === 17, 'باقة البوت ZIP تحتوي 16 أصلًا جديدًا ودليل استخدام');
       const redirect = await fetchPath(port, '/stereo');
       ok(redirect.status === 301 || redirect.status === 308, '‏/stereo يعيد التوجيه إلى /stereo/ (حتى تعمل المسارات النسبية)');
 
@@ -537,6 +547,9 @@ async function checkServer(catalog) {
   checkFrontend();
   checkAndroidProject();
   checkBot();
+  const assistantTests = spawnSync(process.execPath, [path.join(ROOT, 'tests', 'bot-files-check.js')], { encoding: 'utf8' });
+  process.stdout.write(assistantTests.stdout || '');
+  ok(assistantTests.status === 0, 'فحص الصوت العربي ومكتبة المساعد والمعاينات');
   await checkServer(catalog);
 
   console.log('\n' + '═'.repeat(62));

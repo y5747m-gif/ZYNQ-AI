@@ -1,9 +1,9 @@
 {
-  "version": 1,
-  "count": 100,
-  "generated": "2026-11-01T06:05:38.279927+00:00",
+  "version": 2,
+  "count": 150,
+  "generated": "2026-11-01T00:00:00+00:00",
   "title": "ملفات مساعد زينك الآلي",
-  "description": "100 ملف متنوّع عاملاً لجميع الأنواع، يساعد الروبوت الزائر على الوصول إليها وتحميلها.",
+  "description": "150 ملفًا حقيقيًا: صور وصوت ونصوص وأكواد، بالإضافة إلى مؤثرات وأنيميشن قابل للمعاينة والتحميل.",
   "lang": "ar",
   "categories": {
     "avatars": "صور شخصية",
@@ -19,7 +19,8 @@
     "html": "صفحات ويب",
     "js": "سكريبتات",
     "css": "أنماط CSS",
-    "zip": "حزم مضغوطة"
+    "zip": "حزم مضغوطة",
+    "effects": "مؤثرات وأنيميشن"
   },
   "files": [
     {
@@ -86,7 +87,7 @@
       "ext": "png",
       "size": 397,
       "url": "/files/avatars/avatar-06.png",
-      "desc": "صورة شخصية بكسلية رقم 6 بتصميم 뚜حبان."
+      "desc": "صورة شخصية بكسلية رقم 6 بمربعات بكسل ملونة."
     },
     {
       "id": "f007",
@@ -97,7 +98,7 @@
       "ext": "png",
       "size": 397,
       "url": "/files/avatars/avatar-07.png",
-      "desc": "صورة شخصية بكسلية رقم 7 بتصميم 뚜حبان."
+      "desc": "صورة شخصية بكسلية رقم 7 بمربعات بكسل ملونة."
     },
     {
       "id": "f008",
@@ -108,7 +109,7 @@
       "ext": "png",
       "size": 397,
       "url": "/files/avatars/avatar-08.png",
-      "desc": "صورة شخصية بكسلية رقم 8 بتصميم 뚜حبان."
+      "desc": "صورة شخصية بكسلية رقم 8 بمربعات بكسل ملونة."
     },
     {
       "id": "f009",
@@ -119,7 +120,7 @@
       "ext": "png",
       "size": 397,
       "url": "/files/avatars/avatar-09.png",
-      "desc": "صورة شخصية بكسلية رقم 9 بتصميم 뚜حبان."
+      "desc": "صورة شخصية بكسلية رقم 9 بمربعات بكسل ملونة."
     },
     {
       "id": "f010",
@@ -130,7 +131,7 @@
       "ext": "png",
       "size": 397,
       "url": "/files/avatars/avatar-10.png",
-      "desc": "صورة شخصية بكسلية رقم 10 بتصميم 뚜حبان."
+      "desc": "صورة شخصية بكسلية رقم 10 بمربعات بكسل ملونة."
     },
     {
       "id": "f011",
@@ -227,9 +228,9 @@
       "categoryAr": "أيقونات",
       "type": "image/svg+xml",
       "ext": "svg",
-      "size": 370,
+      "size": 251,
       "url": "/files/icons/icon-01.svg",
-      "desc": "أيقونة رمز تشغيل بتصميم نيون 사용."
+      "desc": "أيقونة تشغيل متجهية قابلة للتكبير، مناسبة لواجهات المستخدم العربية."
     },
     {
       "id": "f020",
@@ -238,9 +239,9 @@
       "categoryAr": "أيقونات",
       "type": "image/svg+xml",
       "ext": "svg",
-      "size": 370,
+      "size": 365,
       "url": "/files/icons/icon-02.svg",
-      "desc": "أيقونة رمز تحميل بتصميم نيون 사용."
+      "desc": "أيقونة تحميل متجهية قابلة للتكبير، مناسبة لواجهات المستخدم العربية."
     },
     {
       "id": "f021",
@@ -249,9 +250,9 @@
       "categoryAr": "أيقونات",
       "type": "image/svg+xml",
       "ext": "svg",
-      "size": 370,
+      "size": 397,
       "url": "/files/icons/icon-03.svg",
-      "desc": "أيقونة رمز مشاركة بتصميم نيون 사용."
+      "desc": "أيقونة مشاركة متجهية قابلة للتكبير، مناسبة لواجهات المستخدم العربية."
     },
     {
       "id": "f022",
@@ -260,9 +261,9 @@
       "categoryAr": "أيقونات",
       "type": "image/svg+xml",
       "ext": "svg",
-      "size": 370,
+      "size": 367,
       "url": "/files/icons/icon-04.svg",
-      "desc": "أيقونة رمز بحث بتصميم نيون 사용."
+      "desc": "أيقونة بحث متجهية قابلة للتكبير، مناسبة لواجهات المستخدم العربية."
     },
     {
       "id": "f023",
@@ -271,9 +272,9 @@
       "categoryAr": "أيقونات",
       "type": "image/svg+xml",
       "ext": "svg",
-      "size": 370,
+      "size": 352,
       "url": "/files/icons/icon-05.svg",
-      "desc": "أيقونة رمز إعدادات بتصميم نيون 사용."
+      "desc": "أيقونة إعدادات متجهية قابلة للتكبير، مناسبة لواجهات المستخدم العربية."
     },
     {
       "id": "f024",
@@ -282,9 +283,9 @@
       "categoryAr": "أيقونات",
       "type": "image/svg+xml",
       "ext": "svg",
-      "size": 370,
+      "size": 277,
       "url": "/files/icons/icon-06.svg",
-      "desc": "أيقونة رمز إعجاب بتصميم نيون 사용."
+      "desc": "أيقونة إعجاب متجهية قابلة للتكبير، مناسبة لواجهات المستخدم العربية."
     },
     {
       "id": "f025",
@@ -293,9 +294,9 @@
       "categoryAr": "أيقونات",
       "type": "image/svg+xml",
       "ext": "svg",
-      "size": 370,
+      "size": 260,
       "url": "/files/icons/icon-07.svg",
-      "desc": "أيقونة رمز تعليق بتصميم نيون 사용."
+      "desc": "أيقونة تعليق متجهية قابلة للتكبير، مناسبة لواجهات المستخدم العربية."
     },
     {
       "id": "f026",
@@ -304,9 +305,9 @@
       "categoryAr": "أيقونات",
       "type": "image/svg+xml",
       "ext": "svg",
-      "size": 370,
+      "size": 320,
       "url": "/files/icons/icon-08.svg",
-      "desc": "أيقونة رمز إيقاف بتصميم نيون 사용."
+      "desc": "أيقونة إيقاف متجهية قابلة للتكبير، مناسبة لواجهات المستخدم العربية."
     },
     {
       "id": "f027",
@@ -453,58 +454,58 @@
     },
     {
       "id": "f040",
-      "name": "نغمة تراثية رقم 6",
+      "name": "نغمة وترية رقم 6",
       "category": "ringtones",
       "categoryAr": "نغمات",
       "type": "audio/wav",
       "ext": "wav",
       "size": 61784,
       "url": "/files/audio/ringtones/ring-06.wav",
-      "desc": "نغمة تراثية شرقية رقم 6 للعرض والإشعارات."
+      "desc": "نغمة وترية شرقية رقم 6 للعرض والإشعارات."
     },
     {
       "id": "f041",
-      "name": "نغمة تراثية رقم 7",
+      "name": "نغمة وترية رقم 7",
       "category": "ringtones",
       "categoryAr": "نغمات",
       "type": "audio/wav",
       "ext": "wav",
       "size": 61784,
       "url": "/files/audio/ringtones/ring-07.wav",
-      "desc": "نغمة تراثية شرقية رقم 7 للعرض والإشعارات."
+      "desc": "نغمة وترية شرقية رقم 7 للعرض والإشعارات."
     },
     {
       "id": "f042",
-      "name": "نغمة تراثية رقم 8",
+      "name": "نغمة وترية رقم 8",
       "category": "ringtones",
       "categoryAr": "نغمات",
       "type": "audio/wav",
       "ext": "wav",
       "size": 61784,
       "url": "/files/audio/ringtones/ring-08.wav",
-      "desc": "نغمة تراثية شرقية رقم 8 للعرض والإشعارات."
+      "desc": "نغمة وترية شرقية رقم 8 للعرض والإشعارات."
     },
     {
       "id": "f043",
-      "name": "نغمة تراثية رقم 9",
+      "name": "نغمة وترية رقم 9",
       "category": "ringtones",
       "categoryAr": "نغمات",
       "type": "audio/wav",
       "ext": "wav",
       "size": 61784,
       "url": "/files/audio/ringtones/ring-09.wav",
-      "desc": "نغمة تراثية شرقية رقم 9 للعرض والإشعارات."
+      "desc": "نغمة وترية شرقية رقم 9 للعرض والإشعارات."
     },
     {
       "id": "f044",
-      "name": "نغمة تراثية رقم 10",
+      "name": "نغمة وترية رقم 10",
       "category": "ringtones",
       "categoryAr": "نغمات",
       "type": "audio/wav",
       "ext": "wav",
       "size": 61784,
       "url": "/files/audio/ringtones/ring-10.wav",
-      "desc": "نغمة تراثية شرقية رقم 10 للعرض والإشعارات."
+      "desc": "نغمة وترية شرقية رقم 10 للعرض والإشعارات."
     },
     {
       "id": "f045",
@@ -515,7 +516,7 @@
       "ext": "wav",
       "size": 105884,
       "url": "/files/audio/nature/nature-01.wav",
-      "desc": "تسجيل صناعي لصوت أمطار مناسب للاسترخاء والتصميم الصوتي."
+      "desc": "محاكاة صوتية مولدة لصوت أمطار مناسب للاسترخاء والتصميم الصوتي."
     },
     {
       "id": "f046",
@@ -526,18 +527,18 @@
       "ext": "wav",
       "size": 105884,
       "url": "/files/audio/nature/nature-02.wav",
-      "desc": "تسجيل صناعي لصوت أمواج البحر مناسب للاسترخاء والتصميم الصوتي."
+      "desc": "محاكاة صوتية مولدة لصوت أمواج البحر مناسب للاسترخاء والتصميم الصوتي."
     },
     {
       "id": "f047",
-      "name": "صوت طبيعة — ريح forest",
+      "name": "صوت طبيعة — ريح الغابة",
       "category": "nature",
       "categoryAr": "أصوات الطبيعة",
       "type": "audio/wav",
       "ext": "wav",
       "size": 105884,
       "url": "/files/audio/nature/nature-03.wav",
-      "desc": "تسجيل صناعي لصوت ريح forest مناسب للاسترخاء والتصميم الصوتي."
+      "desc": "محاكاة صوتية مولدة لصوت ريح الغابة مناسب للاسترخاء والتصميم الصوتي."
     },
     {
       "id": "f048",
@@ -548,29 +549,29 @@
       "ext": "wav",
       "size": 105884,
       "url": "/files/audio/nature/nature-04.wav",
-      "desc": "تسجيل صناعي لصوت طيور مناسب للاسترخاء والتصميم الصوتي."
+      "desc": "محاكاة صوتية مولدة لصوت طيور مناسب للاسترخاء والتصميم الصوتي."
     },
     {
       "id": "f049",
-      "name": "صوت طبيعة — م fogo",
+      "name": "صوت طبيعة — مدفأة",
       "category": "nature",
       "categoryAr": "أصوات الطبيعة",
       "type": "audio/wav",
       "ext": "wav",
       "size": 105884,
       "url": "/files/audio/nature/nature-05.wav",
-      "desc": "تسجيل صناعي لصوت م fogo مناسب للاسترخاء والتصميم الصوتي."
+      "desc": "محاكاة صوتية مولدة لصوت مدفأة مناسب للاسترخاء والتصميم الصوتي."
     },
     {
       "id": "f050",
-      "name": "صوت طبيعة — ثunder",
+      "name": "صوت طبيعة — رعد",
       "category": "nature",
       "categoryAr": "أصوات الطبيعة",
       "type": "audio/wav",
       "ext": "wav",
       "size": 105884,
       "url": "/files/audio/nature/nature-06.wav",
-      "desc": "تسجيل صناعي لصوت ثunder مناسب للاسترخاء والتصميم الصوتي."
+      "desc": "محاكاة صوتية مولدة لصوت رعد مناسب للاسترخاء والتصميم الصوتي."
     },
     {
       "id": "f051",
@@ -581,7 +582,7 @@
       "ext": "wav",
       "size": 105884,
       "url": "/files/audio/nature/nature-07.wav",
-      "desc": "تسجيل صناعي لصوت شلال مناسب للاسترخاء والتصميم الصوتي."
+      "desc": "محاكاة صوتية مولدة لصوت شلال مناسب للاسترخاء والتصميم الصوتي."
     },
     {
       "id": "f052",
@@ -592,126 +593,126 @@
       "ext": "wav",
       "size": 105884,
       "url": "/files/audio/nature/nature-08.wav",
-      "desc": "تسجيل صناعي لصوت رياح شتاء مناسب للاسترخاء والتصميم الصوتي."
+      "desc": "محاكاة صوتية مولدة لصوت رياح شتاء مناسب للاسترخاء والتصميم الصوتي."
     },
     {
       "id": "f053",
-      "name": "تنبيه success",
+      "name": "تنبيه نجاح",
       "category": "alerts",
       "categoryAr": "تنبيهات",
       "type": "audio/wav",
       "ext": "wav",
       "size": 19006,
       "url": "/files/audio/alerts/alert-01.wav",
-      "desc": "صوت تنبيه قصير من نوع success لواجهات المستخدم."
+      "desc": "صوت تنبيه قصير — نجاح — لواجهات المستخدم."
     },
     {
       "id": "f054",
-      "name": "تنبيه error",
+      "name": "تنبيه خطأ",
       "category": "alerts",
       "categoryAr": "تنبيهات",
       "type": "audio/wav",
       "ext": "wav",
       "size": 19006,
       "url": "/files/audio/alerts/alert-02.wav",
-      "desc": "صوت تنبيه قصير من نوع error لواجهات المستخدم."
+      "desc": "صوت تنبيه قصير — خطأ — لواجهات المستخدم."
     },
     {
       "id": "f055",
-      "name": "تنبيه warning",
+      "name": "تنبيه تحذير",
       "category": "alerts",
       "categoryAr": "تنبيهات",
       "type": "audio/wav",
       "ext": "wav",
       "size": 19006,
       "url": "/files/audio/alerts/alert-03.wav",
-      "desc": "صوت تنبيه قصير من نوع warning لواجهات المستخدم."
+      "desc": "صوت تنبيه قصير — تحذير — لواجهات المستخدم."
     },
     {
       "id": "f056",
-      "name": "تنبيه info",
+      "name": "تنبيه معلومة",
       "category": "alerts",
       "categoryAr": "تنبيهات",
       "type": "audio/wav",
       "ext": "wav",
       "size": 19006,
       "url": "/files/audio/alerts/alert-04.wav",
-      "desc": "صوت تنبيه قصير من نوع info لواجهات المستخدم."
+      "desc": "صوت تنبيه قصير — معلومة — لواجهات المستخدم."
     },
     {
       "id": "f057",
-      "name": "تنبيه attention",
+      "name": "تنبيه انتباه",
       "category": "alerts",
       "categoryAr": "تنبيهات",
       "type": "audio/wav",
       "ext": "wav",
       "size": 19006,
       "url": "/files/audio/alerts/alert-05.wav",
-      "desc": "صوت تنبيه قصير من نوع attention لواجهات المستخدم."
+      "desc": "صوت تنبيه قصير — انتباه — لواجهات المستخدم."
     },
     {
       "id": "f058",
-      "name": "تنبيه done",
+      "name": "تنبيه اكتمال",
       "category": "alerts",
       "categoryAr": "تنبيهات",
       "type": "audio/wav",
       "ext": "wav",
       "size": 19006,
       "url": "/files/audio/alerts/alert-06.wav",
-      "desc": "صوت تنبيه قصير من نوع done لواجهات المستخدم."
+      "desc": "صوت تنبيه قصير — اكتمال — لواجهات المستخدم."
     },
     {
       "id": "f059",
-      "name": "نص عربي模板 رقم 1",
+      "name": "نص عربي تجريبي رقم 1",
       "category": "texts",
       "categoryAr": "نصوص عربية",
       "type": "text/plain; charset=utf-8",
       "ext": "txt",
-      "size": 1180,
+      "size": 1462,
       "url": "/files/texts/text-01.txt",
       "desc": "نص عربي تجريبي طويل رقم 1 للاختبار والتصميم."
     },
     {
       "id": "f060",
-      "name": "نص عربي模板 رقم 2",
+      "name": "نص عربي تجريبي رقم 2",
       "category": "texts",
       "categoryAr": "نصوص عربية",
       "type": "text/plain; charset=utf-8",
       "ext": "txt",
-      "size": 1166,
+      "size": 1462,
       "url": "/files/texts/text-02.txt",
       "desc": "نص عربي تجريبي طويل رقم 2 للاختبار والتصميم."
     },
     {
       "id": "f061",
-      "name": "نص عربي模板 رقم 3",
+      "name": "نص عربي تجريبي رقم 3",
       "category": "texts",
       "categoryAr": "نصوص عربية",
       "type": "text/plain; charset=utf-8",
       "ext": "txt",
-      "size": 1144,
+      "size": 1462,
       "url": "/files/texts/text-03.txt",
       "desc": "نص عربي تجريبي طويل رقم 3 للاختبار والتصميم."
     },
     {
       "id": "f062",
-      "name": "نص عربي模板 رقم 4",
+      "name": "نص عربي تجريبي رقم 4",
       "category": "texts",
       "categoryAr": "نصوص عربية",
       "type": "text/plain; charset=utf-8",
       "ext": "txt",
-      "size": 1206,
+      "size": 1462,
       "url": "/files/texts/text-04.txt",
       "desc": "نص عربي تجريبي طويل رقم 4 للاختبار والتصميم."
     },
     {
       "id": "f063",
-      "name": "نص عربي模板 رقم 5",
+      "name": "نص عربي تجريبي رقم 5",
       "category": "texts",
       "categoryAr": "نصوص عربية",
       "type": "text/plain; charset=utf-8",
       "ext": "txt",
-      "size": 1212,
+      "size": 1462,
       "url": "/files/texts/text-05.txt",
       "desc": "نص عربي تجريبي طويل رقم 5 للاختبار والتصميم."
     },
@@ -722,7 +723,7 @@
       "categoryAr": "نصوص عربية",
       "type": "text/markdown; charset=utf-8",
       "ext": "md",
-      "size": 511,
+      "size": 588,
       "url": "/files/texts/doc-06.md",
       "desc": "ملف ماركداون منظم رقم 6 للعرض والتوثيق."
     },
@@ -733,7 +734,7 @@
       "categoryAr": "نصوص عربية",
       "type": "text/markdown; charset=utf-8",
       "ext": "md",
-      "size": 497,
+      "size": 588,
       "url": "/files/texts/doc-07.md",
       "desc": "ملف ماركداون منظم رقم 7 للعرض والتوثيق."
     },
@@ -744,7 +745,7 @@
       "categoryAr": "نصوص عربية",
       "type": "text/markdown; charset=utf-8",
       "ext": "md",
-      "size": 497,
+      "size": 588,
       "url": "/files/texts/doc-08.md",
       "desc": "ملف ماركداون منظم رقم 8 للعرض والتوثيق."
     },
@@ -755,7 +756,7 @@
       "categoryAr": "نصوص عربية",
       "type": "text/markdown; charset=utf-8",
       "ext": "md",
-      "size": 511,
+      "size": 588,
       "url": "/files/texts/doc-09.md",
       "desc": "ملف ماركداون منظم رقم 9 للعرض والتوثيق."
     },
@@ -766,7 +767,7 @@
       "categoryAr": "نصوص عربية",
       "type": "text/markdown; charset=utf-8",
       "ext": "md",
-      "size": 521,
+      "size": 590,
       "url": "/files/texts/doc-10.md",
       "desc": "ملف ماركداون منظم رقم 10 للعرض والتوثيق."
     },
@@ -777,9 +778,9 @@
       "categoryAr": "بيانات JSON",
       "type": "application/json; charset=utf-8",
       "ext": "json",
-      "size": 265,
+      "size": 273,
       "url": "/files/data/json/product-01.json",
-      "desc": "ملف بيانات JSON番号 1 يحتوي على تفاصيل منتج باللغة العربية."
+      "desc": "ملف بيانات JSON رقم 1 يحتوي على تفاصيل منتج باللغة العربية."
     },
     {
       "id": "f070",
@@ -788,9 +789,9 @@
       "categoryAr": "بيانات JSON",
       "type": "application/json; charset=utf-8",
       "ext": "json",
-      "size": 265,
+      "size": 273,
       "url": "/files/data/json/product-02.json",
-      "desc": "ملف بيانات JSON番号 2 يحتوي على تفاصيل منتج باللغة العربية."
+      "desc": "ملف بيانات JSON رقم 2 يحتوي على تفاصيل منتج باللغة العربية."
     },
     {
       "id": "f071",
@@ -799,9 +800,9 @@
       "categoryAr": "بيانات JSON",
       "type": "application/json; charset=utf-8",
       "ext": "json",
-      "size": 268,
+      "size": 272,
       "url": "/files/data/json/product-03.json",
-      "desc": "ملف بيانات JSON番号 3 يحتوي على تفاصيل منتج باللغة العربية."
+      "desc": "ملف بيانات JSON رقم 3 يحتوي على تفاصيل منتج باللغة العربية."
     },
     {
       "id": "f072",
@@ -810,9 +811,9 @@
       "categoryAr": "بيانات JSON",
       "type": "application/json; charset=utf-8",
       "ext": "json",
-      "size": 267,
+      "size": 271,
       "url": "/files/data/json/product-04.json",
-      "desc": "ملف بيانات JSON番号 4 يحتوي على تفاصيل منتج باللغة العربية."
+      "desc": "ملف بيانات JSON رقم 4 يحتوي على تفاصيل منتج باللغة العربية."
     },
     {
       "id": "f073",
@@ -823,7 +824,7 @@
       "ext": "json",
       "size": 131,
       "url": "/files/data/json/user-05.json",
-      "desc": "ملف JSON لمستخدم رقم 5suitable for APIs."
+      "desc": "ملف JSON لمستخدم رقم 5 مناسب لتجارب واجهات البرمجة."
     },
     {
       "id": "f074",
@@ -834,7 +835,7 @@
       "ext": "json",
       "size": 131,
       "url": "/files/data/json/user-06.json",
-      "desc": "ملف JSON لمستخدم رقم 6suitable for APIs."
+      "desc": "ملف JSON لمستخدم رقم 6 مناسب لتجارب واجهات البرمجة."
     },
     {
       "id": "f075",
@@ -843,9 +844,9 @@
       "categoryAr": "بيانات JSON",
       "type": "application/json; charset=utf-8",
       "ext": "json",
-      "size": 131,
+      "size": 130,
       "url": "/files/data/json/user-07.json",
-      "desc": "ملف JSON لمستخدم رقم 7suitable for APIs."
+      "desc": "ملف JSON لمستخدم رقم 7 مناسب لتجارب واجهات البرمجة."
     },
     {
       "id": "f076",
@@ -856,7 +857,7 @@
       "ext": "json",
       "size": 131,
       "url": "/files/data/json/user-08.json",
-      "desc": "ملف JSON لمستخدم رقم 8suitable for APIs."
+      "desc": "ملف JSON لمستخدم رقم 8 مناسب لتجارب واجهات البرمجة."
     },
     {
       "id": "f077",
@@ -865,7 +866,7 @@
       "categoryAr": "بيانات CSV",
       "type": "text/csv; charset=utf-8",
       "ext": "csv",
-      "size": 380,
+      "size": 394,
       "url": "/files/data/csv/list-01.csv",
       "desc": "ملف CSV جاهز للاستيراد في جداول البيانات رقم 1."
     },
@@ -876,7 +877,7 @@
       "categoryAr": "بيانات CSV",
       "type": "text/csv; charset=utf-8",
       "ext": "csv",
-      "size": 402,
+      "size": 410,
       "url": "/files/data/csv/list-02.csv",
       "desc": "ملف CSV جاهز للاستيراد في جداول البيانات رقم 2."
     },
@@ -887,7 +888,7 @@
       "categoryAr": "بيانات CSV",
       "type": "text/csv; charset=utf-8",
       "ext": "csv",
-      "size": 392,
+      "size": 384,
       "url": "/files/data/csv/list-03.csv",
       "desc": "ملف CSV جاهز للاستيراد في جداول البيانات رقم 3."
     },
@@ -920,7 +921,7 @@
       "categoryAr": "بيانات CSV",
       "type": "text/csv; charset=utf-8",
       "ext": "csv",
-      "size": 178,
+      "size": 175,
       "url": "/files/data/csv/stats-06.csv",
       "desc": "ملف إحصائيات أسبوعية رقم 6 للتقارير والرسوم البيانية."
     },
@@ -931,7 +932,7 @@
       "categoryAr": "صفحات ويب",
       "type": "text/html; charset=utf-8",
       "ext": "html",
-      "size": 605,
+      "size": 723,
       "url": "/files/web/html/page-01.html",
       "desc": "صفحة ويب عربية عدد 1 جاهزة للفتح في المتصفح."
     },
@@ -942,7 +943,7 @@
       "categoryAr": "صفحات ويب",
       "type": "text/html; charset=utf-8",
       "ext": "html",
-      "size": 595,
+      "size": 723,
       "url": "/files/web/html/page-02.html",
       "desc": "صفحة ويب عربية عدد 2 جاهزة للفتح في المتصفح."
     },
@@ -953,42 +954,42 @@
       "categoryAr": "صفحات ويب",
       "type": "text/html; charset=utf-8",
       "ext": "html",
-      "size": 605,
+      "size": 723,
       "url": "/files/web/html/page-03.html",
       "desc": "صفحة ويب عربية عدد 3 جاهزة للفتح في المتصفح."
     },
     {
       "id": "f086",
-      "name": "باقة تأثيرات ويب رقم 4",
+      "name": "تأثير ويب — نبض مضيء",
       "category": "html",
       "categoryAr": "صفحات ويب",
       "type": "text/html; charset=utf-8",
       "ext": "html",
-      "size": 274,
+      "size": 866,
       "url": "/files/web/html/fx-04.html",
-      "desc": "صفحة عرض لباقة تأثيرات رقم 4 للمواقع والتطبيقات."
+      "desc": "صفحة مستقلة تعرض تأثير نبض مضيء مع دعم تقليل الحركة، بدون مكتبات خارجية."
     },
     {
       "id": "f087",
-      "name": "باقة تأثيرات ويب رقم 5",
+      "name": "تأثير ويب — طفو ناعم",
       "category": "html",
       "categoryAr": "صفحات ويب",
       "type": "text/html; charset=utf-8",
       "ext": "html",
-      "size": 268,
+      "size": 880,
       "url": "/files/web/html/fx-05.html",
-      "desc": "صفحة عرض لباقة تأثيرات رقم 5 للمواقع والتطبيقات."
+      "desc": "صفحة مستقلة تعرض تأثير طفو ناعم مع دعم تقليل الحركة، بدون مكتبات خارجية."
     },
     {
       "id": "f088",
-      "name": "باقة تأثيرات ويب رقم 6",
+      "name": "تأثير ويب — مسح ضوئي",
       "category": "html",
       "categoryAr": "صفحات ويب",
       "type": "text/html; charset=utf-8",
       "ext": "html",
-      "size": 260,
+      "size": 884,
       "url": "/files/web/html/fx-06.html",
-      "desc": "صفحة عرض لباقة تأثيرات رقم 6 للمواقع والتطبيقات."
+      "desc": "صفحة مستقلة تعرض تأثير مسح ضوئي مع دعم تقليل الحركة، بدون مكتبات خارجية."
     },
     {
       "id": "f089",
@@ -1063,9 +1064,9 @@
       "categoryAr": "أنماط CSS",
       "type": "text/css; charset=utf-8",
       "ext": "css",
-      "size": 203,
+      "size": 440,
       "url": "/files/code/css/style-01.css",
-      "desc": "ملف أنماط Cascading رقم 1 لتصميم بطاقات واجهة المستخدم."
+      "desc": "ملف أنماط CSS رقم 1 لتصميم بطاقات واجهة المستخدم."
     },
     {
       "id": "f096",
@@ -1074,9 +1075,9 @@
       "categoryAr": "أنماط CSS",
       "type": "text/css; charset=utf-8",
       "ext": "css",
-      "size": 203,
+      "size": 440,
       "url": "/files/code/css/style-02.css",
-      "desc": "ملف أنماط Cascading رقم 2 لتصميم بطاقات واجهة المستخدم."
+      "desc": "ملف أنماط CSS رقم 2 لتصميم بطاقات واجهة المستخدم."
     },
     {
       "id": "f097",
@@ -1085,9 +1086,9 @@
       "categoryAr": "أنماط CSS",
       "type": "text/css; charset=utf-8",
       "ext": "css",
-      "size": 203,
+      "size": 440,
       "url": "/files/code/css/style-03.css",
-      "desc": "ملف أنماط Cascading رقم 3 لتصميم بطاقات واجهة المستخدم."
+      "desc": "ملف أنماط CSS رقم 3 لتصميم بطاقات واجهة المستخدم."
     },
     {
       "id": "f098",
@@ -1096,7 +1097,7 @@
       "categoryAr": "حزم مضغوطة",
       "type": "application/zip",
       "ext": "zip",
-      "size": 409,
+      "size": 433,
       "url": "/files/packs/zip/pack-01.zip",
       "desc": "ملف ZIP رقم 1 يحتوي على ملفات نصية وبيانات للتجريب."
     },
@@ -1107,7 +1108,7 @@
       "categoryAr": "حزم مضغوطة",
       "type": "application/zip",
       "ext": "zip",
-      "size": 414,
+      "size": 433,
       "url": "/files/packs/zip/pack-02.zip",
       "desc": "ملف ZIP رقم 2 يحتوي على ملفات نصية وبيانات للتجريب."
     },
@@ -1118,9 +1119,1653 @@
       "categoryAr": "حزم مضغوطة",
       "type": "application/zip",
       "ext": "zip",
-      "size": 417,
+      "size": 433,
       "url": "/files/packs/zip/pack-03.zip",
       "desc": "ملف ZIP رقم 3 يحتوي على ملفات نصية وبيانات للتجريب."
+    },
+    {
+      "id": "fx-light-sweep-hero",
+      "name": "كنس الضوء الهيرو",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "light",
+      "effectCategoryAr": "مؤثرات ضوئية",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 2819,
+      "url": "/downloads/lottie/light-sweep-hero.json",
+      "desc": "مسحة ضوء نظيفة بثلاث طبقات (أبيض + سماوي + ذهبي) بسرعات متدرّجة تمنح إحساس عمق حقيقي عند دمجها بوضع Screen فوق اللقطة. مثالي للإنتروهات وعروض المنتجات واللقطات الإعلانية.",
+      "tagline": "شريط ضوء عريض يمسح الكادر بثلاث طبقات سرعة",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "في أفتر إيفكت: ثبّت إضافة Lottie (Bodymovin) ثم استورد الملف. في بريمير: إضافة Lottie. وللأوڤرلاي: حوّله لفيديو أو استخدمه على الويب بوضعية دمج Screen.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات ضوئية",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-flash-burst",
+      "name": "وميض الاصطدام",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "light",
+      "effectCategoryAr": "مؤثرات ضوئية",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 5311,
+      "url": "/downloads/lottie/flash-burst.json",
+      "desc": "وميض قوي للحظات الذروة: فلاش أبيض + حلقتان متمددتان + صليب ضوئي + نواة توهّج. مصمم لضربات التايتل ولحظات الـ Beat Drop في المونتاج الموسيقي.",
+      "tagline": "فلاش احترافي بحلقة تمدد وصليب ضوئي",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "ضعه في لحظة القطع أو ظهور التايتل. الدمج Screen / Add يمنح أفضل نتيجة فوق اللقطات الداكنة.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات ضوئية",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-lens-flare-streak",
+      "name": "وميض العدسة الأفقي",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "light",
+      "effectCategoryAr": "مؤثرات ضوئية",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 7460,
+      "url": "/downloads/lottie/lens-flare-streak.json",
+      "desc": "وميض عدسة على طراز Anamorphic: خط ضوئي رئيسي + هالة ناعمة + كرات عدسة ملوّنة تتحرك بانسجام. يمنح إنتاجك مظهر الأفلام السينمائية فورًا.",
+      "tagline": "خط ضوئي سينمائي بكرات عدسة متحركة",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "حرّك مسار الوميض ليطابق مصدر الضوء في اللقطة. أفضل نتيجة مع وضع الدمج Screen.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات ضوئية",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-glow-pulse",
+      "name": "نبض التوهّج",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "light",
+      "effectCategoryAr": "مؤثرات ضوئية",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 4180,
+      "url": "/downloads/lottie/glow-pulse.json",
+      "desc": "حلقات توهّج متحدة المركز تنبض بإيقاع هادئ — مثالي كخلفية للنصوص، أو كطبقة حيوية تحت العناصر الرسومية في البث المباشر والريكلز.",
+      "tagline": "هالة ضوئية تنبض بطبقات متدرّجة",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "اضبط سرعة النبض على إيقاع الموسيقى عبر تغيير مدة الكومبوزيشن.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات ضوئية",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bokeh-drift",
+      "name": "البوكيه العائم",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "light",
+      "effectCategoryAr": "مؤثرات ضوئية",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 13216,
+      "url": "/downloads/lottie/bokeh-drift.json",
+      "desc": "إحدى عشرة كرة بوكيه بحجم وسرعة مختلفة تمنح خلفيتك حياة وعمقًا دون أن تسرق انتباه المشاهد. حل مثالي للفيديوهات الحوارية والعروض التقديمية.",
+      "tagline": "كرات ضوء خلفية تطفو بعمق ناعم",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "ضعه كطبقة خلفية بشفافية 60-80% مع تمويه خفيف (Gaussian Blur 2-4).",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات ضوئية",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-light-leak-sweep",
+      "name": "تسريب الضوء المتحرك",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "light",
+      "effectCategoryAr": "مؤثرات ضوئية",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1012,
+      "url": "/downloads/svg/light-leak-sweep.svg",
+      "desc": "ملف SVG متحرك بمحرك SMIL يعمل مباشرة في المتصفح بأي موقع أو عرض ويب. ضوء دافئ بحواف ناعمة يشبه التسريبات الفيلمية الحقيقية.",
+      "tagline": "SVG متحركة بضوء دافئ يمسح الكادر",
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "60fps",
+      "usage": "ضعه في موقعك مباشرة بـ <img> أو <object> أو inline — الحركة تعمل في كل المتصفحات. لبرامج المونتاج: صدّره كفيديو أو تسلسل صور من المتصفح.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات ضوئية",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-electric-bolt",
+      "name": "الصاعقة الكهربائية",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "light",
+      "effectCategoryAr": "مؤثرات ضوئية",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1028,
+      "url": "/downloads/svg/electric-bolt.svg",
+      "desc": "صاعقة كوميكسية بتوهّج أصفر ومحيط سماوي مع اهتزاز دقيق. مثالية للحظات الصدمة والتأثيرات الكوميدية في المحتوى الترفيهي.",
+      "tagline": "ومضة برق متحركة بتوهّج مزدوج",
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "—",
+      "usage": "يفتح ويتحرك في أي متصفح. لبرامج المونتاج: صدّره كفيديو من المتصفح أو استخدمه كشريحة صور ثابتة.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات ضوئية",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-light-leak-overlay",
+      "name": "أوفرلاي تسريب الضوء",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "light",
+      "effectCategoryAr": "مؤثرات ضوئية",
+      "type": "image/gif",
+      "ext": "gif",
+      "size": 1536383,
+      "url": "/downloads/overlays/light-leak-overlay.gif",
+      "desc": "أوفرلاي تسريب ضوء دافئ جاهز للسحب والإفلات فوق أي لقطة في أفتر إيفكت أو بريمير أو فاينال كت — ضعه بوضع الدمج Screen وستحصل فورًا على مظهر فيلمي.",
+      "tagline": "GIF أوفرلاي دافئ بالحجم الكامل",
+      "format": "GIF",
+      "quality": "800×450",
+      "fps": "24fps",
+      "usage": "اسحب الملف فوق التايم لاين في AE/بريمير/FCP، اضبط Blend Mode على Screen أو Add، وقلّل الشفافية إلى 60-80%.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "final-cut"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات ضوئية",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "فاينال كت"
+      ]
+    },
+    {
+      "id": "fx-flash-hit-overlay",
+      "name": "أوفرلاي الوميض",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "light",
+      "effectCategoryAr": "مؤثرات ضوئية",
+      "type": "image/gif",
+      "ext": "gif",
+      "size": 238466,
+      "url": "/downloads/overlays/flash-hit-overlay.gif",
+      "desc": "وميض اصطدام قصير (أقل من ثانية) بحواف ناعمة — أداة المونتير السرية لضربات التايتل ولحظات القطع على الإيقاع.",
+      "tagline": "فلاش أبيض سريع للضربات القوية",
+      "format": "GIF",
+      "quality": "800×450",
+      "fps": "24fps",
+      "usage": "ضعه تمامًا لحظة القطع في AE/بريمير/FCP. وضع Screen + شفافية 70%.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "final-cut"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات ضوئية",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "فاينال كت"
+      ]
+    },
+    {
+      "id": "fx-flash-burst-seq",
+      "name": "تسلسل الوميض المتفجر",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "light",
+      "effectCategoryAr": "مؤثرات ضوئية",
+      "type": "application/zip",
+      "ext": "zip",
+      "size": 677065,
+      "url": "/downloads/sequences/flash-burst-seq.zip",
+      "desc": "تسلسل إطارات PNG بقناة ألفا حقيقية — يُستورد كشريحة فيديو واحدة في أي برنامج مونتاج. حلقة تمدد ضوئية احترافية قابلة للتكبير دون فقدان جودة الطبقة.",
+      "tagline": "24 إطار PNG بشفافية حقيقية",
+      "format": "PNG Sequence",
+      "quality": "640×360",
+      "fps": "24fps",
+      "usage": "فك الضغط، ثم File → Import → اختر أول ملف وفعّل «Image Sequence». يعمل على كل البرامج بشفافية كاملة.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات ضوئية",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "دافنشي ريزولف",
+        "فاينال كت"
+      ]
+    },
+    {
+      "id": "fx-whip-transition",
+      "name": "الانتقال الويب",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "transitions",
+      "effectCategoryAr": "انتقالات",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 3947,
+      "url": "/downloads/lottie/whip-transition.json",
+      "desc": "انتقال ويب احترافي بثلاث خطوط ملوّنة تسبق شريطًا داكنًا مع فلاش في المنتصف. التوقيت مضبوط على 25 إطارًا فقط — سريع ونظيف واحترافي.",
+      "tagline": "انتقال سريع بخطوط ملوّنة وفلاش",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "ضعه فوق نقطة القطع بين اللقطتين، مع وضع الدمج Screen أو Normal حسب الخلفية.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "انتقالات",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-ink-reveal",
+      "name": "كشف الحبر",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "transitions",
+      "effectCategoryAr": "انتقالات",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 990,
+      "url": "/downloads/svg/ink-reveal.svg",
+      "desc": "كشف فني بحبر متحرك يكشف لوحة ملوّنة — أسلوب فني مثالي للمحتوى الثقافي والعربي والإعلانات ذات الطابع اليدوي.",
+      "tagline": "SVG متحركة بكشف حبري فني",
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "—",
+      "usage": "يتحرك مباشرة في المتصفح. يمكنك استبدال الألوان من داخل الملف النصي، أو تصديره كفيديو من المتصفح لاستخدامه في المونتاج.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "انتقالات",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-film-burn-overlay",
+      "name": "أوفرلاي احتراق الفيلم",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "transitions",
+      "effectCategoryAr": "انتقالات",
+      "type": "image/gif",
+      "ext": "gif",
+      "size": 2069841,
+      "url": "/downloads/overlays/film-burn-overlay.gif",
+      "desc": "احترق فيلمي (Film Burn) بحركة عضوية غير متكررة — التفاصيل الدافئة التي تفرق بين مونتاج هاوٍ ومونتاج استوديو. مثالي بين اللقطات وبداية الفيديو.",
+      "tagline": "توهّج فيلمي دافئ بحركة عضوية",
+      "format": "GIF",
+      "quality": "800×450",
+      "fps": "24fps",
+      "usage": "اسحب فوق التايم لاين في AE/بريمير/FCP، Blend Mode: Screen، الشفافية 65-85%.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "final-cut"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "انتقالات",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "فاينال كت"
+      ]
+    },
+    {
+      "id": "fx-light-sweep-seq",
+      "name": "تسلسل الكنس الضوئي",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "transitions",
+      "effectCategoryAr": "انتقالات",
+      "type": "application/zip",
+      "ext": "zip",
+      "size": 843264,
+      "url": "/downloads/sequences/light-sweep-seq.zip",
+      "desc": "مسحة ضوء بشرائح PNG بقناة ألفا — الحل الاحترافي عندما تحتاج دقة أعلى من الـ GIF مع شفافية حقيقية. قابل للتكبير إلى 4K دون فقدان جودة.",
+      "tagline": "24 إطار PNG بشفافية — تكبير بلا فقدان",
+      "format": "PNG Sequence",
+      "quality": "640×360",
+      "fps": "24fps",
+      "usage": "فك الضغط ثم استورد كـ Image Sequence. Blend Mode: Screen / Add.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "انتقالات",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "دافنشي ريزولف",
+        "فاينال كت"
+      ]
+    },
+    {
+      "id": "fx-title-slam-comic",
+      "name": "تايتل الصَمْ الكوميكس",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "elements",
+      "effectCategoryAr": "عناصر حركية",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 4637,
+      "url": "/downloads/lottie/title-slam-comic.json",
+      "desc": "تايتل يهبط بقوة بظل أسود مزدوج على طراز القصص المصورة — لوحة صفراء + شريط أحمر + سطر داكن. حركة قوية بتوقيت سينمائي (Anticipation → Hit → Settle).",
+      "tagline": "هبوط قوي بظل مزدوج وفلاش",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "اضبط النص فوق اللوحة الصفراء. سرعة الهبوط قابلة للتعديل من التايم لاين.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "عناصر حركية",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-lower-third-pack",
+      "name": "اللَوَر ثِرْد الحديث",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "elements",
+      "effectCategoryAr": "عناصر حركية",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 3511,
+      "url": "/downloads/lottie/lower-third-pack.json",
+      "desc": "لَوَر ثِرْد نظيف بشريط أسود + لمسة حمراء + مربع أصفر، مع سطرين جاهزين للاسم والوظيفة. تصميم يليق بالمقابلات والوثائقيات والبودكاست المرئي.",
+      "tagline": "شريط أسماء بشريطين ملوّنين",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "استبدل السطرين بالنص المطلوب. مدة الظهور 2 ثانية بمدخل ناعم.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "عناصر حركية",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-neon-underline",
+      "name": "الخط النيوني",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "elements",
+      "effectCategoryAr": "عناصر حركية",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1398,
+      "url": "/downloads/svg/neon-underline.svg",
+      "desc": "خط نيون يُرسم تحت النص مع نقطة ضوء تتحرك على طوله — لمسة احترافية صغيرة تغيّر إحساس الصفحة أو الفيديو بالكامل.",
+      "tagline": "SVG يرسم خطًا متوهجًا تحت النص",
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "—",
+      "usage": "مثالي للمواقع والواجهات — يعمل مباشرة في المتصفح. في برامج المونتاج استخدمه كشريحة صور أو صدّره كفيديو.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "عناصر حركية",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-glitch-scan",
+      "name": "المسح التشويشي",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "glitch",
+      "effectCategoryAr": "تشويش رقمي",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 17322,
+      "url": "/downloads/lottie/glitch-scan.json",
+      "desc": "تشويش رقمي حقيقي: سبعة أشرطة تتنطّ بخطوة 6 إطارات (Step Keyframes) + طبقتا انفصال RGB + خط مسح رأسي. يبدو عشوائيًا لكنه محسوب بعناية ليبقى نظيفًا على الشاشة.",
+      "tagline": "أشرطة تنطّ + انفصال RGB + خط مسح",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "مثالي قبل الكشف عن الشعار أو بين المشاهد. جرّب قصّه لثلاثة إطارات فقط للضربات السريعة.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "تشويش رقمي",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-glitch-bars-overlay",
+      "name": "أوفرلاي أشرطة التشويش",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "glitch",
+      "effectCategoryAr": "تشويش رقمي",
+      "type": "image/gif",
+      "ext": "gif",
+      "size": 273029,
+      "url": "/downloads/overlays/glitch-bars-overlay.gif",
+      "desc": "أشرطة إشارة ملوّنة (أحمر/سماوي/أبيض) تظهر وتختفي بترتيب عشوائي — أوفرلاي جاهز لـ AE وبريمير وFCP يمنح أي لقطة إحساس الخطأ الرقمي المقصود.",
+      "tagline": "GIF بأشرطة إشارة ملوّنة",
+      "format": "GIF",
+      "quality": "800×450",
+      "fps": "24fps",
+      "usage": "Blend Mode: Screen أو Normal حسب الخلفية. جرّب قصّه على إيقاع الموسيقى.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "final-cut"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "تشويش رقمي",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "فاينال كت"
+      ]
+    },
+    {
+      "id": "fx-particles-burst",
+      "name": "انفجار الجزيئات",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "particles",
+      "effectCategoryAr": "جزيئات ودخان",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 21803,
+      "url": "/downloads/lottie/particles-burst.json",
+      "desc": "انفجار جزيئات محسوب إحصائيًا: 16 جسيمًا بأربعة ألوان، زوايا وسرعات وتسارع جاذبية مختلف. النتيجة حركة طبيعية غير آلية — كما لو صُنعت يدويًا جسيمًا جسيمًا.",
+      "tagline": "16 جسيمًا بزوايا وسرعات مدروسة",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "مثالي للحظات الاحتفال والكشف والضربات. الدمج Screen فوق الداكن.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "جزيئات ودخان",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-spark-trails",
+      "name": "ذيول الشرارات",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "particles",
+      "effectCategoryAr": "جزيئات ودخان",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 13108,
+      "url": "/downloads/lottie/spark-trails.json",
+      "desc": "اثنا عشر شرارة متوهجة بذيول متلاشية تطير من المركز — تشبه شرارات اللحام والألعاب النارية. كل شرارة بزاوية وطول مختلف لتجنب التكرار البصري.",
+      "tagline": "شرارات متوهجة تطير باتجاهات متعددة",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "استخدمه مع صوت شرارات لحظة التأثير. ممتاز تحت النصوص المعدنية.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "جزيئات ودخان",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-halftone-burst",
+      "name": "انفجار الهافتون",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "particles",
+      "effectCategoryAr": "جزيئات ودخان",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1367,
+      "url": "/downloads/svg/halftone-burst.svg",
+      "desc": "انفجار نقطي على طراز الهافتون الكوميكس: حلقتان متوهّجتان تدوران في اتجاهين متعاكسين مع نواة نقطية — هوية بصرية قوية للمحتوى الشبابي.",
+      "tagline": "SVG بحلقات هافتون كوميكس",
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "—",
+      "usage": "مثالي خلف التايتلز الكوميدية على الويب. غيّر الألوان من داخل الملف النصي.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "جزيئات ودخان",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-smoke-wisp",
+      "name": "خيوط الدخان",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "particles",
+      "effectCategoryAr": "جزيئات ودخان",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1056,
+      "url": "/downloads/svg/smoke-wisp.svg",
+      "desc": "ثلاث خيوط دخان ناعمة بتمويه Gaussian تتصاعد وتتلاشى بإيقاعات مختلفة — حركة خلفية هادئة تمنح العمق دون تشتيت.",
+      "tagline": "SVG بدخان ناعم يتصاعد ببطء",
+      "format": "SVG متحرك",
+      "quality": "Vector",
+      "fps": "—",
+      "usage": "ضعه كطبقة خلفية في موقعك بشفافية منخفضة. يعمل بشكل رائع في المشاهد الليلية.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "جزيئات ودخان",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-logo-reveal-rings",
+      "name": "كشف الشعار بالحلقات",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "logos",
+      "effectCategoryAr": "كشف الشعار",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 7260,
+      "url": "/downloads/lottie/logo-reveal-rings.json",
+      "desc": "كشف شعار متكامل: حلقتان ضوئيتان تتمددان، شريطان ينسحبان لكشف المكان، ثم يهبط كتلة الشعار بحركة Overshoot مع شرارتين نهائيتين. توقيت مثالي للاستخدام كإنترو.",
+      "tagline": "حلقتان + شريطان + لحظة ظهور قوية",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "استبدل الكتلة الحمراء بشعارك (Shape Layer أو PNG). المدة 2.5 ثانية.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "كشف الشعار",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-hud-frame-tech",
+      "name": "إطار HUD التقني",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "hud",
+      "effectCategoryAr": "إطارات HUD",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 9559,
+      "url": "/downloads/lottie/hud-frame-tech.json",
+      "desc": "إطار تقني بأربع زوايا تدخل من الأطراف، نقاط تحذير نابضة، خط مسح رأسي، وشريط بيانات سفلي. المثالي للمحتوى التقني وعروض المنتجات والألعاب.",
+      "tagline": "زوايا متحركة + خط مسح + بيانات",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "استخدمه كطبقة إطار فوق اللقطة. قابل للتلوين من إعدادات الشكل.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "إطارات HUD",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-progress-ring",
+      "name": "حلقة التقدّم",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "info",
+      "effectCategoryAr": "إنفوجرافيك",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 2102,
+      "url": "/downloads/lottie/progress-ring.json",
+      "desc": "حلقة تقدّم صفراء على مسار رمادي مع نواة سماوية — مبنية بـ Trim Path (المسار الصحيح احترافيًا) وليست مجرد دوران. مثالي للإحصائيات وعروض البيانات.",
+      "tagline": "رسم دائري بـ Trim Path احترافي",
+      "format": "Lottie JSON",
+      "quality": "1920×1080",
+      "fps": "60fps",
+      "usage": "عدّل نسبة التقدّم من قيمة End في Trim Path. متوافق مع كل مشغّلات Lottie.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "web"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "إنفوجرافيك",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-cinematic-teal-orange",
+      "name": "تيل وأورانج سينمائي",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "color",
+      "effectCategoryAr": "لوكات ألوان",
+      "type": "text/plain; charset=utf-8",
+      "ext": "cube",
+      "size": 132757,
+      "url": "/downloads/luts/cinematic-teal-orange.cube",
+      "desc": "اللوك الأكثر استخدامًا في هوليوود: ظلال مائلة للسماوي ودرجات بشرة دافئة. مصنوع بعناية ليبقى البشرة طبيعية دون إفراط.",
+      "tagline": "اللوك الكلاسيكي للأفلام",
+      "format": "LUT .cube",
+      "quality": "33×33×33",
+      "fps": "—",
+      "usage": "في بريمير: Lumetri Color → Creative → Look. في ريزولف: LUTs. في AE: Lumetri. في FCP: Color Board/LUT.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "لوكات ألوان",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "دافنشي ريزولف",
+        "فاينال كت"
+      ]
+    },
+    {
+      "id": "fx-warm-film-look",
+      "name": "الفيلم الدافئ",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "color",
+      "effectCategoryAr": "لوكات ألوان",
+      "type": "text/plain; charset=utf-8",
+      "ext": "cube",
+      "size": 132748,
+      "url": "/downloads/luts/warm-film-look.cube",
+      "desc": "لوك دافئ بدرجات عسلية وأصفر خفيف — مثالي للسفر والطعام والمحتوى العائلي واللحظات الإنسانية.",
+      "tagline": "لوك عسلي دافئ للمقاطع العائلية",
+      "format": "LUT .cube",
+      "quality": "33×33×33",
+      "fps": "—",
+      "usage": "يطبَّق مباشرةً أو بشفافية 50-70% للتخفيف.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "لوكات ألوان",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "دافنشي ريزولف",
+        "فاينال كت"
+      ]
+    },
+    {
+      "id": "fx-neon-night",
+      "name": "النيون الليلي",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "color",
+      "effectCategoryAr": "لوكات ألوان",
+      "type": "text/plain; charset=utf-8",
+      "ext": "cube",
+      "size": 132744,
+      "url": "/downloads/luts/neon-night.cube",
+      "desc": "لوك ليلي يرفع النيون الأزرق والماجنتا في الإضاءة الملونة ويُعمّق الظلال — مصمم خصيصًا لمدن الليل والحفلات والمحتوى الموسيقي.",
+      "tagline": "ظلال أعمق وألوان أقوى للّيل",
+      "format": "LUT .cube",
+      "quality": "33×33×33",
+      "fps": "—",
+      "usage": "الأفضل مع لقطات فيها إضاءة ملونة فعلية (نيون، شاشات، أضواء مسرح).",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "لوكات ألوان",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "دافنشي ريزولف",
+        "فاينال كت"
+      ]
+    },
+    {
+      "id": "fx-bw-dramatic",
+      "name": "أبيض وأسود درامي",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "color",
+      "effectCategoryAr": "لوكات ألوان",
+      "type": "text/plain; charset=utf-8",
+      "ext": "cube",
+      "size": 132746,
+      "url": "/downloads/luts/bw-dramatic.cube",
+      "desc": "أبيض وأسود بتباين درامي محسوب (S-Curve) — ليس مجرد إزالة الألوان، بل إعادة صياغة للضوء والظل كما في أفلام نوار.",
+      "tagline": "تباين عالٍ بظلال سينمائية",
+      "format": "LUT .cube",
+      "quality": "33×33×33",
+      "fps": "—",
+      "usage": "جربه على لقطات بها إضاءة جانبية قوية للحصول على أفضل نتيجة.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "لوكات ألوان",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "دافنشي ريزولف",
+        "فاينال كت"
+      ]
+    },
+    {
+      "id": "fx-vintage-fade",
+      "name": "الفينتاج الباهت",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "color",
+      "effectCategoryAr": "لوكات ألوان",
+      "type": "text/plain; charset=utf-8",
+      "ext": "cube",
+      "size": 132746,
+      "url": "/downloads/luts/vintage-fade.cube",
+      "desc": "لوك الفينتاج المطفي (Matte Fade) بظلال مرفوعة وألوان عتيقة — الطابع الذي يميّز المحتوى الراقي على إنستغرام واليوتيوب.",
+      "tagline": "تلاشي مطفي بألوان عتيقة",
+      "format": "LUT .cube",
+      "quality": "33×33×33",
+      "fps": "—",
+      "usage": "طبّقه بشفافية 60% ثم ارفع التباين قليلًا حسب اللقطة.",
+      "programs": [
+        "after-effects",
+        "premiere",
+        "resolve",
+        "final-cut"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "لوكات ألوان",
+        "أفتر إيفكت",
+        "بريمير برو",
+        "دافنشي ريزولف",
+        "فاينال كت"
+      ]
+    },
+    {
+      "id": "fx-ae-expressions-pack",
+      "name": "حزمة تعابير AE",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "tools",
+      "effectCategoryAr": "أدوات وتعابير",
+      "type": "text/plain; charset=utf-8",
+      "ext": "txt",
+      "size": 1891,
+      "url": "/downloads/expressions/ae-expressions-pack.txt",
+      "desc": "ستة تعابير After Effects مجرّبة وتعمل على المحرّك القياسي: Overshoot، Wiggle أفقي، Auto Fade، Pulsing، Float، Speed Fade — مع شرح عربي لكل تعبير. (حُذف منها أي تعبير لا يعمل بشكل صحيح).",
+      "tagline": "6 تعابير موثّقة تعمل فعليًا في AE",
+      "format": "TXT",
+      "quality": "6 تعابير",
+      "fps": "—",
+      "usage": "انسخ التعبير → Alt/Option + انقر على مؤقت الخاصية → الصق.",
+      "programs": [
+        "after-effects"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "أدوات وتعابير",
+        "أفتر إيفكت"
+      ]
+    },
+    {
+      "id": "fx-overshoot-expression",
+      "name": "تعبير Overshoot",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "tools",
+      "effectCategoryAr": "أدوات وتعابير",
+      "type": "text/plain; charset=utf-8",
+      "ext": "txt",
+      "size": 344,
+      "url": "/downloads/expressions/overshoot.txt",
+      "desc": "التعبير الكلاسيكي الذي يمنح كل حركتك Overshoot طبيعيًا محسوبًا من السرعة اللحظية — بدون إعداد يدوي.",
+      "tagline": "ارتداد ناعم بعد نهاية الحركة",
+      "format": "TXT",
+      "quality": "تعبير واحد",
+      "fps": "—",
+      "usage": "الصقه على Position أو Scale أو Rotation.",
+      "programs": [
+        "after-effects"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "أدوات وتعابير",
+        "أفتر إيفكت"
+      ]
+    },
+    {
+      "id": "fx-auto-fade-expression",
+      "name": "تعبير الظهور التلقائي",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "tools",
+      "effectCategoryAr": "أدوات وتعابير",
+      "type": "text/plain; charset=utf-8",
+      "ext": "txt",
+      "size": 153,
+      "url": "/downloads/expressions/auto-fade.txt",
+      "desc": "ظهور وتلاشٍ تلقائيان حسب مدة الطبقة — حرّك الطبقة على التايم لاين وسيتغيّر التلاشي معها تلقائيًا.",
+      "tagline": "تلاشٍ داخلي وخارجي تلقائي",
+      "format": "TXT",
+      "quality": "تعبير واحد",
+      "fps": "—",
+      "usage": "الصقه على Opacity.",
+      "programs": [
+        "after-effects"
+      ],
+      "tags": [
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "أدوات وتعابير",
+        "أفتر إيفكت"
+      ]
+    },
+    {
+      "id": "fx-bot-welcome-rings",
+      "name": "حلقات الترحيب",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 3536,
+      "url": "/downloads/bot/welcome-rings.json",
+      "desc": "ثلاث حلقات تستقبل الزائر وتتمدد حول نواة مضيئة. ملف متجهي بخلفية شفافة، قابل لتغيير الألوان والحجم دون فقدان الجودة.",
+      "tagline": "ثلاث حلقات تستقبل الزائر وتتمدد حول نواة مضيئة.",
+      "format": "Lottie JSON",
+      "quality": "512×512",
+      "fps": "60fps",
+      "usage": "افتح المعاينة في مساعد الملفات، أو حمّل JSON وشغّله بمكتبة lottie-web. في أفتر إيفكت استخدم إضافة Lottie/Bodymovin؛ يلزم تصديره إلى فيديو لاستخدامه مباشرة في بريمير.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "lottie",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-thinking-orbit",
+      "name": "مدار التفكير",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 7781,
+      "url": "/downloads/bot/thinking-orbit.json",
+      "desc": "ثلاثة أقمار تدور أثناء البحث عن الملف المناسب. ملف متجهي بخلفية شفافة، قابل لتغيير الألوان والحجم دون فقدان الجودة.",
+      "tagline": "ثلاثة أقمار تدور أثناء البحث عن الملف المناسب.",
+      "format": "Lottie JSON",
+      "quality": "512×512",
+      "fps": "60fps",
+      "usage": "افتح المعاينة في مساعد الملفات، أو حمّل JSON وشغّله بمكتبة lottie-web. في أفتر إيفكت استخدم إضافة Lottie/Bodymovin؛ يلزم تصديره إلى فيديو لاستخدامه مباشرة في بريمير.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "lottie",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-voice-bars",
+      "name": "موجات الحديث",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 6197,
+      "url": "/downloads/bot/voice-bars.json",
+      "desc": "مؤشر زخرفي للحديث يتحرك مع حالة المساعد، وليس مقياسًا للميكروفون. ملف متجهي بخلفية شفافة، قابل لتغيير الألوان والحجم دون فقدان الجودة.",
+      "tagline": "مؤشر زخرفي للحديث يتحرك مع حالة المساعد، وليس مقياسًا للميكروفون.",
+      "format": "Lottie JSON",
+      "quality": "512×512",
+      "fps": "60fps",
+      "usage": "افتح المعاينة في مساعد الملفات، أو حمّل JSON وشغّله بمكتبة lottie-web. في أفتر إيفكت استخدم إضافة Lottie/Bodymovin؛ يلزم تصديره إلى فيديو لاستخدامه مباشرة في بريمير.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "lottie",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-loading-orbit",
+      "name": "مدار التحميل",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 12984,
+      "url": "/downloads/bot/loading-orbit.json",
+      "desc": "حلقة تحميل لرسائل الانتظار والبحث عن الملفات. ملف متجهي بخلفية شفافة، قابل لتغيير الألوان والحجم دون فقدان الجودة.",
+      "tagline": "حلقة تحميل لرسائل الانتظار والبحث عن الملفات.",
+      "format": "Lottie JSON",
+      "quality": "512×512",
+      "fps": "60fps",
+      "usage": "افتح المعاينة في مساعد الملفات، أو حمّل JSON وشغّله بمكتبة lottie-web. في أفتر إيفكت استخدم إضافة Lottie/Bodymovin؛ يلزم تصديره إلى فيديو لاستخدامه مباشرة في بريمير.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "lottie",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-success-check",
+      "name": "علامة النجاح",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 1981,
+      "url": "/downloads/bot/success-check.json",
+      "desc": "علامة صح تُرسم تدريجيًا لتأكيد طلب التحميل، ولا تعني اكتمال حفظ الملف. ملف متجهي بخلفية شفافة، قابل لتغيير الألوان والحجم دون فقدان الجودة.",
+      "tagline": "علامة صح تُرسم تدريجيًا لتأكيد طلب التحميل، ولا تعني اكتمال حفظ الملف.",
+      "format": "Lottie JSON",
+      "quality": "512×512",
+      "fps": "60fps",
+      "usage": "افتح المعاينة في مساعد الملفات، أو حمّل JSON وشغّله بمكتبة lottie-web. في أفتر إيفكت استخدم إضافة Lottie/Bodymovin؛ يلزم تصديره إلى فيديو لاستخدامه مباشرة في بريمير.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "lottie",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-download-arrow",
+      "name": "سهم التنزيل",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 1825,
+      "url": "/downloads/bot/download-arrow.json",
+      "desc": "سهم متحرك لزر تنزيل الملفات والمؤثرات. ملف متجهي بخلفية شفافة، قابل لتغيير الألوان والحجم دون فقدان الجودة.",
+      "tagline": "سهم متحرك لزر تنزيل الملفات والمؤثرات.",
+      "format": "Lottie JSON",
+      "quality": "512×512",
+      "fps": "60fps",
+      "usage": "افتح المعاينة في مساعد الملفات، أو حمّل JSON وشغّله بمكتبة lottie-web. في أفتر إيفكت استخدم إضافة Lottie/Bodymovin؛ يلزم تصديره إلى فيديو لاستخدامه مباشرة في بريمير.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "lottie",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-typing-dots",
+      "name": "نقاط الكتابة",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 3428,
+      "url": "/downloads/bot/typing-dots.json",
+      "desc": "ثلاث نقاط متتابعة عندما يجهّز المساعد ردًا بالعربية. ملف متجهي بخلفية شفافة، قابل لتغيير الألوان والحجم دون فقدان الجودة.",
+      "tagline": "ثلاث نقاط متتابعة عندما يجهّز المساعد ردًا بالعربية.",
+      "format": "Lottie JSON",
+      "quality": "512×512",
+      "fps": "60fps",
+      "usage": "افتح المعاينة في مساعد الملفات، أو حمّل JSON وشغّله بمكتبة lottie-web. في أفتر إيفكت استخدم إضافة Lottie/Bodymovin؛ يلزم تصديره إلى فيديو لاستخدامه مباشرة في بريمير.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "lottie",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-celebration-sparks",
+      "name": "شرارات الاحتفال",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "application/json; charset=utf-8",
+      "ext": "json",
+      "size": 10284,
+      "url": "/downloads/bot/celebration-sparks.json",
+      "desc": "دفعة جسيمات ملونة للاحتفال باختيار مؤثر أو بدء تنزيل. ملف متجهي بخلفية شفافة، قابل لتغيير الألوان والحجم دون فقدان الجودة.",
+      "tagline": "دفعة جسيمات ملونة للاحتفال باختيار مؤثر أو بدء تنزيل.",
+      "format": "Lottie JSON",
+      "quality": "512×512",
+      "fps": "60fps",
+      "usage": "افتح المعاينة في مساعد الملفات، أو حمّل JSON وشغّله بمكتبة lottie-web. في أفتر إيفكت استخدم إضافة Lottie/Bodymovin؛ يلزم تصديره إلى فيديو لاستخدامه مباشرة في بريمير.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "lottie",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-hello",
+      "name": "تحية البوت",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1646,
+      "url": "/downloads/bot/bot-hello.svg",
+      "desc": "وجه مساعد يتحرك برفق مع نجوم ترحيب. يعمل مباشرة في المتصفح ويحترم إعداد تقليل الحركة في النظام.",
+      "tagline": "وجه مساعد يتحرك برفق مع نجوم ترحيب.",
+      "format": "SVG متحرك",
+      "quality": "512×512 · متجهي",
+      "fps": "CSS",
+      "usage": "افتحه في المتصفح أو ضعه في عنصر img. لتعديل الحركة والألوان، عدّل CSS داخل ملف SVG. برامج المونتاج تحتاج تصديره إلى فيديو أولًا.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "svg",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-scan",
+      "name": "مسح الملفات",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1496,
+      "url": "/downloads/bot/bot-scan.svg",
+      "desc": "خط سماوي يمسح إطار البحث عن الملفات. يعمل مباشرة في المتصفح ويحترم إعداد تقليل الحركة في النظام.",
+      "tagline": "خط سماوي يمسح إطار البحث عن الملفات.",
+      "format": "SVG متحرك",
+      "quality": "512×512 · متجهي",
+      "fps": "CSS",
+      "usage": "افتحه في المتصفح أو ضعه في عنصر img. لتعديل الحركة والألوان، عدّل CSS داخل ملف SVG. برامج المونتاج تحتاج تصديره إلى فيديو أولًا.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "svg",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-energy",
+      "name": "طاقة البوت",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1330,
+      "url": "/downloads/bot/bot-energy.svg",
+      "desc": "برق ذهبي نابض داخل حلقة بنفسجية. يعمل مباشرة في المتصفح ويحترم إعداد تقليل الحركة في النظام.",
+      "tagline": "برق ذهبي نابض داخل حلقة بنفسجية.",
+      "format": "SVG متحرك",
+      "quality": "512×512 · متجهي",
+      "fps": "CSS",
+      "usage": "افتحه في المتصفح أو ضعه في عنصر img. لتعديل الحركة والألوان، عدّل CSS داخل ملف SVG. برامج المونتاج تحتاج تصديره إلى فيديو أولًا.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "svg",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-stars",
+      "name": "نجوم التفاعل",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1663,
+      "url": "/downloads/bot/bot-stars.svg",
+      "desc": "ثلاث نجوم تتلألأ حول وجه مساعد سعيد. يعمل مباشرة في المتصفح ويحترم إعداد تقليل الحركة في النظام.",
+      "tagline": "ثلاث نجوم تتلألأ حول وجه مساعد سعيد.",
+      "format": "SVG متحرك",
+      "quality": "512×512 · متجهي",
+      "fps": "CSS",
+      "usage": "افتحه في المتصفح أو ضعه في عنصر img. لتعديل الحركة والألوان، عدّل CSS داخل ملف SVG. برامج المونتاج تحتاج تصديره إلى فيديو أولًا.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "svg",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-talk",
+      "name": "فقاعة العربية",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1600,
+      "url": "/downloads/bot/bot-talk.svg",
+      "desc": "فقاعة كلام عربية مع نقاط حديث متحركة. يعمل مباشرة في المتصفح ويحترم إعداد تقليل الحركة في النظام.",
+      "tagline": "فقاعة كلام عربية مع نقاط حديث متحركة.",
+      "format": "SVG متحرك",
+      "quality": "512×512 · متجهي",
+      "fps": "CSS",
+      "usage": "افتحه في المتصفح أو ضعه في عنصر img. لتعديل الحركة والألوان، عدّل CSS داخل ملف SVG. برامج المونتاج تحتاج تصديره إلى فيديو أولًا.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "svg",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-sleep",
+      "name": "استراحة البوت",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1599,
+      "url": "/downloads/bot/bot-sleep.svg",
+      "desc": "وجه هادئ يدخل في الاستراحة مع نجوم صغيرة تطفو. يعمل مباشرة في المتصفح ويحترم إعداد تقليل الحركة في النظام.",
+      "tagline": "وجه هادئ يدخل في الاستراحة مع نجوم صغيرة تطفو.",
+      "format": "SVG متحرك",
+      "quality": "512×512 · متجهي",
+      "fps": "CSS",
+      "usage": "افتحه في المتصفح أو ضعه في عنصر img. لتعديل الحركة والألوان، عدّل CSS داخل ملف SVG. برامج المونتاج تحتاج تصديره إلى فيديو أولًا.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "svg",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-download",
+      "name": "تنزيل هادئ",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1572,
+      "url": "/downloads/bot/bot-download.svg",
+      "desc": "سهم تنزيل مع حلقة تقدم زخرفية. يعمل مباشرة في المتصفح ويحترم إعداد تقليل الحركة في النظام.",
+      "tagline": "سهم تنزيل مع حلقة تقدم زخرفية.",
+      "format": "SVG متحرك",
+      "quality": "512×512 · متجهي",
+      "fps": "CSS",
+      "usage": "افتحه في المتصفح أو ضعه في عنصر img. لتعديل الحركة والألوان، عدّل CSS داخل ملف SVG. برامج المونتاج تحتاج تصديره إلى فيديو أولًا.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "svg",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
+    },
+    {
+      "id": "fx-bot-notification",
+      "name": "تنبيه لطيف",
+      "category": "effects",
+      "categoryAr": "مؤثرات وأنيميشن",
+      "effectCategory": "bot",
+      "effectCategoryAr": "مؤثرات البوت",
+      "type": "image/svg+xml",
+      "ext": "svg",
+      "size": 1584,
+      "url": "/downloads/bot/bot-notification.svg",
+      "desc": "جرس ذهبي يتمايل عند وصول تنبيه جديد. يعمل مباشرة في المتصفح ويحترم إعداد تقليل الحركة في النظام.",
+      "tagline": "جرس ذهبي يتمايل عند وصول تنبيه جديد.",
+      "format": "SVG متحرك",
+      "quality": "512×512 · متجهي",
+      "fps": "CSS",
+      "usage": "افتحه في المتصفح أو ضعه في عنصر img. لتعديل الحركة والألوان، عدّل CSS داخل ملف SVG. برامج المونتاج تحتاج تصديره إلى فيديو أولًا.",
+      "programs": [
+        "web"
+      ],
+      "tags": [
+        "أنيميشن",
+        "مؤثرات البوت",
+        "animation",
+        "svg",
+        "شفاف",
+        "مؤثرات",
+        "أنيميشن",
+        "effects",
+        "animation",
+        "مؤثرات البوت",
+        "الويب والموبايل"
+      ]
     }
   ]
 }

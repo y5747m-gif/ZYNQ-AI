@@ -51,6 +51,8 @@ const MIME = {
   '.txt': 'text/plain; charset=utf-8',
   '.cube': 'text/plain; charset=utf-8',
   '.zip': 'application/zip',
+  '.csv': 'text/csv; charset=utf-8',
+  '.md': 'text/markdown; charset=utf-8',
   '.apk': 'application/vnd.android.package-archive',
 };
 
@@ -308,9 +310,11 @@ async function handler(req, res) {
 
     // تطبيق «ستيريو» يحتاج الشرطة المائلة في النهاية حتى تعمل المسارات النسبية
     // (app.js · sw.js · manifest) داخل نطاقه على أي خادم أو استضافة.
-    if (p === '/stereo') {
-      res.writeHead(301, { Location: '/stereo/' });
-      return res.end();
+    for (const route of ['/stereo', '/bot', '/files-bot']) {
+      if (p === route) {
+        res.writeHead(301, { Location: route + '/' + url.search });
+        return res.end();
+      }
     }
 
     // الأيقونة الافتراضية للمتصفح حتى لا يظهر 404 في الكونسول
@@ -386,10 +390,11 @@ async function handler(req, res) {
       entries.push({
         name: 'ZYNQ-FX-README.txt',
         data: Buffer.from(
-          'ZYNQ FX — Professional Motion & Light FX Pack\n' +
-          '================================================\n' +
+          'ZYNQ FX — باقة المؤثرات والحركة\n' +
+          '================================\n' +
           'هذه الباقة من مكتبة ZYNQ FX — استخدم الملفات بحرية في مشاريعك التجارية.\n' +
-          'Lottie JSON: أفتر إيفكت/بريمير عبر إضافة Lottie — أو أي ويب/موبايل.\n' +
+          'Lottie JSON: شغّله في الويب بمكتبة lottie-web، أو استورده في أفتر إيفكت عبر إضافة Lottie/Bodymovin. لبريمير صدّره إلى فيديو أولًا.\n' +
+          'SVG: افتحه في المتصفح؛ الحركة مضمّنة داخل الملف. راجع إعداد تقليل الحركة.\n' +
           'PNG Sequence: استورد كـ Image Sequence بشفافية كاملة.\n' +
           'GIF: أوفرلاي بوضع الدمج Screen.\n' +
           'LUT .cube: عبر Lumetri / Resolve / Final Cut.\n', 'utf8'),

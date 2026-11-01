@@ -9,7 +9,7 @@
 
   const TIPS = [
     'أهلًا! أنا ZYNQ BOT ⚡',
-    'تريد مؤثرات جاهزة؟ عندي ٣٤ أصلًا.',
+    'تريد مؤثرات جاهزة؟ افتح مساعد الملفات وشوف الجديد.',
     'اضغط عليّ لأتحرّك!',
     'كل الأصول مجانية للاستخدام التجاري.',
     'جرّب صفحتي: أوضاع · وجوه · صوت 🤖'
@@ -33,14 +33,15 @@
 
     const btn = host.querySelector('.zy-buddy-hit') || host;
     btn.addEventListener('click', () => {
-      bot.react();
-      say(TIPS[i++ % TIPS.length], 5200);
-      if (!window.ZynqBot.voice.muted) window.ZynqBot.voice.sfx(Math.random() > 0.5 ? 'boing' : 'ok');
+      bot.wave({ silent: true });
+      const text = TIPS[i++ % TIPS.length];
+      say(text, 5200);
+      bot.say(text, { expression: 'happy' });
     });
 
     // يحيّي الزائر مرة واحدة بعد ثانيتين (بلا صوت — المتصفح يمنعه)
     setTimeout(() => {
-      bot.wave();
+      bot.wave({ silent: true });
       say(TIPS[0], 5200);
     }, 2200);
 
