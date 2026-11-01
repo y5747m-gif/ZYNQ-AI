@@ -7,6 +7,7 @@
 <meta name="description" content="مكتبة تحميل مؤثرات حركية وضوئية احترافية: انتقالات، كشف شعار، لوكات ألوان، تعابير أفتر إيفكت — ملفات جاهزة لأفتر إيفكت وبريمير ودافنشي وفاينال كت.">
 <link rel="icon" type="image/svg+xml" href="logo.svg">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="bot/bot.css">
 </head>
 <body>
 
@@ -22,6 +23,7 @@
     <nav class="nav-links" aria-label="التنقل">
       <a href="#library">المكتبة</a>
       <a href="#programs">البرامج</a>
+      <a href="bot/index.html">الروبوت 🤖</a>
       <a href="#stereo-app">تطبيق الموبايل</a>
       <a href="#packs">الباقات</a>
       <a href="#faq">أسئلة</a>
@@ -97,6 +99,37 @@
       <p>كل ملف يمرّ باختبار فتح واستيراد فعلي — ونكتب لك الخطوات بالضبط.</p>
     </div>
     <div class="programs-row reveal" id="programs-row"></div>
+  </div>
+</section>
+
+
+<!-- ======================= ZYNQ BOT — الروبوت ======================= -->
+<section class="section section-bot" id="bot">
+  <div class="container bot-feature">
+    <div class="bot-feature-copy reveal">
+      <div class="sticker sticker-violet">شخصية الموقع الجديدة</div>
+      <h2>قابل <span class="bot-grad">ZYNQ BOT</span> — روبوت حيّ يتكلّم ويتحرّك</h2>
+      <p>
+        رفيقك في الموقع: رأس لامع، سماعات بإضاءة بنفسجية، وهودي ZYNQ FX.
+        عيونه OLED تنبض بالضوء، ويتحرّك في <strong>١٠ أوضاع</strong> و<strong>١٢ تعبيرًا</strong>،
+        ويصدر <strong>صوت روبوت لطيف</strong> — كل ذلك مرسوم بـ SVG بلا صور ولا مكتبات.
+      </p>
+      <div class="bot-feature-poses">
+        <div class="lib-pose" data-bot-pose="wave" data-bot-face="happy"></div>
+        <div class="lib-pose" data-bot-pose="dance" data-bot-face="laugh"></div>
+        <div class="lib-pose" data-bot-pose="fly" data-bot-face="star"></div>
+        <div class="lib-pose" data-bot-pose="think" data-bot-face="think"></div>
+      </div>
+      <div class="bot-feature-actions">
+        <a class="btn btn-violet" href="bot/index.html">افتح مختبر الروبوت 🤖</a>
+        <button class="btn btn-ghost" type="button" id="bot-tease">👋 حيّني أنا بوت</button>
+      </div>
+      <p class="bot-feature-note" id="bot-tease-line">يظهر الروبوت أيضًا في زاوية الشاشة — اضغط عليه في أي وقت.</p>
+    </div>
+    <div class="bot-feature-stage reveal">
+      <div class="lib-bot" id="bot-feature-live"></div>
+      <div class="lib-bot-glow" aria-hidden="true"></div>
+    </div>
   </div>
 </section>
 
@@ -306,6 +339,7 @@
       <a href="#library">كل الأصول</a>
       <a href="#packs">الباقات</a>
       <a href="#programs">البرامج المدعومة</a>
+      <a href="bot/index.html">شخصية الروبوت 🤖</a>
     </div>
     <div class="footer-links">
       <h4>مساعدة</h4>
@@ -369,6 +403,16 @@
   </div>
 </div>
 
+<div class="zy-buddy" data-zynq-buddy>
+  <div class="zy-buddy-say" hidden></div>
+  <button class="zy-buddy-hit" type="button" aria-label="تحدّث مع روبوت ZYNQ">
+    <span class="zy-buddy-bot"></span>
+  </button>
+</div>
+
+<script src="bot/bot-engine.js"></script>
+<script src="bot/buddy.js"></script>
+<script src="bot/home-bot.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

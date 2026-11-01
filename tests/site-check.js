@@ -269,6 +269,136 @@ function checkAndroidProject() {
   return dir;
 }
 
+
+// --------------------------------------------------------- 3.5) روبوت ZYNQ
+function checkBot() {
+  console.log('\nشخصية ZYNQ BOT:');
+  const dir = path.join(PUBLIC, 'bot');
+  const files = ['index.html', 'bot-engine.js', 'app.js', 'style.css', 'bot.css', 'buddy.js', 'home-bot.js'];
+  const missing = files.filter((f) => !exists(path.join(dir, f)));
+  ok(missing.length === 0, `ملفات الروبوت كاملة${missing.length ? ' — ناقص: ' + missing.join('، ') : ''}`);
+
+  const enginePath = path.join(dir, 'bot-engine.js');
+  const engine = read(enginePath);
+  const botHtml = read(path.join(dir, 'index.html'));
+  const botCss = read(path.join(dir, 'bot.css'));
+
+  // تشغيل المحرّك في بيئة افتراضية والتأكد من أنه ينتج رسمًا لكل وضع وتعبير
+  let api = null;
+  try {
+    const sandbox = { window: {}, console: { log() {} }, localStorage: null, navigator: {}, setTimeout, clearTimeout };
+    sandbox.globalThis = sandbox;
+    require('vm').createContext(sandbox);
+    require('vm').runInContext(engine, sandbox);
+    api = sandbox.window.ZynqBot;
+  } catch (err) {
+    ok(false, 'محرّك الروبوت يعمل بلا أخطاء — ' + err.message);
+  }
+  ok(!!api, 'محرّك الروبوت يُنشئ واجهة ZynqBot');
+  if (!api) return;
+
+  ok(api.POSES.length >= 8, `عدد الأوضاع (${api.POSES.length})`);
+  ok(api.FACES.length >= 10, `عدد التعبيرات (${api.FACES.length})`);
+  ok(api.THEMES.length >= 4, `عدد الألوان المتغيّرة (${api.THEMES.length})`);
+  ok(api.THEMES.every((t) => /^#[0-9a-f]{6}$/i.test(t.accent)), 'كل لون تمييز معرَّف بقيمة HEX صحيحة');
+  ok(typeof api.mount === 'function' && typeof api.applyTheme === 'function', 'واجهة mount/applyTheme متاحة');
+  ok(typeof api.voice.speak === 'function' && typeof api.voice.sfx === 'function', 'واجهة الصوت (speak/sfx) متاحة');
+
+  // كل تعبير يُنتج شكلاً مطابقًا، وكل وضع ينتج وسمًا متوازنًا
+  const badFaces = [];
+  for (const f of api.FACES) {
+    const m = api.markup('t' + f.id, { expression: f.id });
+    if (!m.includes(`data-eyes="${f.eyes}"`) || !m.includes(`data-mouth="${f.mouth}"`)) badFaces.push(f.id);
+    if (!new RegExp(`class="eyes-${f.eyes}`).test(m)) badFaces.push(f.id + ':shape');
+  }
+  ok(badFaces.length === 0, `كل تعبير يرسم عينه وفمه الصحيحين${badFaces.length ? ' — ' + badFaces.join('، ') : ''}`);
+
+  const badPoses = [];
+  for (const p of api.POSES) {
+    const m = api.markup('t' + p.id, { pose: p.id });
+    const open = (m.match(/<g\b/g) || []).length;
+    const close = (m.match(/<\/g>/g) || []).length;
+    if (open !== close) badPoses.push(p.id + ':tags');
+    if (!m.includes(`data-pose="${p.id}"`)) badPoses.push(p.id + ':attr');
+    if (!/viewBox="[-\d. ]+"/.test(m)) badPoses.push(p.id + ':viewBox');
+  }
+  ok(badPoses.length === 0, `كل وضع يُنتج SVG متوازنًا (${api.POSES.length} وضعًا)${badPoses.length ? ' — ' + badPoses.join('، ') : ''}`);
+
+  // الرسم نفسه: العناصر المميزة للشخصية
+  const one = api.markup('t', { pose: 'stand', expression: 'idle' });
+  const parts = [
+    ['class="screen"', 'شاشة الوجه'],
+    ['class="head-shell"', 'رأس أبيض'],
+    ['class="cup cup-l"', 'سماعة يسرى'],
+    ['class="bot-logo"', 'شعار ZYNQ FX على الهودي'],
+    ['logo-bolt', 'برق الشعار'],
+    ['class="bot-arm bot-arm-l"', 'ذراع يسرى'],
+    ['class="forearm"', 'مرفق متحرك'],
+    ['class="bot-leg bot-leg-l"', 'قدم'],
+    ['class="bot-shadow"', 'ظل أرضي'],
+    ['class="face"', 'مجموعة الوجه']
+  ];
+  const lost = parts.filter(([needle]) => !one.includes(needle)).map(([, label]) => label);
+  ok(lost.length === 0, `أجزاء الشخصية كلها مرسومة${lost.length ? ' — ناقص: ' + lost.join('، ') : ''}`);
+
+  // كل تعبير/وضع له قاعدة CSS (لا وجه بلا تصميم)
+  const cssFaces = api.FACES.filter((f) => !botCss.includes(`[data-eyes="${f.eyes}"]`) || !botCss.includes(`[data-mouth="${f.mouth}"]`));
+  ok(cssFaces.length === 0, `كل تعبير له قاعدة عرض في CSS${cssFaces.length ? ' — ' + cssFaces.map((f) => f.id).join('، ') : ''}`);
+  const cssPoses = api.POSES.filter((p) => !botCss.includes(`[data-pose="${p.id}"]`));
+  ok(cssPoses.length === 0, `كل وضع له حركة في CSS${cssPoses.length ? ' — ' + cssPoses.map((p) => p.id).join('، ') : ''}`);
+
+  // كل animation في CSS له @keyframes موجود (لا حركة ميتة)
+  const declared = new Set([...botCss.matchAll(/@keyframes\s+([\w-]+)/g)].map((m) => m[1]));
+  const used = new Set([...botCss.matchAll(/animation(?:-name)?\s*:\s*([\w-]+)/g)].map((m) => m[1]).filter((n) => n !== 'none'));
+  const dangling = [...used].filter((n) => !declared.has(n));
+  ok(dangling.length === 0, `كل الحركات المستخدمة معرَّفة${dangling.length ? ' — ' + dangling.join('، ') : ''}`);
+  ok(declared.size >= 25, `عدد الحركات المعرَّفة (${declared.size})`);
+
+  // الصوت: مُولَّد محليًا، ولا تشغيل تلقائي، ويحترم الكتم
+  ok(/AudioContext/.test(engine), 'الصوت يُولَّد بـ Web Audio (بلا ملفات صوت)');
+  ok(!/new\s+Audio\(/.test(engine) && !/\.play\(\)/.test(engine), 'لا ملفات صوت تُشغَّل تلقائيًا');
+  ok(/speechSynthesis/.test(engine), 'يستخدم محرّك النطق في الجهاز للكلام العربي');
+  ok(/setMuted|muted/.test(engine) && /this\.muted\)\s*return/.test(engine), 'الصوت يُحترم عند الكتم');
+  ok(/ensure\(\)/.test(engine), 'سياق الصوت يُنشأ بعد تفاعل المستخدم فقط (ensure)');
+
+  // صفحة الروبوت: الأقسام والعناصر التي يستخدمها السكربت
+  const idsInHtml = new Set([...botHtml.matchAll(/id="([\w-]+)"/g)].map((m) => m[1]));
+  const appJs = read(path.join(dir, 'app.js'));
+  const usedIds = new Set([...appJs.matchAll(/\$\('#([\w-]+)'\)/g)].map((m) => m[1]));
+  const missingIds = [...usedIds].filter((i) => !idsInHtml.has(i));
+  ok(missingIds.length === 0, `عناصر صفحة الروبوت التي يستخدمها السكربت موجودة${missingIds.length ? ' — ناقص: ' + missingIds.join('، ') : ''}`);
+  const wantedSections = ['poses', 'lab', 'faces', 'voice', 'embed'];
+  const missingSections = wantedSections.filter((x) => !idsInHtml.has(x));
+  ok(missingSections.length === 0, `أقسام الصفحة (أوضاع · مختبر · تعبيرات · صوت · دمج)${missingSections.length ? ' — ناقص: ' + missingSections.join('، ') : ''}`);
+
+  // ملفات الصفحة المحلية موجودة + لا روابط خارجية
+  const botAssets = [...botHtml.matchAll(/(?:href|src)="([^"#:]+)"/g)].map((m) => m[1]).filter((x) => !x.startsWith('http'));
+  const botMissing = botAssets.filter((rel) => !exists(path.join(dir, rel)) && !exists(path.join(PUBLIC, rel)));
+  ok(botMissing.length === 0, `كل ملفات صفحة الروبوت موجودة${botMissing.length ? ' — ناقص: ' + botMissing.join('، ') : ''}`);
+  ok(!/href="https?:\/\//.test(botHtml), 'صفحة الروبوت بلا روابط خارجية');
+
+  // الصفحة الرئيسية تعرض الروبوت وتشير إلى صفحته
+  const html = read(path.join(PUBLIC, 'index.html'));
+  ok(/href="bot\/index\.html"/.test(html), 'الصفحة الرئيسية فيها رابط إلى صفحة الروبوت');
+  ok(/bot\/bot\.css/.test(html) && /bot\/bot-engine\.js/.test(html), 'الصفحة الرئيسية تحمّل أنماط الروبوت ومحرّكه');
+  ok(/href="bot\.css"/.test(botHtml) && /href="style\.css"/.test(botHtml), 'صفحة الروبوت تحمّل أنماط الشخصية وأنماط الصفحة');
+  ok(!/@import/.test(read(path.join(PUBLIC, 'style.css'))), 'لا استيراد CSS بمسار خاطئ في أنماط الصفحة الرئيسية');
+  ok(!/\/bot\/style\.css/.test(botHtml), 'كود الدمج يوجّه إلى ملف أنماط الشخصية الصحيح (bot.css)');
+  ok(/data-zynq-buddy/.test(html), 'الرفيق العائم موجود في الصفحة الرئيسية');
+  ok(/id="bot-feature-live"/.test(html) && /home-bot\.js/.test(html), 'قسم الشخصية الحيّ موصول بسكربت الصفحة');
+  const homeIds = new Set([...html.matchAll(/id="([\w-]+)"/g)].map((m) => m[1]));
+  const homeBotJs = read(path.join(dir, 'home-bot.js'));
+  const homeUsed = new Set([...homeBotJs.matchAll(/getElementById\('([\w-]+)'\)/g)].map((m) => m[1]));
+  const homeMissing = [...homeUsed].filter((i) => !homeIds.has(i));
+  ok(homeMissing.length === 0, `عناصر الصفحة الرئيسية التي يستخدمها سكربت الروبوت موجودة${homeMissing.length ? ' — ناقص: ' + homeMissing.join('، ') : ''}`);
+
+  // إتاحة وأداء
+  ok(/prefers-reduced-motion/.test(botCss), 'الروبوت يحترم تقليل الحركة');
+  ok(/aria-label="ZYNQ BOT/.test(one), 'الرسم له وصف نصّي (aria-label)');
+  ok(/IntersectionObserver/.test(appJs), 'الحركات تُشغَّل عند ظهور القسم فقط');
+  ok(/animation-play-state:\s*paused/.test(botCss), 'بطاقات المعرض توقف الحركة حتى المرور (أداء الهاتف)');
+}
+
 // ------------------------------------------------------- 4) الخادم والمسارات
 function fetchPath(port, p, method = 'GET') {
   return new Promise((resolve) => {
@@ -307,6 +437,8 @@ async function checkServer(catalog) {
         '/stereo/', '/stereo/index.html', '/stereo/app.js', '/stereo/style.css',
         '/stereo/sw.js', '/stereo/manifest.webmanifest',
         '/stereo/icons/icon-192.png', '/stereo/icons/icon-512.png', '/stereo/icons/maskable-512.png',
+        '/bot/', '/bot/index.html', '/bot/bot-engine.js', '/bot/app.js', '/bot/style.css', '/bot/bot.css',
+        '/bot/buddy.js', '/bot/home-bot.js',
       ];
       // كل ملف أصل + باقة لكل تصنيف
       for (const it of catalog.items) pages.push('/' + it.file);
@@ -404,6 +536,7 @@ async function checkServer(catalog) {
   const catalog = checkCatalog();
   checkFrontend();
   checkAndroidProject();
+  checkBot();
   await checkServer(catalog);
 
   console.log('\n' + '═'.repeat(62));
