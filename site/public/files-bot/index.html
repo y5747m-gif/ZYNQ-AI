@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مساعد الملفات — الروبوت الآلي لـ ZYNQ FX</title>
+<meta name="description" content="مساعد آلي يتكلم العربية يساعدك في الوصول إلى 100 ملف متنوّع وتحميلها بسهولة — كل الملفات عاملة وجاهزة للتنزيل.">
+<link rel="icon" type="image/svg+xml" href="../logo.svg">
+<link rel="stylesheet" href="../bot/bot.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============================== الشريط ============================== -->
+<header class="top">
+  <div class="container top-in">
+    <a class="brand" href="index.html">
+      <span class="brand-bot" id="brand-bot" aria-hidden="true"></span>
+      <span>ZYNQ <em>مساعد الملفات</em></span>
+    </a>
+    <nav class="top-links" aria-label="التنقل">
+      <a href="../index.html">ZYNQ FX</a>
+      <a href="../bot/index.html">مختبر الروبوت 🤖</a>
+      <a href="#" class="is-active">مساعد الملفات 📁</a>
+    </nav>
+    <div class="top-tools">
+      <button class="icon-btn" id="btn-mute" type="button" aria-pressed="false" aria-label="كتم الصوت" title="كتم/تشغيل الصوت">🔊</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- =============================== الهيرو =============================== -->
+  <section class="hero">
+    <div class="container hero-in">
+      <div class="hero-copy">
+        <span class="eyebrow">مساعدك الآلي يتكلم العربية</span>
+        <h1>المساعد الآلي <span class="grad">ZYNQ BOT</span> يساعدك في الوصول لملفاتك</h1>
+        <p>
+          الروبوت يرافقك في صفحة الملفات، يتحدث <b>بالعربية</b>، ويقرأ أسماء الملفات،
+          ويُنبهك عند بدء التحميل. عندك <b>100 ملف</b> متنوّع — صور، صوت، نصوص، بيانات،
+          أكواد، وصفحات ويب — وكلها عاملة وجاهزة للتنزيل المباشر.
+        </p>
+        <div class="hero-cta">
+          <button class="btn btn-primary" type="button" id="hero-hit">👋 حيّني المساعد</button>
+          <a class="btn btn-ghost" href="#files">ابدأ تصفح الملفات</a>
+        </div>
+        <ul class="hero-badges">
+          <li><b>100</b> ملفًا عاملاً</li>
+          <li><b>14</b> تصنيفًا متنوعًا</li>
+          <li><b>اللغة العربية</b> أصلًا</li>
+          <li>تحميل مباشر بلا إنترنت خارجي</li>
+        </ul>
+      </div>
+
+      <div class="hero-stage">
+        <div class="speech" id="hero-speech" hidden></div>
+        <button class="hero-bot" id="hero-bot" type="button" aria-label="شغّل صوت المساعد" style="border:0;background:none;padding:0;cursor:pointer"></button>
+        <div class="hero-bot-hint">اضغط على المساعد ليُحييك ويتحدث بالعربية</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ribbon" aria-hidden="true">
+    <div class="ribbon-track">
+      <span>100 FILE</span><span>ALL WORKING</span><span>عربي</span><span>تحميل مباشر</span>
+      <span>صور · صوت · نصوص · بيانات · أكواد</span><span>ZYNQ BOT ⚡</span>
+      <span>100 FILE</span><span>ALL WORKING</span><span>عربي</span><span>تحميل مباشر</span>
+      <span>صور · صوت · نصوص · بيانات · أكواد</span><span>ZYNQ BOT ⚡</span>
+    </div>
+  </div>
+
+  <!-- ================================ الملفات ================================ -->
+  <section class="section" id="files">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">مكتبة الملفات</span>
+        <h2>ابحث في <span class="grad">الملفات</span> وحمّل ما تحتاجه</h2>
+        <p>اكتب اسم الملف أو اختر تصنيفًا — المساعد يقرأ 결과 البحث بالعربية.</p>
+      </div>
+
+      <div class="controls reveal">
+        <div class="search-wrap">
+          <label class="field"><span aria-hidden="true">🔍</span>
+            <input id="search" type="text" placeholder="ابحث عن ملف بالArabic أو English…">
+          </label>
+        </div>
+        <div class="chips-wrap" id="chips"></div>
+        <div class="count" id="result-count">عرض كل الملفات (100)</div>
+      </div>
+
+      <div class="files-grid" id="files-grid"></div>
+    </div>
+  </section>
+
+  <!-- ================================ كيف يعمل ================================ -->
+  <section class="section how">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">كيف يساعدك الروبوت</span>
+        <h2>ثلاث خطوات فقط</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <span class="num">1</span>
+          <h4>ابحث أو صنّف</h4>
+          <p>اكتب اسم الملف في البحث، أو اضغط على تصنيف لعرض ملفاته فقط.</p>
+        </div>
+        <div class="step reveal">
+          <span class="num">2</span>
+          <h4>استمع للمساعد</h4>
+          <p>يقرّرك المساعد عدد النتائج بالعربية، ويُرشدك عند فتح أي ملف.</p>
+        </div>
+        <div class="step reveal">
+          <span class="num">3</span>
+          <h4>حمّل الملف</h4>
+          <p>اضغط «تحميل» على أي بطاقة — الملف يُنزَّل مباشرة إلى جهازك، والمساعد يعلن عن اكتمال البدء.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="container foot-in">
+    <p>ZYNQ FX — مساعد الملفات الآلي © 2026 — الروبوت يتكلم العربية وجميع الملفات عاملة ✓</p>
+    <div class="foot-links">
+      <a href="../index.html">ZYNQ FX</a>
+      <a href="../bot/index.html">مختبر الروبوت</a>
+      <a href="#files">الملفات</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../bot/bot-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
